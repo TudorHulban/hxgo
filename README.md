@@ -93,7 +93,7 @@ Simple deployment model with static assets optional.
 Predictable lifecycle driven by server responses.   
 Full control over rendering and state transitions.
 
-### D. Zero JavaScript
+### D. Zero Custom JavaScript
 
 hxgo removes the need for handwritten JavaScript, npm tooling, or browser‑side frameworks.
 
@@ -149,17 +149,92 @@ go get github.com/TudorHulban/hxgo
 
 ## 6. Core Concepts
 
+hxgo is built on a small set of composable primitives. These primitives form the foundation of the language and define how UI structure, behavior, and composition are expressed in typed Go.
+
 ### Nodes
+
+A Node is the fundamental unit of hxgo. Every piece of UI — elements, text, attributes, widgets — ultimately resolves to a Node. Nodes form a tree that mirrors the structure of the resulting HTML.
+
+Unified representation: all UI constructs reduce to a Node.  
+Tree‑structured output: Nodes compose into hierarchical HTML.  
+Pure values: Nodes contain no side effects or rendering logic.  
+Render‑ready: Nodes serialize deterministically into HTML.  
+Nodes are the “atoms” of the language.
+
+A Node becomes HTML through a simple, predictable process:
+
+1. The Node exposes a render method that serializes its structure into a stable HTML representation.  
+2. Composite Nodes recursively render their children, producing a hierarchical output.  
+3. Attributes are rendered in a fixed order to ensure deterministic output.  
+
+The final result is a byte slice or string containing valid HTML, ready to be sent to the client.  
+This rendering model ensures that UI generation is pure, testable, and free from side effects.
 
 ### Elements
 
+An Element is a Node that represents a HTML tag. Elements contain:
+
+- a tag name
+- zero or more attributes
+- zero or more child nodes
+
+Elements are constructed through typed functions such as Div(), Span(), Button(), and so on.  
+Typed constructors: each HTML tag maps to a Go function.  
+Structured children: Elements contain other Nodes.  
+Deterministic rendering: output HTML is predictable.  
+No string concatenation: structure is encoded, not assembled.
+
+Elements define the structural skeleton of the UI.
+
 ### Attributes
+
+An Attribute is a typed value representing a HTML attribute. Attributes attach metadata or behavior to Elements. Unlike string‑based HTML, hxgo ensures attributes are well‑formed and type‑checked.
+
+Typed attribute values: no free‑form strings.  
+Compile‑time safety: invalid attributes cannot be constructed.  
+Consistent semantics: attributes behave uniformly across components.  
+Composable sets: attributes can be grouped and reused.  
+Attributes define the configuration of an Element.
 
 ### Behavior controls (hx-*)
 
+Behavior controls represent hypermedia interactions such as `hx-get` or `hx-post`. In hxgo, these are expressed as typed constructs rather than raw strings.
+
+Typed hypermedia controls: no malformed hx‑attributes.  
+Declarative behavior: interactions encoded directly in markup.  
+Server‑driven updates: behavior defined on the server.  
+Predictable semantics: consistent across all components.  
+Behavior controls define how the UI interacts with the server.
+
 ### Widgets
 
+A Widget is a reusable, composable function that returns a Node. Widgets encapsulate structure, attributes, and behavior into a single unit that can be reused across the application.
+
+Pure functions: widgets take data and return Nodes.  
+Encapsulated behavior: structure and hx‑controls bundled together.  
+Reusable components: composable across the UI.  
+No templates: all logic expressed in typed Go.  
+
+Widgets are the building blocks of higher‑level UI composition.
+
 ### Server handlers
+
+A server handler is the bridge between hxgo’s typed UI and the application’s backend logic. Handlers receive HTTP requests, perform domain‑specific work by callng domain services, and return Nodes that hxgo renders into HTML fragments. These fragments are then swapped into the client’s DOM by HTMX’s minimal vanilla JavaScript runtime.
+
+Handlers define how the server responds to hypermedia interactions, and they form the execution boundary between UI construction and application logic.
+
+A handler performs the following responsibilities:
+
+1. Accepts an HTTP request: receives form data, query parameters, or event triggers.
+2. Executes validations and delegates domain logic: calls domain services to perform updates, queries, or computations when the interaction requires domain behavior.
+3. Coordinates with the presentation layer:
+
+    - for purely presentational pages (for example, a landing or login page), the handler can invoke the presentation layer directly to obtain a Node,
+    - for domain‑driven interactions, the handler passes the resulting domain objects to the presentation layer, where they are injected into widget functions and transformed into a Node.
+
+4. Renders the Node into HTML and writes the response: the Node is rendered into HTML and sent back to the client.
+
+This model keeps the UI and backend unified in a single language and eliminates the need for JSON APIs, DTOs, or client‑side state machines.
 
 ## 7. HTML DSL
 
