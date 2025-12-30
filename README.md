@@ -1,6 +1,6 @@
 # hxgo
 
-Typed, server-side hypermedia DSL that compiles to HTMX-compatible HTML
+Typed, server-side hypermedia domain specific language (DSL) that compiles to HTMX-compatible HTML
 
 ## 1. Introduction
 
