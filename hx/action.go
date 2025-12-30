@@ -4,7 +4,7 @@ import (
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
-type HXAction struct {
+type Action struct {
 	Method                   string // if not provided will switch to new tab.
 	Endpoint                 string
 	CSSIDValidationDisable   string
@@ -26,14 +26,14 @@ type HXAction struct {
 	LengthMin uint16
 }
 
-func (hx HXAction) HavePasswordsValues() bool {
-	return len(hx.CSSIDValidationPasswords[0]) > 0 && len(hx.CSSIDValidationPasswords[1]) > 0 && len(hx.CSSIDValidationPasswords[2]) > 0
+func (a Action) HavePasswordsValues() bool {
+	return len(a.CSSIDValidationPasswords[0]) > 0 && len(a.CSSIDValidationPasswords[1]) > 0 && len(a.CSSIDValidationPasswords[2]) > 0
 }
 
-func (hx HXAction) PasswordsIDsSanitized() string {
-	return helpers.SanitizeCSSId(hx.CSSIDValidationPasswords[0]) +
+func (a Action) PasswordsIDsSanitized() string {
+	return helpers.SanitizeCSSId(a.CSSIDValidationPasswords[0]) +
 		`,` +
-		helpers.SanitizeCSSId(hx.CSSIDValidationPasswords[1]) +
+		helpers.SanitizeCSSId(a.CSSIDValidationPasswords[1]) +
 		`,` +
-		helpers.SanitizeCSSId(hx.CSSIDValidationPasswords[2])
+		helpers.SanitizeCSSId(a.CSSIDValidationPasswords[2])
 }

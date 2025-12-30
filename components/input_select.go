@@ -20,7 +20,8 @@ type InputSelect struct {
 
 	SelectedValue string
 	SelectValues  []string
-	HX            hx.HXAction
+
+	Action hx.Action
 
 	WithEmptyOption bool
 	IsDisabled      bool
@@ -85,45 +86,45 @@ func (el InputSelect) selectAttributes() string {
 
 	sb.WriteString(
 		helpers.Ternary(
-			len(el.HX.Method) > 0,
+			len(el.Action.Method) > 0,
 
-			el.HX.Method+`="`+el.HX.Endpoint+`"`+" ",
+			el.Action.Method+`="`+el.Action.Endpoint+`"`+" ",
 			"",
 		),
 	)
 
 	sb.WriteString(
 		helpers.Ternary(
-			len(el.HX.Swaps) > 0,
+			len(el.Action.Swaps) > 0,
 
-			hx.HXSwap+`="`+helpers.SanitizeCSSIds(el.HX.Swaps)+`"`+" ",
+			hx.HXSwap+`="`+helpers.SanitizeCSSIds(el.Action.Swaps)+`"`+" ",
 			"",
 		),
 	)
 
 	sb.WriteString(
 		helpers.Ternary(
-			len(el.HX.Sends) > 0,
+			len(el.Action.Sends) > 0,
 
-			hx.HXSend+`="`+helpers.SanitizeCSSIds(el.HX.Sends)+`"`+" ",
+			hx.HXSend+`="`+helpers.SanitizeCSSIds(el.Action.Sends)+`"`+" ",
 			"",
 		),
 	)
 
 	sb.WriteString(
 		helpers.Ternary(
-			len(el.HX.Require) > 0,
+			len(el.Action.Require) > 0,
 
-			hx.HXRequire+`="`+helpers.SanitizeCSSIds(el.HX.Require)+`"`+" ",
+			hx.HXRequire+`="`+helpers.SanitizeCSSIds(el.Action.Require)+`"`+" ",
 			"",
 		),
 	)
 
 	sb.WriteString(
 		helpers.Ternary(
-			len(el.HX.OnChangeEnable) > 0,
+			len(el.Action.OnChangeEnable) > 0,
 
-			hx.HXOnChangeEnable+`="`+helpers.SanitizeCSSIds(el.HX.OnChangeEnable)+`"`+" ",
+			hx.HXOnChangeEnable+`="`+helpers.SanitizeCSSIds(el.Action.OnChangeEnable)+`"`+" ",
 			"",
 		),
 	)

@@ -1,9 +1,8 @@
 package components
 
 import (
-	"fmt"
-
 	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 )
 
 type ParamsButtonSubmit struct {
@@ -66,7 +65,7 @@ func ButtonSubmit(params *ParamsButtonSubmit) dsl.Writer {
 			params.IsNewTab,
 
 			dsl.OnClick(
-				fmt.Sprintf(
+				helpers.Sprintf(
 					`window.open('%s','_blank')`,
 					params.HXActionEndpoint,
 				),

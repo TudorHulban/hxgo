@@ -14,7 +14,7 @@ func TestElementSelectInput(t *testing.T) {
 		CSSInputID:       "id-input",
 		LabelElementName: "label",
 
-		HX: hx.HXAction{
+		Action: hx.Action{
 			Swaps: []string{
 				"id1",
 			},
@@ -44,7 +44,7 @@ func TestEmptyElementSelectInput(t *testing.T) {
 		CSSInputID:       "id-input",
 		LabelElementName: "label",
 
-		HX: hx.HXAction{
+		Action: hx.Action{
 			Sends: []string{
 				"id1",
 			},
@@ -68,7 +68,7 @@ func TestOnChangeSelectInput(t *testing.T) {
 		CSSInputID:       "id-input",
 		LabelElementName: "label",
 
-		HX: hx.HXAction{
+		Action: hx.Action{
 			OnChangeEnable: []string{
 				"id1",
 			},
