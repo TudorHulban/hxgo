@@ -20,9 +20,9 @@ func Body(children ...Node) Writer {
 
 func Doctype(node Node) Writer {
 	return Writer(
-		func(w io.Writer) error {
+		func(w io.Writer) ([]Style, error) {
 			if _, errWrite := w.Write([]byte("<!doctype html>")); errWrite != nil {
-				return errWrite
+				return nil, errWrite
 			}
 
 			return node.Render(w)

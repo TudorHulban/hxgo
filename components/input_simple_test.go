@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
@@ -32,11 +33,15 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 			Render(os.Stdout),
 	)
 
-	expectedOutput := fmt.Sprintf(`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`, el.LabelElementName)
+	expectedOutput := helpers.Sprintf(
+		`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`,
+		el.LabelElementName,
+	)
 
 	var buf bytes.Buffer
-	err := el.Raw().Render(&buf)
+	styles, err := el.Raw().Render(&buf)
 	require.NoError(t, err, "render error")
+	require.Zero(t, styles)
 
 	actualOutput := buf.String()
 	require.Equal(t, expectedOutput, actualOutput, "unexpected output")

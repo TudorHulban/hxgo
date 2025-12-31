@@ -1,13 +1,15 @@
 package dsl
 
-import "io"
+import (
+	"io"
+)
 
-type Writer func(io.Writer) error
+type Writer func(io.Writer) ([]Style, error)
 
-func (wHX Writer) isAttribute() bool {
+func (w Writer) isAttribute() bool {
 	return false
 }
 
-func (wHX Writer) Render(w io.Writer) error {
-	return wHX(w)
+func (w Writer) Render(wr io.Writer) ([]Style, error) {
+	return w(wr)
 }

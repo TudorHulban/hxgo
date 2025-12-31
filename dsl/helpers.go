@@ -6,22 +6,22 @@ import (
 )
 
 func Text(text string) Writer {
-	return func(w io.Writer) error {
+	return func(w io.Writer) ([]Style, error) {
 		_, errWrite := w.Write(
 			[]byte(template.HTMLEscapeString(text)),
 		)
 
-		return errWrite
+		return nil, errWrite
 	}
 }
 
 func Raw(text string) Writer {
-	return func(w io.Writer) error {
+	return func(w io.Writer) ([]Style, error) {
 		_, errWrite := w.Write(
 			[]byte(text),
 		)
 
-		return errWrite
+		return nil, errWrite
 	}
 }
 
