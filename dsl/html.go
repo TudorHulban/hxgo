@@ -1,6 +1,6 @@
 package dsl
 
-func A(children ...Node) Node {
+func A(children ...Node) Writer {
 	return El(
 		"a",
 		children...,

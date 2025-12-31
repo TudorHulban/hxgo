@@ -153,12 +153,12 @@ hxgo is built on a small set of composable primitives. These primitives form the
 
 ### Nodes
 
-A Node is the fundamental unit of hxgo. Every piece of UI — elements, text, attributes, widgets — ultimately resolves to a Node. Nodes form a tree that mirrors the structure of the resulting HTML.
+A Node is the fundamental unit of hxgo. Every piece of UI — elements, text, attributes, CSS, widgets — ultimately resolves to a Node. Nodes form a tree that mirrors the structure of the resulting HTML.
 
 Unified representation: all UI constructs reduce to a Node.  
 Tree‑structured output: Nodes compose into hierarchical HTML.  
 Pure values: Nodes contain no side effects or rendering logic.  
-Render‑ready: Nodes serialize deterministically into HTML.  
+Render‑ready: Nodes serialize deterministically into HTML or CSS.  
 Nodes are the “atoms” of the language.
 
 A Node becomes HTML through a simple, predictable process:
@@ -167,7 +167,9 @@ A Node becomes HTML through a simple, predictable process:
 2. Composite Nodes recursively render their children, producing a hierarchical output.  
 3. Attributes are rendered in a fixed order to ensure deterministic output.  
 
-The final result is a byte slice or string containing valid HTML, ready to be sent to the client.  
+During this process the components CSS is accumulated and consolidated.
+
+The final result is a byte slice or string containing valid HTML, ready to be sent to the client, together with the CSS the components need.  
 This rendering model ensures that UI generation is pure, testable, and free from side effects.
 
 ### Elements

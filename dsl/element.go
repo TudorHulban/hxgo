@@ -6,21 +6,18 @@ import (
 )
 
 func El(name string, nodes ...Node) Writer {
-	return func(w io.Writer) error {
+	return func(w io.Writer) ([]Style, error) {
 		return renderNodes(
 			w,
 
-			sql.NullString{
-				Valid:  true,
-				String: name,
-			},
+			sql.NullString{Valid: true, String: name},
 			nodes...,
 		)
 	}
 }
 
 func ElWId(name, cssID string, nodes ...Node) Writer {
-	return func(w io.Writer) error {
+	return func(w io.Writer) ([]Style, error) {
 		return renderNodesWithCSSId(
 			w,
 
