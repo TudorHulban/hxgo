@@ -68,22 +68,22 @@ func NewFormThreeContainers(params *ParamsNewFormThreeContainers) dsl.Node {
 						[]dsl.Node{
 							dsl.AttrID(params.IDContainersDiv),
 
-							RenderFormContainer(
-								&ParamsRenderFormContainer{
+							dsl.ContainerDiv(
+								&dsl.ParamsContainerDiv{
 									IDContainer: params.IDContainerLeft,
 									Elements:    params.ElementsInputLeft,
 								},
 							),
 
-							RenderFormContainer(
-								&ParamsRenderFormContainer{
+							dsl.ContainerDiv(
+								&dsl.ParamsContainerDiv{
 									IDContainer: params.IDContainerMiddle,
 									Elements:    params.ElementsInputMiddle,
 								},
 							),
 
-							RenderFormContainer(
-								&ParamsRenderFormContainer{
+							dsl.ContainerDiv(
+								&dsl.ParamsContainerDiv{
 									IDContainer: params.IDContainerRight,
 									Elements:    params.ElementsInputRight,
 								},
