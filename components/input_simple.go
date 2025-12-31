@@ -55,7 +55,7 @@ func (el InputSimple) tagInput(toLowerElementName string) string {
 			attributes = append(
 				attributes,
 				helpers.Sprintf(
-					`%s="%s"`,
+					`%s=%s`,
 
 					hx.HXMax,
 					string(buf),
