@@ -3,13 +3,13 @@ package request_test
 import (
 	"testing"
 
-	hxrequest "github.com/TudorHulban/hx-request"
+	"github.com/TudorHulban/hxgo/request"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRequest(t *testing.T) {
-	formData, errParse := hxrequest.NewRequestData(
-		&hxrequest.ParamsNewRequestData{
+	formData, errParse := request.NewRequestData(
+		&request.ParamsNewRequestData{
 			BodyRaw:        []byte{},
 			RequestHeaders: map[string][]string{},
 		},
