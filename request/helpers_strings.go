@@ -45,6 +45,8 @@ func getNumberFromParentheses(text string) (int64, error) {
 		}
 }
 
+// Use TRUE or FALSE for fastest match.
+// See benchmark.
 func parseBool(value string) (bool, error) {
 	switch value {
 	case "1", "t", "T", "true", "TRUE", "True", "yes":
