@@ -64,6 +64,21 @@ No JS bundling or transpilation.
 No hydration step.  
 Minimal client runtime.
 
+E. Single‑frame CSS delivery via data URLs  
+Embedding component‑scoped CSS directly into the HTML response using data:text/css;base64 URLs eliminates an entire network round‑trip and removes the need for external stylesheet management. Because both the HTML fragment and its associated CSS typically fit comfortably within a ~15 KB TCP/IP frame, the browser receives everything it needs to render the component in a single packet, without waiting for additional resources.
+
+No external stylesheet fetch: CSS arrives inline with the HTML, eliminating render‑blocking requests.
+
+Single‑frame delivery: HTML + base64‑encoded CSS often fit within one TCP frame, minimizing latency.
+
+Deterministic styling: Each component carries its own isolated CSS, avoiding global leakage and cascade conflicts.
+
+No asset pipeline: No bundling, no minification, no cache invalidation, no file management.
+
+Immediate paint: The browser can render the component as soon as the first response arrives.
+
+This approach restores hypermedia’s original strength: a complete, self‑contained document delivered atomically, without auxiliary resources or client‑side orchestration.
+
 ## 3. Key Features
 
 ### A. Typed HTML DSL

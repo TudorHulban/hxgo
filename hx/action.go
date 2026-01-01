@@ -4,6 +4,9 @@ import (
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
+// TODO: move method to HXMethod.
+type HXMethod string
+
 type Action struct {
 	Method                   string // if not provided will switch to new tab.
 	Endpoint                 string

@@ -2,6 +2,9 @@ package dsl
 
 import (
 	"bytes"
+	"encoding/base64"
+
+	"github.com/TudorHulban/hxgo/helpers"
 )
 
 func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
@@ -25,4 +28,13 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
 	}
 
 	return htmlBuf.Bytes(), collector.String(), nil
+}
+
+func HTMLwithDataCSS(html []byte, css string) string {
+	return helpers.Sprintf(
+		`<html><head><link rel="stylesheet" href="data:text/css;base64,%s"></head><body>%s</body></html>`,
+
+		base64.StdEncoding.EncodeToString([]byte(css)),
+		string(html),
+	)
 }
