@@ -6,10 +6,11 @@ import (
 )
 
 func renderNodes(w io.Writer, elName sql.NullString, nodes ...Node) ([]Style, error) {
-	var collected []Style
+	var collected []Style // no allocation if no styke nodes. grow is a trade-off.
 
 	if elName.Valid {
-		_, _ = w.Write([]byte("<" + elName.String))
+		_, _ = io.WriteString(w, "<")
+		_, _ = io.WriteString(w, elName.String)
 
 		// Render attributes
 		for _, node := range nodes {
@@ -45,7 +46,10 @@ func renderNodes(w io.Writer, elName sql.NullString, nodes ...Node) ([]Style, er
 	}
 
 	if elName.Valid && !isTagless(elName.String) {
-		_, _ = w.Write([]byte("</" + elName.String + ">"))
+		_, _ = io.WriteString(w, "</")
+		_, _ = io.WriteString(w, elName.String)
+		_, _ = io.WriteString(w, ">")
+
 	}
 
 	return collected, nil
