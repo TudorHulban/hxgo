@@ -2,7 +2,6 @@ package components
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"testing"
 
@@ -27,12 +26,9 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 	// <div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
 	// <input type="text"  name="label" hx-max=50></div>
 
-	fnIsAttribute, fnRender := el.Raw()(os.Stdout)
-	require.False(t, fnIsAttribute())
-
-	fmt.Println(
-		fnRender(os.Stdout),
-	)
+	isAttribute, _, errRaw := el.Raw()(os.Stdout)
+	require.NoError(t, errRaw)
+	require.False(t, isAttribute)
 
 	expectedOutput := helpers.Sprintf(
 		`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`,
@@ -40,7 +36,7 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 	)
 
 	var buf bytes.Buffer
-	styles, err := fnRender(&buf)
+	_, styles, err := el.Raw()(&buf)
 	require.NoError(t, err, "render error")
 	require.Zero(t, styles)
 

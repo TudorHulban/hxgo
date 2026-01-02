@@ -1,124 +1,155 @@
 package dsl
 
 import (
+	"bytes"
 	"io"
 )
 
 // Empty nodes still emit tags because the renderer treats
 // the element itself as meaningful, not just its children.
+// func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
+// 	var styles []Style
+
+// 	// Buffers
+// 	var attrsBuf bytes.Buffer
+// 	var childrenBuf bytes.Buffer
+
+// 	// First pass: call each node ONCE
+// 	for _, node := range nodes {
+// 		if node == nil {
+// 			continue
+// 		}
+
+// 		// Each node writes into its own temp buffer
+// 		var tmp bytes.Buffer
+// 		isAttr, st, err := node(&tmp)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+
+// 		if isAttr {
+// 			// attribute → write into attrs buffer
+// 			attrsBuf.Write(tmp.Bytes())
+// 		} else {
+// 			// child → write into children buffer
+// 			childrenBuf.Write(tmp.Bytes())
+// 		}
+
+// 		// collect styles
+// 		styles = append(styles, st...)
+// 	}
+
+// 	// Now write final HTML
+// 	io.WriteString(w, "<")
+// 	io.WriteString(w, elName)
+// 	w.Write(attrsBuf.Bytes())
+// 	io.WriteString(w, ">")
+// 	w.Write(childrenBuf.Bytes())
+// 	io.WriteString(w, "</")
+// 	io.WriteString(w, elName)
+// 	io.WriteString(w, ">")
+
+// 	return styles, nil
+// }
+
 func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
-	var collected []Style
+	var styles []Style
+	var nodeBuf bytes.Buffer
 
-	_, _ = io.WriteString(w, "<")
-	_, _ = io.WriteString(w, elName)
-
-	// First pass: attributes + buffering children
-	type child struct {
-		render Render
+	// Collect output with type info in one pass
+	type nodeOutput struct {
+		data   []byte
+		isAttr bool
 	}
-	var children []child
+	outputs := make([]nodeOutput, 0, len(nodes))
 
 	for _, node := range nodes {
 		if node == nil {
 			continue
 		}
 
-		isAttrFn, renderFn := node(w)
-
-		if isAttrFn() {
-			// Attribute: render immediately
-			if _, err := renderFn(w); err != nil {
-				return nil, err
-			}
-
-			continue
-		}
-
-		// Child: store for later
-		children = append(children, child{render: renderFn})
-	}
-
-	_, _ = io.WriteString(w, ">")
-
-	if isTagless(elName) {
-		return collected, nil
-	}
-
-	// Second phase: render children (but NOT calling node again)
-	for _, c := range children {
-		styles, err := c.render(w)
+		nodeBuf.Reset()
+		isAttr, st, err := node(&nodeBuf)
 		if err != nil {
 			return nil, err
 		}
 
-		collected = append(collected, styles...)
+		// Copy bytes once
+		data := make([]byte, nodeBuf.Len())
+		copy(data, nodeBuf.Bytes())
+		outputs = append(outputs, nodeOutput{data, isAttr})
+
+		styles = append(styles, st...)
 	}
 
-	_, _ = io.WriteString(w, "</")
-	_, _ = io.WriteString(w, elName)
-	_, _ = io.WriteString(w, ">")
+	// Write final HTML
+	io.WriteString(w, "<")
+	io.WriteString(w, elName)
 
-	return collected, nil
+	for _, out := range outputs {
+		if out.isAttr {
+			w.Write(out.data)
+		}
+	}
+
+	io.WriteString(w, ">")
+
+	for _, out := range outputs {
+		if !out.isAttr {
+			w.Write(out.data)
+		}
+	}
+
+	io.WriteString(w, "</")
+	io.WriteString(w, elName)
+	io.WriteString(w, ">")
+
+	return styles, nil
 }
 
 func renderNodesWithCSSId(w io.Writer, elName, cssID string, nodes ...Node) ([]Style, error) {
-	var collected []Style
+	var styles []Style
 
-	_, _ = io.WriteString(w, "<")
-	_, _ = io.WriteString(w, elName)
+	// Buffers
+	var attrsBuf bytes.Buffer
+	var childrenBuf bytes.Buffer
 
-	isAttrFn, renderFn := AttrIDLength(cssID)(w)
-	if isAttrFn() {
-		if _, err := renderFn(w); err != nil {
-			return nil, err
-		}
-	}
-
-	// First pass: attributes + buffering children
-	type child struct {
-		render Render
-	}
-	var children []child
-
+	// First pass: call each node ONCE
 	for _, node := range nodes {
 		if node == nil {
 			continue
 		}
 
-		isAttrFn, renderFn := node(w)
-
-		if isAttrFn() {
-			// Attribute: render immediately
-			if _, err := renderFn(w); err != nil {
-				return nil, err
-			}
-
-			continue
-		}
-
-		// Child: store for later
-		children = append(children, child{render: renderFn})
-	}
-
-	_, _ = io.WriteString(w, ">")
-
-	if isTagless(elName) {
-		return collected, nil
-	}
-
-	// Second phase: render children (but NOT calling node again)
-	for _, c := range children {
-		styles, err := c.render(w)
+		// Each node writes into its own temp buffer
+		var tmp bytes.Buffer
+		isAttr, st, err := node(&tmp)
 		if err != nil {
 			return nil, err
 		}
 
-		collected = append(collected, styles...)
+		if isAttr {
+			// attribute → write into attrs buffer
+			attrsBuf.Write(tmp.Bytes())
+		} else {
+			// child → write into children buffer
+			childrenBuf.Write(tmp.Bytes())
+		}
+
+		// collect styles
+		styles = append(styles, st...)
 	}
 
-	_, _ = io.WriteString(w, "</")
-	_, _ = io.WriteString(w, elName)
-	_, _ = io.WriteString(w, ">")
+	// Now write final HTML
+	AttrIDLength(cssID)(w)
 
-	return collected, nil
+	io.WriteString(w, "<")
+	io.WriteString(w, elName)
+	w.Write(attrsBuf.Bytes())
+	io.WriteString(w, ">")
+	w.Write(childrenBuf.Bytes())
+	io.WriteString(w, "</")
+	io.WriteString(w, elName)
+	io.WriteString(w, ">")
+
+	return styles, nil
 }

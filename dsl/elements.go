@@ -19,20 +19,15 @@ func Body(children ...Node) Node {
 }
 
 func Doctype(node Node) Node {
-	return func(w io.Writer) (IsAttribute, Render) {
-		return func() bool {
-				return false // doctype is never an attribute
-			},
-			func(wr io.Writer) ([]Style, error) {
-				if _, err := wr.Write([]byte("<!doctype html>")); err != nil {
-					return nil, err
-				}
+	return func(w io.Writer) (bool, []Style, error) {
+		// Write the doctype
+		if _, err := w.Write([]byte("<!doctype html>")); err != nil {
+			return false, nil, err
+		}
 
-				// Now render the wrapped node
-				_, renderFn := node(wr)
-
-				return renderFn(wr)
-			}
+		// Render the wrapped node directly
+		_, styles, err := node(w)
+		return false, styles, err
 	}
 }
 

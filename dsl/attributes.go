@@ -6,20 +6,11 @@ import (
 )
 
 func AttrWithValue(name, value string) Node {
-	return func(w io.Writer) (IsAttribute, Render) {
-		return func() bool {
-				return true
-			},
-
-			func(wr io.Writer) ([]Style, error) {
-				_, err := wr.Write(
-					[]byte(
-						" " + name + `="` + template.HTMLEscapeString(value) + `"`,
-					),
-				)
-
-				return nil, err
-			}
+	return func(w io.Writer) (bool, []Style, error) {
+		_, err := w.Write([]byte(
+			" " + name + `="` + template.HTMLEscapeString(value) + `"`,
+		))
+		return true, nil, err
 	}
 }
 

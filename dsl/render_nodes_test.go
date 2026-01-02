@@ -9,14 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func benchNode(w io.Writer) (IsAttribute, Render) {
-	return func() bool {
-			return false
-		},
-		func(io.Writer) ([]Style, error) {
-			return nil,
-				errors.New("some error")
-		}
+func benchNode(w io.Writer) (bool, []Style, error) {
+	return false, nil, errors.New("some error")
 }
 
 // BenchmarkRenderNodes/0._error_input-16         	 4914921	       241.5 ns/op	     128 B/op	       3 allocs/op

@@ -30,11 +30,9 @@ func AssertNode(t *testing.T, node dsl.Node, expectedHTML string) {
 
 	var buf bytes.Buffer
 
-	// Evaluate the node ONCE
-	_, renderFn := node(&buf)
-
-	// Render HTML
-	if _, err := renderFn(&buf); err != nil {
+	// Evaluate the node ONCE (it writes directly into buf)
+	_, _, err := node(&buf)
+	if err != nil {
 		t.Fatalf("failed to render node: %v", err)
 	}
 

@@ -116,10 +116,7 @@ func BenchmarkButtonSubmit(b *testing.B) {
 		var buf bytes.Buffer
 
 		// Evaluate the node ONCE
-		_, renderFn := ButtonSubmit(params)(&buf)
-
-		// Render it
-		_, err := renderFn(&buf)
-		require.NoError(b, err)
+		_, _, errRender := ButtonSubmit(params)(&buf)
+		require.NoError(b, errRender)
 	}
 }

@@ -16,11 +16,8 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
 			continue
 		}
 
-		// Evaluate the node ONCE
-		_, renderFn := node(&htmlBuf)
-
-		// Render HTML and collect styles
-		styles, err := renderFn(&htmlBuf)
+		// Each node writes directly into htmlBuf
+		_, styles, err := node(&htmlBuf)
 		if err != nil {
 			return nil, "", err
 		}
