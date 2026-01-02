@@ -7,7 +7,7 @@ import (
 // Empty nodes still emit tags because the renderer treats
 // the element itself as meaningful, not just its children.
 func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
-	var collected []Style // no allocation if no styke nodes. grow is a trade-off.
+	var collected []Style // no allocation if no style nodes. slice growth is a trade-off.
 
 	_, _ = io.WriteString(w, "<")
 	_, _ = io.WriteString(w, elName)
@@ -17,7 +17,7 @@ func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
 		if node == nil || !node.isAttribute() {
 			continue
 		}
-		// Attributes don't return styles, just ignore them
+
 		if _, err := node.Render(w); err != nil {
 			return nil, err
 		}
@@ -59,12 +59,12 @@ func renderNodesWithCSSId(w io.Writer, elName, cssID string, nodes ...Node) ([]S
 
 	_, _ = AttrIDLength(cssID).Render(w) // introduces one allocation more than wo css ID
 
-	// Render attributes
+	// Render attributes.
 	for _, node := range nodes {
 		if node == nil || !node.isAttribute() {
 			continue
 		}
-		// Attributes don't return styles, just ignore them
+
 		if _, err := node.Render(w); err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func renderNodesWithCSSId(w io.Writer, elName, cssID string, nodes ...Node) ([]S
 		return collected, nil
 	}
 
-	// Render children and collect their styles in one pass
+	// Render children and collect their styles in one pass.
 	for _, node := range nodes {
 		if node == nil || node.isAttribute() {
 			continue

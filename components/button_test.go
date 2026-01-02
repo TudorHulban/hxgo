@@ -1,6 +1,7 @@
 package components
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"testing"
@@ -87,4 +88,36 @@ func TestButton(t *testing.T) {
 	)
 
 	http.ListenAndServe(":8080", nil)
+}
+
+// BenchmarkButtonSubmit-16    	  540169	      2178 ns/op	    1792 B/op	      43 allocs/op
+
+func BenchmarkButtonSubmit(b *testing.B) {
+	b.ReportAllocs()
+
+	params := &ParamsButtonSubmit{
+		CSSID:             "btn-submit",
+		CSSClass:          "btn primary",
+		Label:             "Submit",
+		HXActionType:      "hx-post",
+		HXActionEndpoint:  "/submit",
+		HXRedirectTo:      "/done",
+		HXSwapElements:    []string{"#content"},
+		HXRequireElements: []string{"#form"},
+		HXSendElements:    []string{"#input"},
+		HXEnableElements:  []string{"#ok"},
+		HXDisableElements: []string{"#no"},
+		IsHXUpload:        false,
+		IsDisabled:        false,
+		IsNewTab:          false,
+	}
+
+	b.ResetTimer()
+
+	for b.Loop() {
+		var buf bytes.Buffer
+
+		_, err := ButtonSubmit(params)(&buf)
+		require.NoError(b, err)
+	}
 }
