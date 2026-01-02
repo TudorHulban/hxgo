@@ -1,7 +1,6 @@
 package dsl
 
 import (
-	"database/sql"
 	"io"
 )
 
@@ -10,7 +9,7 @@ func El(name string, nodes ...Node) Writer {
 		return renderNodes(
 			w,
 
-			sql.NullString{Valid: true, String: name},
+			name,
 			nodes...,
 		)
 	}
