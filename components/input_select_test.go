@@ -1,7 +1,6 @@
 package components
 
 import (
-	"os"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/hx"
@@ -31,9 +30,8 @@ func TestElementSelectInput(t *testing.T) {
 	// <option value="b">b</option></select>
 	// </div>
 
-	isAttribute, _, errRaw := el.Raw()(os.Stdout)
-	require.NoError(t, errRaw)
-	require.False(t, isAttribute)
+	output := el.Raw()
+	require.False(t, output().IsAttr)
 }
 
 func TestEmptyElementSelectInput(t *testing.T) {
@@ -53,9 +51,8 @@ func TestEmptyElementSelectInput(t *testing.T) {
 	// <select id="id-input" name="label" hx-send="#id1" ></select>
 	// </div>
 
-	isAttribute, _, errRaw := el.Raw()(os.Stdout)
-	require.NoError(t, errRaw)
-	require.False(t, isAttribute)
+	output := el.Raw()
+	require.False(t, output().IsAttr)
 }
 
 func TestOnChangeSelectInput(t *testing.T) {
@@ -81,7 +78,6 @@ func TestOnChangeSelectInput(t *testing.T) {
 	// <option value="b">b</option></select>
 	// </div>
 
-	isAttribute, _, errRaw := el.Raw()(os.Stdout)
-	require.NoError(t, errRaw)
-	require.False(t, isAttribute)
+	output := el.Raw()
+	require.False(t, output().IsAttr)
 }

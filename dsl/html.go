@@ -14,6 +14,25 @@ func Aside(children ...Node) Node {
 	)
 }
 
+func Class(name string) Node {
+	return func() NodeOutput {
+		// space + class=" + name + "
+		size := 1 + len(`class="`) + len(name) + 1
+		html := make([]byte, 0, size)
+
+		html = append(html, ' ')
+		html = append(html, `class="`...)
+		html = append(html, name...)
+		html = append(html, '"')
+
+		return NodeOutput{
+			IsAttr: true,
+			HTML:   html,
+			Styles: nil,
+		}
+	}
+}
+
 func Div(children ...Node) Node {
 	return El(
 		"div",

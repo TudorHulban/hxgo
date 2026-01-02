@@ -1,23 +1,31 @@
 package dsl
 
 import (
-	"io"
 	"text/template"
 )
 
 func Text(text string) Node {
-	return func(w io.Writer) (bool, []Style, error) {
-		_, err := w.Write([]byte(
-			template.HTMLEscapeString(text),
-		))
-		return false, nil, err
+	return func() NodeOutput {
+		escaped := template.HTMLEscapeString(text)
+		html := []byte(escaped) // can be optimized to manual escape later
+
+		return NodeOutput{
+			IsAttr: false,
+			HTML:   html,
+			Styles: nil,
+		}
 	}
 }
 
 func Raw(text string) Node {
-	return func(w io.Writer) (bool, []Style, error) {
-		_, err := w.Write([]byte(text))
-		return false, nil, err
+	return func() NodeOutput {
+		html := []byte(text)
+
+		return NodeOutput{
+			IsAttr: false,
+			HTML:   html,
+			Styles: nil,
+		}
 	}
 }
 

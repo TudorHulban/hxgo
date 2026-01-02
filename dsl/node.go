@@ -1,5 +1,9 @@
 package dsl
 
-import "io"
+type NodeOutput struct {
+	IsAttr bool
+	HTML   []byte
+	Styles []Style
+}
 
-type Node func(io.Writer) (bool, []Style, error)
+type Node func() NodeOutput

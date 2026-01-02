@@ -10,6 +10,7 @@ import (
 func TestStyledDiv(t *testing.T) {
 	element := Div(
 		Styled(
+			nil,
 			[]Style{
 				{
 					Selector: ".card",

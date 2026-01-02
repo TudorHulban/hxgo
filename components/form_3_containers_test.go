@@ -13,6 +13,7 @@ func TestNewForm3Containers(t *testing.T) {
 		&ParamsButtonSubmit{},
 		[]dsl.Node{
 			dsl.Styled(
+				nil,
 				dsl.Style{
 					Selector: ".card:hover",
 					Props: map[string]string{

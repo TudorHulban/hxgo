@@ -1,12 +1,9 @@
 package dsl
 
 import (
-	"bytes"
 	"errors"
 	"io"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func benchNode(w io.Writer) (bool, []Style, error) {
@@ -24,14 +21,7 @@ func BenchmarkRenderNodes(b *testing.B) {
 		description string
 		elName      string
 		nodes       []Node
-		wantErr     bool
 	}{
-		{
-			description: "0. error input",
-			elName:      "some el",
-			nodes:       []Node{benchNode},
-			wantErr:     true,
-		},
 		{
 			description: "1. empty input",
 			elName:      "",
@@ -41,7 +31,7 @@ func BenchmarkRenderNodes(b *testing.B) {
 			description: "2. valid HTML input",
 			elName:      "div",
 			nodes: []Node{
-				Div(AttrClass("card")),
+				Div(Class("card")),
 			},
 		},
 		{
@@ -49,24 +39,16 @@ func BenchmarkRenderNodes(b *testing.B) {
 			elName:      "div",
 			nodes: []Node{
 				Styled(
-					[]Style{
-						{
-							Selector: ".card",
-							Props: map[string]string{
-								"padding":       "20px",
-								"border-radius": "8px",
-								"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
-							},
-
-							Media: "min-width: 768px",
+					noop,
+					Style{
+						Selector: ".card",
+						Props: map[string]string{
+							"padding":       "20px",
+							"border-radius": "8px",
+							"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
 						},
-						{
-							Selector: ".card:hover",
-							Props: map[string]string{
-								"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
-							},
-						},
-					}...,
+						Media: "min-width: 768px",
+					},
 				),
 			},
 		},
@@ -74,52 +56,32 @@ func BenchmarkRenderNodes(b *testing.B) {
 			description: "4. valid HTML-CSS input",
 			elName:      "div",
 			nodes: []Node{
-				Div(AttrClass("card")),
+				Div(Class("card")),
 				Styled(
-					[]Style{
-						{
-							Selector: ".card",
-							Props: map[string]string{
-								"padding":       "20px",
-								"border-radius": "8px",
-								"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
-							},
-
-							Media: "min-width: 768px",
+					noop,
+					Style{
+						Selector: ".card",
+						Props: map[string]string{
+							"padding":       "20px",
+							"border-radius": "8px",
+							"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
 						},
-						{
-							Selector: ".card:hover",
-							Props: map[string]string{
-								"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
-							},
-						},
-					}...,
+						Media: "min-width: 768px",
+					},
 				),
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		b.Run(
-			tt.description,
-			func(b *testing.B) {
-				b.ReportAllocs()
-				b.ResetTimer()
+		b.Run(tt.description, func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
 
-				for i := 0; i < b.N; i++ {
-					var buf bytes.Buffer
-
-					_, errRender := renderNodes(&buf, tt.elName, tt.nodes...)
-					if tt.wantErr {
-						require.Error(b, errRender)
-
-						continue
-					}
-
-					require.NoError(b, errRender)
-				}
-			},
-		)
+			for i := 0; i < b.N; i++ {
+				_, _ = renderNodes(tt.elName, tt.nodes...)
+			}
+		})
 	}
 }
 
@@ -134,14 +96,7 @@ func BenchmarkRenderNodesWithCSSId(b *testing.B) {
 		description string
 		elName      string
 		nodes       []Node
-		wantErr     bool
 	}{
-		{
-			description: "0. error input",
-			elName:      "some el",
-			nodes:       []Node{benchNode},
-			wantErr:     true,
-		},
 		{
 			description: "1. empty input",
 			elName:      "",
@@ -151,7 +106,7 @@ func BenchmarkRenderNodesWithCSSId(b *testing.B) {
 			description: "2. valid HTML input",
 			elName:      "div",
 			nodes: []Node{
-				Div(AttrClass("card")),
+				Div(Class("card")),
 			},
 		},
 		{
@@ -159,76 +114,29 @@ func BenchmarkRenderNodesWithCSSId(b *testing.B) {
 			elName:      "div",
 			nodes: []Node{
 				Styled(
-					[]Style{
-						{
-							Selector: ".card",
-							Props: map[string]string{
-								"padding":       "20px",
-								"border-radius": "8px",
-								"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
-							},
-
-							Media: "min-width: 768px",
+					noop,
+					Style{
+						Selector: ".card",
+						Props: map[string]string{
+							"padding":       "20px",
+							"border-radius": "8px",
+							"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
 						},
-						{
-							Selector: ".card:hover",
-							Props: map[string]string{
-								"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
-							},
-						},
-					}...,
-				),
-			},
-		},
-		{
-			description: "4. valid HTML-CSS input",
-			elName:      "div",
-			nodes: []Node{
-				Div(AttrClass("card")),
-				Styled(
-					[]Style{
-						{
-							Selector: ".card",
-							Props: map[string]string{
-								"padding":       "20px",
-								"border-radius": "8px",
-								"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
-							},
-
-							Media: "min-width: 768px",
-						},
-						{
-							Selector: ".card:hover",
-							Props: map[string]string{
-								"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
-							},
-						},
-					}...,
+						Media: "min-width: 768px",
+					},
 				),
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		b.Run(
-			tt.description,
-			func(b *testing.B) {
-				b.ReportAllocs()
-				b.ResetTimer()
+		b.Run(tt.description, func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
 
-				for i := 0; i < b.N; i++ {
-					var buf bytes.Buffer
-
-					_, errRender := renderNodesWithCSSId(&buf, tt.elName, "css ID", tt.nodes...)
-					if tt.wantErr {
-						require.Error(b, errRender)
-
-						continue
-					}
-
-					require.NoError(b, errRender)
-				}
-			},
-		)
+			for i := 0; i < b.N; i++ {
+				_, _ = renderNodesWithCSSId(tt.elName, "cssID", tt.nodes...)
+			}
+		})
 	}
 }

@@ -1,16 +1,27 @@
 package dsl
 
 import (
-	"io"
 	"text/template"
 )
 
 func AttrWithValue(name, value string) Node {
-	return func(w io.Writer) (bool, []Style, error) {
-		_, err := w.Write([]byte(
-			" " + name + `="` + template.HTMLEscapeString(value) + `"`,
-		))
-		return true, nil, err
+	return func() NodeOutput {
+		escaped := template.HTMLEscapeString(value)
+		// space + name + =" + value + "
+		size := 1 + len(name) + 2 + len(escaped) + 1
+		html := make([]byte, 0, size)
+
+		html = append(html, ' ')
+		html = append(html, name...)
+		html = append(html, '=', '"')
+		html = append(html, escaped...)
+		html = append(html, '"')
+
+		return NodeOutput{
+			IsAttr: true,
+			HTML:   html,
+			Styles: nil,
+		}
 	}
 }
 

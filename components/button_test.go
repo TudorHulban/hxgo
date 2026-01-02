@@ -1,7 +1,6 @@
 package components
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"testing"
@@ -22,11 +21,11 @@ func TestButton(t *testing.T) {
 			Label:            "Press me!",
 			HXActionType:     hx.HXPOST,
 			HXActionEndpoint: "/",
-
-			CSSID: t.Name(),
+			CSSID:            t.Name(),
 		},
 		[]dsl.Node{
 			dsl.Styled(
+				dsl.Div(), // child node (empty div or whatever wrapper you expect)
 				dsl.Style{
 					Selector: "#" + t.Name(),
 					Props: map[string]string{
@@ -113,10 +112,6 @@ func BenchmarkButtonSubmit(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		var buf bytes.Buffer
-
-		// Evaluate the node ONCE
-		_, _, errRender := ButtonSubmit(params)(&buf)
-		require.NoError(b, errRender)
+		_ = ButtonSubmit(params)().HTML
 	}
 }

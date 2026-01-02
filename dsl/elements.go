@@ -1,9 +1,5 @@
 package dsl
 
-import (
-	"io"
-)
-
 func Button(children ...Node) Node {
 	return El(
 		"button",
@@ -19,15 +15,22 @@ func Body(children ...Node) Node {
 }
 
 func Doctype(node Node) Node {
-	return func(w io.Writer) (bool, []Style, error) {
-		// Write the doctype
-		if _, err := w.Write([]byte("<!doctype html>")); err != nil {
-			return false, nil, err
-		}
+	return func() NodeOutput {
+		// Render child node first
+		child := node()
 
-		// Render the wrapped node directly
-		_, styles, err := node(w)
-		return false, styles, err
+		// Pre-size: "<!doctype html>" + child HTML
+		size := len("<!doctype html>") + len(child.HTML)
+		html := make([]byte, 0, size)
+
+		html = append(html, "<!doctype html>"...)
+		html = append(html, child.HTML...)
+
+		return NodeOutput{
+			IsAttr: false,
+			HTML:   html,
+			Styles: child.Styles,
+		}
 	}
 }
 
