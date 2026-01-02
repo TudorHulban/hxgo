@@ -7,20 +7,35 @@ import (
 // Empty nodes still emit tags because the renderer treats
 // the element itself as meaningful, not just its children.
 func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
-	var collected []Style // no allocation if no style nodes. slice growth is a trade-off.
+	var collected []Style
 
 	_, _ = io.WriteString(w, "<")
 	_, _ = io.WriteString(w, elName)
 
-	// Render attributes
+	// First pass: attributes + buffering children
+	type child struct {
+		render Render
+	}
+	var children []child
+
 	for _, node := range nodes {
-		if node == nil || !node.isAttribute() {
+		if node == nil {
 			continue
 		}
 
-		if _, err := node.Render(w); err != nil {
-			return nil, err
+		isAttrFn, renderFn := node(w)
+
+		if isAttrFn() {
+			// Attribute: render immediately
+			if _, err := renderFn(w); err != nil {
+				return nil, err
+			}
+
+			continue
 		}
+
+		// Child: store for later
+		children = append(children, child{render: renderFn})
 	}
 
 	_, _ = io.WriteString(w, ">")
@@ -29,14 +44,9 @@ func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
 		return collected, nil
 	}
 
-	// Render children and collect their styles in one pass
-	for _, node := range nodes {
-		if node == nil || node.isAttribute() {
-			continue
-		}
-
-		// Render child HTML and collect its styles (from entire subtree)
-		styles, err := node.Render(w)
+	// Second phase: render children (but NOT calling node again)
+	for _, c := range children {
+		styles, err := c.render(w)
 		if err != nil {
 			return nil, err
 		}
@@ -57,17 +67,37 @@ func renderNodesWithCSSId(w io.Writer, elName, cssID string, nodes ...Node) ([]S
 	_, _ = io.WriteString(w, "<")
 	_, _ = io.WriteString(w, elName)
 
-	_, _ = AttrIDLength(cssID).Render(w) // introduces one allocation more than wo css ID
+	isAttrFn, renderFn := AttrIDLength(cssID)(w)
+	if isAttrFn() {
+		if _, err := renderFn(w); err != nil {
+			return nil, err
+		}
+	}
 
-	// Render attributes.
+	// First pass: attributes + buffering children
+	type child struct {
+		render Render
+	}
+	var children []child
+
 	for _, node := range nodes {
-		if node == nil || !node.isAttribute() {
+		if node == nil {
 			continue
 		}
 
-		if _, err := node.Render(w); err != nil {
-			return nil, err
+		isAttrFn, renderFn := node(w)
+
+		if isAttrFn() {
+			// Attribute: render immediately
+			if _, err := renderFn(w); err != nil {
+				return nil, err
+			}
+
+			continue
 		}
+
+		// Child: store for later
+		children = append(children, child{render: renderFn})
 	}
 
 	_, _ = io.WriteString(w, ">")
@@ -76,14 +106,9 @@ func renderNodesWithCSSId(w io.Writer, elName, cssID string, nodes ...Node) ([]S
 		return collected, nil
 	}
 
-	// Render children and collect their styles in one pass.
-	for _, node := range nodes {
-		if node == nil || node.isAttribute() {
-			continue
-		}
-
-		// Render child HTML and collect its styles (from entire subtree)
-		styles, err := node.Render(w)
+	// Second phase: render children (but NOT calling node again)
+	for _, c := range children {
+		styles, err := c.render(w)
 		if err != nil {
 			return nil, err
 		}

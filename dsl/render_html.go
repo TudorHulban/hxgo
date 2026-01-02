@@ -16,10 +16,13 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
 			continue
 		}
 
-		// Single pass: render HTML and get styles
-		styles, errRender := node.Render(&htmlBuf)
-		if errRender != nil {
-			return nil, "", errRender
+		// Evaluate the node ONCE
+		_, renderFn := node(&htmlBuf)
+
+		// Render HTML and collect styles
+		styles, err := renderFn(&htmlBuf)
+		if err != nil {
+			return nil, "", err
 		}
 
 		for _, s := range styles {

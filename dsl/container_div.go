@@ -5,7 +5,7 @@ type ParamsContainerDiv struct {
 	Elements    []Node
 }
 
-func ContainerDiv(params *ParamsContainerDiv) Writer {
+func ContainerDiv(params *ParamsContainerDiv) Node {
 	return Div(
 		append(
 			params.Elements,

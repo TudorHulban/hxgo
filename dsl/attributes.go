@@ -1,69 +1,62 @@
 package dsl
 
-import "database/sql"
+import (
+	"io"
+	"text/template"
+)
 
-func Attr(name string) attribute {
-	return attribute{
-		name: name,
+func AttrWithValue(name, value string) Node {
+	return func(w io.Writer) (IsAttribute, Render) {
+		return func() bool {
+				return true
+			},
+
+			func(wr io.Writer) ([]Style, error) {
+				_, err := wr.Write(
+					[]byte(
+						" " + name + `="` + template.HTMLEscapeString(value) + `"`,
+					),
+				)
+
+				return nil, err
+			}
 	}
 }
 
-func AttrIf(condition bool, name string) attribute {
-	if condition {
-		return attribute{
-			name: name,
-		}
-	}
-
-	return attribute{}
+func Attr(name string) Node {
+	return AttrWithValue(name, name)
 }
 
-func AttrWithName(name string) attribute {
+func AttrIf(condition bool, name, value string) Node {
+	if !condition {
+		return noop
+	}
+
+	return AttrWithValue(name, value)
+}
+
+func AttrWithName(name string) Node {
 	return AttrWithValue(
 		"name",
 		name,
 	)
 }
 
-func AttrWithValue(name, value string) attribute {
-	return attribute{
-		name: name,
-		value: sql.NullString{
-			Valid:  true,
-			String: value,
-		},
-	}
-}
-
-func AttrWithValueIf(condition bool, name, value string) attribute {
-	if condition {
-		return attribute{
-			name: name,
-			value: sql.NullString{
-				Valid:  true,
-				String: value,
-			},
-		}
-	}
-
-	return attribute{}
-}
-
-func AttrCSS(css string) attribute {
+func AttrCSS(css string) Node {
 	return AttrWithValue(
 		"style",
 		css,
 	)
 }
 
-func AttrClass(class string) attribute {
+func AttrClass(class string) Node {
 	return AttrWithValue(
 		"class",
 		class,
 	)
 }
 
-func AttrClassLength(class string) attribute {
+func AttrClassLength(class string) Node {
 	if len(class) > 0 {
 		return AttrWithValue(
 			"class",
@@ -71,17 +64,17 @@ func AttrClassLength(class string) attribute {
 		)
 	}
 
-	return attribute{}
+	return noop
 }
 
-func AttrID(value string) attribute {
+func AttrID(value string) Node {
 	return AttrWithValue(
 		"id",
 		value,
 	)
 }
 
-func AttrIDIf(condition bool, value string) attribute {
+func AttrIDIf(condition bool, value string) Node {
 	if condition {
 		return AttrWithValue(
 			"id",
@@ -89,11 +82,11 @@ func AttrIDIf(condition bool, value string) attribute {
 		)
 	}
 
-	return attribute{}
+	return noop
 }
 
-// AttrIDLength returns css id attribute if passed value valid.
-func AttrIDLength(value string) attribute {
+// AttrIDLength returns css id Node if passed value valid.
+func AttrIDLength(value string) Node {
 	if len(value) > 0 {
 		return AttrWithValue(
 			"id",
@@ -101,94 +94,94 @@ func AttrIDLength(value string) attribute {
 		)
 	}
 
-	return attribute{}
+	return noop
 }
 
-func AttrType(class string) attribute {
+func AttrType(class string) Node {
 	return AttrWithValue(
 		"type",
 		class,
 	)
 }
 
-func LabelFor(text string) attribute {
+func LabelFor(text string) Node {
 	return AttrWithValue(
 		"for",
 		text,
 	)
 }
 
-func Lang(language string) attribute {
+func Lang(language string) Node {
 	return AttrWithValue(
 		"lang",
 		language,
 	)
 }
 
-func Charset(charset string) attribute {
+func Charset(charset string) Node {
 	return AttrWithValue(
 		"charset",
 		charset,
 	)
 }
 
-func Content(content string) attribute {
+func Content(content string) Node {
 	return AttrWithValue(
 		"content",
 		content,
 	)
 }
 
-func Href(ref string) attribute {
+func Href(ref string) Node {
 	return AttrWithValue(
 		"href",
 		ref,
 	)
 }
 
-func MethodPOST() attribute {
+func MethodPOST() Node {
 	return AttrWithValue(
 		"method",
 		"post",
 	)
 }
 
-func Name(name string) attribute {
+func Name(name string) Node {
 	return AttrWithValue(
 		"name",
 		name,
 	)
 }
 
-func OnClick(toRun string) attribute {
+func OnClick(toRun string) Node {
 	return AttrWithValue(
 		"onclick",
 		toRun,
 	)
 }
 
-func Rel(relationship string) attribute {
+func Rel(relationship string) Node {
 	return AttrWithValue(
 		"rel",
 		relationship,
 	)
 }
 
-func Src(source string) attribute {
+func Src(source string) Node {
 	return AttrWithValue(
 		"src",
 		source,
 	)
 }
 
-func Action(action string) attribute {
+func Action(action string) Node {
 	return AttrWithValue(
 		"action",
 		action,
 	)
 }
 
-func ActionLength(action string) attribute {
+func ActionLength(action string) Node {
 	if len(action) > 0 {
 		return AttrWithValue(
 			"action",
@@ -202,14 +195,14 @@ func ActionLength(action string) attribute {
 	)
 }
 
-func Method(method string) attribute {
+func Method(method string) Node {
 	return AttrWithValue(
 		"method",
 		method,
 	)
 }
 
-func AutocompleteOff() attribute {
+func AutocompleteOff() Node {
 	return AttrWithValue(
 		"autocomplete",
 		"off",

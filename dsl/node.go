@@ -2,15 +2,7 @@ package dsl
 
 import "io"
 
-type Node interface {
-	isAttribute() bool
-	Render(w io.Writer) ([]Style, error)
-}
+type IsAttribute func() bool
+type Render func(wr io.Writer) ([]Style, error)
 
-var _ Node = attribute{}
-var _ Node = Writer(
-	func(io.Writer) ([]Style, error) {
-		return nil, nil
-	},
-)
-var _ Node = &NodeStyle{}
+type Node func(io.Writer) (IsAttribute, Render)

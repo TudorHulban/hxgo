@@ -24,13 +24,14 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 		},
 	}
 
-	// 	<div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
+	// <div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
 	// <input type="text"  name="label" hx-max=50></div>
 
+	fnIsAttribute, fnRender := el.Raw()(os.Stdout)
+	require.False(t, fnIsAttribute())
+
 	fmt.Println(
-		el.
-			Raw().
-			Render(os.Stdout),
+		fnRender(os.Stdout),
 	)
 
 	expectedOutput := helpers.Sprintf(
@@ -39,7 +40,7 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 	)
 
 	var buf bytes.Buffer
-	styles, err := el.Raw().Render(&buf)
+	styles, err := fnRender(&buf)
 	require.NoError(t, err, "render error")
 	require.Zero(t, styles)
 

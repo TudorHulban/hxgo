@@ -9,13 +9,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type benchNode struct{}
-
-func (n benchNode) isAttribute() bool { return false }
-
-func (n benchNode) Render(w io.Writer) ([]Style, error) {
-	return nil,
-		errors.New("some error")
+func benchNode(w io.Writer) (IsAttribute, Render) {
+	return func() bool {
+			return false
+		},
+		func(io.Writer) ([]Style, error) {
+			return nil,
+				errors.New("some error")
+		}
 }
 
 // BenchmarkRenderNodes/0._error_input-16         	 4914921	       241.5 ns/op	     128 B/op	       3 allocs/op
@@ -34,7 +35,7 @@ func BenchmarkRenderNodes(b *testing.B) {
 		{
 			description: "0. error input",
 			elName:      "some el",
-			nodes:       []Node{benchNode{}},
+			nodes:       []Node{benchNode},
 			wantErr:     true,
 		},
 		{
@@ -144,7 +145,7 @@ func BenchmarkRenderNodesWithCSSId(b *testing.B) {
 		{
 			description: "0. error input",
 			elName:      "some el",
-			nodes:       []Node{benchNode{}},
+			nodes:       []Node{benchNode},
 			wantErr:     true,
 		},
 		{

@@ -12,16 +12,14 @@ func TestNewForm3Containers(t *testing.T) {
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
 		[]dsl.Node{
-			dsl.NodeStyle{
-				Styles: []dsl.Style{
-					{
-						Selector: ".card:hover",
-						Props: map[string]string{
-							"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
-						},
+			dsl.Styled(
+				dsl.Style{
+					Selector: ".card:hover",
+					Props: map[string]string{
+						"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
 					},
 				},
-			},
+			),
 		},
 	)
 
