@@ -28,30 +28,30 @@ func TestButton(t *testing.T) {
 				dsl.Div(), // child node (empty div or whatever wrapper you expect)
 				dsl.Style{
 					Selector: "#" + t.Name(),
-					Props: map[string]string{
-						"display":       "inline-block",
-						"padding":       "10px 18px",
-						"background":    "#4a6cf7",
-						"color":         "white",
-						"border":        "none",
-						"border-radius": "6px",
-						"font-size":     "45px",
-						"cursor":        "pointer",
-						"transition":    "background 0.2s ease, box-shadow 0.2s ease",
+					Props: [][2]string{
+						{"display", "inline-block"},
+						{"padding", "10px 18px"},
+						{"background", "#4a6cf7"},
+						{"color", "white"},
+						{"border", "none"},
+						{"border-radius", "6px"},
+						{"font-size", "45px"},
+						{"cursor", "pointer"},
+						{"transition", "background 0.2s ease, box-shadow 0.2s ease"},
 					},
 				},
 				dsl.Style{
 					Selector: "#" + t.Name() + ":hover",
-					Props: map[string]string{
-						"background": "#3d5be0",
-						"box-shadow": "0 4px 14px rgba(0,0,0,0.15)",
+					Props: [][2]string{
+						{"background", "#3d5be0"},
+						{"box-shadow", "0 4px 14px rgba(0,0,0,0.15)"},
 					},
 				},
 				dsl.Style{
 					Selector: "#" + t.Name() + ":active",
-					Props: map[string]string{
-						"background": "#344fcc",
-						"box-shadow": "0 2px 8px rgba(0,0,0,0.2)",
+					Props: [][2]string{
+						{"background", "#344fcc"},
+						{"box-shadow", "0 2px 8px rgba(0,0,0,0.2)"},
 					},
 				},
 			),

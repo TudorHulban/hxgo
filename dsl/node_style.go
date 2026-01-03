@@ -4,7 +4,7 @@ import "unsafe"
 
 type Style struct {
 	Selector string
-	Props    map[string]string
+	Props    [][2]string
 	Media    string // optional media query
 }
 

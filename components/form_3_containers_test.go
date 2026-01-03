@@ -16,8 +16,8 @@ func TestNewForm3Containers(t *testing.T) {
 				dsl.Noop,
 				dsl.Style{
 					Selector: ".card:hover",
-					Props: map[string]string{
-						"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
+					Props: [][2]string{
+						{"box-shadow", "0 8px 24px rgba(0,0,0,0.2)"},
 					},
 				},
 			),

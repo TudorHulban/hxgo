@@ -14,18 +14,18 @@ func TestStyledDiv(t *testing.T) {
 			[]Style{
 				{
 					Selector: ".card",
-					Props: map[string]string{
-						"padding":       "20px",
-						"border-radius": "8px",
-						"box-shadow":    "0 4px 12px rgba(0,0,0,0.1)",
+					Props: [][2]string{
+						{"padding", "20px"},
+						{"border-radius", "8px"},
+						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
 					},
 
 					Media: "min-width: 768px",
 				},
 				{
 					Selector: ".card:hover",
-					Props: map[string]string{
-						"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
+					Props: [][2]string{
+						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
 					},
 				},
 			}...,

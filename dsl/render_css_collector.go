@@ -25,14 +25,15 @@ func newSmartCSSCollector() *smartCSSCollector {
 func (c *smartCSSCollector) Add(style Style) {
 	key := cssRuleKey{selector: style.Selector, media: style.Media}
 
-	if _, exists := c.rules[key]; !exists {
-		c.rules[key] = make(map[string]string)
+	propsMap, exists := c.rules[key]
+	if !exists {
+		propsMap = make(map[string]string, len(style.Props))
+		c.rules[key] = propsMap
 		c.order = append(c.order, key)
 	}
 
-	// Later definitions override earlier ones (like real CSS cascade)
-	for prop, val := range style.Props {
-		c.rules[key][prop] = val
+	for _, prop := range style.Props {
+		propsMap[prop[0]] = prop[1]
 	}
 }
 

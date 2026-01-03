@@ -9,7 +9,7 @@ func BenchmarkStyleOnly(b *testing.B) {
 	for b.Loop() {
 		_ = Style{
 			Selector: "div",
-			Props:    map[string]string{"color": "red"},
+			Props:    [][2]string{{"color", "red"}},
 		}
 	}
 }
@@ -19,7 +19,10 @@ func BenchmarkStyleCall(b *testing.B) {
 
 	el := Styled(
 		Text("hello"),
-		Style{Selector: "div", Props: map[string]string{"color": "red"}},
+		Style{
+			Selector: "div",
+			Props:    [][2]string{{"color", "red"}},
+		},
 	)
 
 	b.ResetTimer()

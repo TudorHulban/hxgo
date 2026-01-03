@@ -53,8 +53,8 @@ func TestAllocGuard_CSSOnly(t *testing.T) {
 		Noop,
 		Style{
 			Selector: ".card",
-			Props: map[string]string{
-				"padding": "20px",
+			Props: [][2]string{
+				{"padding", "20px"},
 			},
 		},
 	)
@@ -83,8 +83,8 @@ func TestAllocGuard_HTMLAndCSS(t *testing.T) {
 			Noop,
 			Style{
 				Selector: ".card",
-				Props: map[string]string{
-					"padding": "20px",
+				Props: [][2]string{
+					{"padding", "20px"},
 				},
 			},
 		),
