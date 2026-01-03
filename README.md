@@ -76,7 +76,8 @@ Immediate paint: The browser can render the component as soon as the first respo
 
 This approach restores hypermedia’s original strength: a complete, self‑contained document delivered atomically, without auxiliary resources or client‑side orchestration.  
 
-It is best suited for Tailwind. For vanilla CSS, the usual file can be referred and the element will receive the CSS based on the classes set.
+The usual file can also be referred and the element will receive the CSS based on the classes set.  
+Note that this method has a small performance penalty.  
 
 ## 3. Key Features
 

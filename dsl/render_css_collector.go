@@ -23,7 +23,10 @@ func newSmartCSSCollector() *smartCSSCollector {
 }
 
 func (c *smartCSSCollector) Add(style Style) {
-	key := cssRuleKey{selector: style.Selector, media: style.Media}
+	key := cssRuleKey{
+		selector: style.Selector,
+		media:    style.Media,
+	}
 
 	propsMap, exists := c.rules[key]
 	if !exists {

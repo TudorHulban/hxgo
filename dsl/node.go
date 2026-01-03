@@ -4,8 +4,8 @@ import "unsafe"
 
 // Accumulator: single builder used by the renderer
 type Acc struct {
-	html   []byte
-	styles []Style
+	html []byte
+	css  []Style
 }
 
 func (a *Acc) Write(s string) {

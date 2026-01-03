@@ -21,13 +21,13 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 	html := a.html
 
 	// No styles collected → no CSS
-	if len(a.styles) == 0 {
+	if len(a.css) == 0 {
 		return html, ""
 	}
 
 	// Build CSS
 	css := newSmartCSSCollector()
-	for _, s := range a.styles {
+	for _, s := range a.css {
 		css.Add(s)
 	}
 
