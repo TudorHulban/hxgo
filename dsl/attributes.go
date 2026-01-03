@@ -2,26 +2,36 @@ package dsl
 
 import (
 	"text/template"
+	"unsafe"
 )
 
 func AttrWithValue(name, value string) Node {
-	escaped := template.HTMLEscapeString(value)
-
-	prefix := []byte(" " + name + `="`)
-	val := []byte(escaped)
-	suffix := []byte(`"`)
-
-	return func() NodeOutput {
-		return NodeOutput{
-			IsAttr: true,
-			HTMLParts: [][]byte{
-				prefix,
-				val,
-				suffix,
-			},
-			Styles: nil,
-		}
+	// pack both strings into one small struct
+	data := struct {
+		name  string
+		value string
+	}{
+		name:  name,
+		value: template.HTMLEscapeString(value),
 	}
+
+	return Node{
+		fn:   renderAttrWithValue,
+		data: unsafe.Pointer(&data),
+	}
+}
+
+func renderAttrWithValue(a *Acc, p unsafe.Pointer) {
+	d := (*struct {
+		name  string
+		value string
+	})(p)
+
+	a.Write(" ")
+	a.Write(d.name)
+	a.Write(`="`)
+	a.Write(d.value)
+	a.Write(`"`)
 }
 
 func Attr(name string) Node {

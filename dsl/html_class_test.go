@@ -5,11 +5,11 @@ import "testing"
 func BenchmarkClassCall(b *testing.B) {
 	b.ReportAllocs()
 
-	node := Class("hi!")
+	el := Class("hi!")
 
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = node()
+		_ = Render(el)
 	}
 }

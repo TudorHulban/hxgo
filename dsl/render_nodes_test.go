@@ -17,6 +17,14 @@ import (
 // BenchmarkRenderHTMLandCSS/3._valid_CSS_input-16     	  157761	      6663 ns/op	    1344 B/op	      15 allocs/op
 // BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-16         	  132006	      9041 ns/op	    1896 B/op	      21 allocs/op
 
+// unsafe
+// BenchmarkRenderHTMLandCSS/1._empty_input-16         	32015983	       141.4 ns/op	      48 B/op	       1 allocs/op
+// BenchmarkRenderHTMLandCSS/2._valid_HTML_input-16    	 1726992	       689.1 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-16   	 1695763	       716.2 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-16   	 1000000	      1047 ns/op	     168 B/op	       5 allocs/op
+// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-16     	  165558	      6373 ns/op	    1344 B/op	      15 allocs/op
+// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-16         	  171697	      7070 ns/op	    1400 B/op	      18 allocs/op
+
 func BenchmarkRenderHTMLandCSS(b *testing.B) {
 	tests := []struct {
 		description string

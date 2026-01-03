@@ -1,5 +1,7 @@
 package dsl
 
+import "unsafe"
+
 func Button(children ...Node) Node {
 	return El(
 		"button",
@@ -14,23 +16,16 @@ func Body(children ...Node) Node {
 	)
 }
 
-func Doctype(node Node) Node {
-	doctype := []byte("<!doctype html>") // Static fragment, allocated once
-
-	return func() NodeOutput {
-		child := node()
-
-		// Prepend doctype as a fragment
-		parts := make([][]byte, 0, 1+len(child.HTMLParts))
-		parts = append(parts, doctype)
-		parts = append(parts, child.HTMLParts...)
-
-		return NodeOutput{
-			IsAttr:    false,
-			HTMLParts: parts,
-			Styles:    child.Styles,
-		}
+func Doctype(child Node) Node {
+	return Node{
+		fn:       renderDoctype,
+		data:     nil,
+		children: []Node{child},
 	}
+}
+
+func renderDoctype(a *Acc, _ unsafe.Pointer) {
+	a.Write("<!doctype html>")
 }
 
 func Head(children ...Node) Node {

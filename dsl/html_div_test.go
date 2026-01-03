@@ -20,7 +20,7 @@ func BenchmarkElCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = el()
+		_ = Render(el)
 	}
 }
 
@@ -32,20 +32,19 @@ func BenchmarkElWIdCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = el()
+		_ = Render(el)
 	}
 }
 
 func BenchmarkDiv(b *testing.B) {
 	b.ReportAllocs()
 
-	div := El("div", Text("hi!"))
+	el := El("div", Text("hi!"))
 
 	b.ResetTimer()
 
 	for b.Loop() {
-		out := div()
-		_ = out.HTMLParts // or out.HTML if interface version
+		_ = Render(el)
 	}
 }
 

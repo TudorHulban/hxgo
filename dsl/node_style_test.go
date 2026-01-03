@@ -17,7 +17,7 @@ func BenchmarkStyleOnly(b *testing.B) {
 func BenchmarkStyleCall(b *testing.B) {
 	b.ReportAllocs()
 
-	s := Styled(
+	el := Styled(
 		Text("hello"),
 		Style{Selector: "div", Props: map[string]string{"color": "red"}},
 	)
@@ -25,6 +25,6 @@ func BenchmarkStyleCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = s()
+		_ = Render(el)
 	}
 }

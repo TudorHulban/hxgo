@@ -5,11 +5,11 @@ import "testing"
 func BenchmarkIfCall(b *testing.B) {
 	b.ReportAllocs()
 
-	n := If(false, Text("hi!"))
+	el := If(false, Text("hi!"))
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_ = n()
+		_ = Render(el)
 	}
 }

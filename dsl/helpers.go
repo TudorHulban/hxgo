@@ -1,36 +1,29 @@
 package dsl
 
-import (
-	"text/template"
-)
+import "unsafe"
 
 func Text(text string) Node {
-	escaped := template.HTMLEscapeString(text)
-	b := []byte(escaped)
-
-	// CHANGED: prebuild the slice once, instead of using a literal in the closure
-	parts := [][]byte{b}
-
-	return func() NodeOutput {
-		return NodeOutput{
-			IsAttr:    false,
-			HTMLParts: parts, // no per-call slice allocation
-			Styles:    nil,
-		}
+	return Node{
+		fn:   renderText,
+		data: unsafe.Pointer(&text),
 	}
 }
 
-func Raw(text string) Node {
-	return func() NodeOutput {
-		return NodeOutput{
-			IsAttr: false,
-			HTMLParts: [][]byte{
-				[]byte(
-					text,
-				),
-			},
-		}
+func renderText(a *Acc, p unsafe.Pointer) {
+	s := *(*string)(p)
+	a.Write(s)
+}
+
+func Raw(s string) Node {
+	return Node{
+		fn:   renderRaw,
+		data: unsafe.Pointer(&s),
 	}
+}
+
+func renderRaw(a *Acc, p unsafe.Pointer) {
+	s := *(*string)(p)
+	a.Write(s) // no escaping, direct write
 }
 
 func If(condition bool, node Node) Node {

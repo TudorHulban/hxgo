@@ -1,5 +1,7 @@
 package dsl
 
+import "unsafe"
+
 type Style struct {
 	Selector string
 	Props    map[string]string
@@ -8,11 +10,15 @@ type Style struct {
 
 // Style nodes are not attributes.
 // no HTML output, only styles.
-func Styled(child Node, style ...Style) Node {
-	return func() NodeOutput {
-		out := child()
-		out.Styles = append(out.Styles, style...)
-
-		return out
+func Styled(child Node, styles ...Style) Node {
+	return Node{
+		fn:       renderStyled,
+		data:     unsafe.Pointer(&styles),
+		children: []Node{child},
 	}
+}
+
+func renderStyled(a *Acc, p unsafe.Pointer) {
+	styles := *(*[]Style)(p)
+	a.Styles = append(a.Styles, styles...)
 }

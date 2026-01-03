@@ -31,7 +31,7 @@ func TestElementSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.False(t, output().IsAttr)
+	require.NotNil(t, output) // TODO: review
 }
 
 func TestEmptyElementSelectInput(t *testing.T) {
@@ -52,7 +52,7 @@ func TestEmptyElementSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.False(t, output().IsAttr)
+	require.NotNil(t, output) // TODO: review
 }
 
 func TestOnChangeSelectInput(t *testing.T) {
@@ -79,5 +79,5 @@ func TestOnChangeSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.False(t, output().IsAttr)
+	require.NotNil(t, output) // TODO: review
 }

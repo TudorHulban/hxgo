@@ -5,11 +5,11 @@ import "testing"
 func BenchmarkTextCall(b *testing.B) {
 	b.ReportAllocs()
 
-	node := Text("hi!")
+	el := Text("hi!")
 
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = node()
+		_ = Render(el)
 	}
 }

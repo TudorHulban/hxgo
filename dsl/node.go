@@ -1,21 +1,32 @@
 package dsl
 
-import "strings"
+import "unsafe"
 
-type NodeOutput struct {
-	IsAttr    bool
-	HTMLParts [][]byte // slice of references to static or prebuilt byte slices.
-	Styles    []Style
+// ------------------------------------------------------------
+// Accumulator: single builder used by the renderer
+// ------------------------------------------------------------
+
+type Acc struct {
+	Buf    []byte
+	Styles []Style
 }
 
-func (n NodeOutput) String() string {
-	var b strings.Builder
-
-	for _, part := range n.HTMLParts {
-		b.Write(part)
-	}
-
-	return b.String()
+func (a *Acc) Write(s string) {
+	a.Buf = append(a.Buf, s...)
 }
 
-type Node func() NodeOutput
+func (a *Acc) WriteBytes(b []byte) {
+	a.Buf = append(a.Buf, b...)
+}
+
+// ------------------------------------------------------------
+// Node: function pointer + data pointer
+// ------------------------------------------------------------
+
+type Accumulator func(*Acc, unsafe.Pointer)
+
+type Node struct {
+	fn       Accumulator
+	data     unsafe.Pointer
+	children []Node
+}

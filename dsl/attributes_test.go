@@ -14,11 +14,11 @@ func BenchmarkAttrWithValueOnly(b *testing.B) {
 func BenchmarkAttrWithValueCall(b *testing.B) {
 	b.ReportAllocs()
 
-	node := AttrWithValue("data-x", "hi!")
+	el := AttrWithValue("data-x", "hi!")
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_ = node()
+		_ = Render(el)
 	}
 }

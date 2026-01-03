@@ -1,5 +1,7 @@
 package dsl
 
+import "unsafe"
+
 func A(children ...Node) Node {
 	return El(
 		"a",
@@ -15,28 +17,33 @@ func Aside(children ...Node) Node {
 }
 
 func Class(name string) Node {
-	prefix := []byte(` class="`)
-	value := []byte(name)
-	suffix := []byte(`"`)
-
-	return func() NodeOutput {
-		return NodeOutput{
-			IsAttr: true,
-			HTMLParts: [][]byte{
-				prefix,
-				value,
-				suffix,
-			},
-			Styles: nil,
-		}
+	return Node{
+		fn:   renderClass,
+		data: unsafe.Pointer(&name),
 	}
 }
 
+func renderClass(a *Acc, p unsafe.Pointer) {
+	name := *(*string)(p)
+	a.Write(` class="`)
+	a.Write(name)
+	a.Write(`"`)
+}
+
 func Div(children ...Node) Node {
-	return El(
-		"div",
-		children...,
-	)
+	return Node{
+		fn:       renderDiv,
+		data:     nil,
+		children: children,
+	}
+}
+
+func renderDiv(a *Acc, _ unsafe.Pointer) {
+	a.Write("<div")
+	// attributes would be rendered by children before closing '>'
+	a.Write(">")
+	// children rendered by walk()
+	a.Write("</div>")
 }
 
 func Label(children ...Node) Node {
