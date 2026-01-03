@@ -2,31 +2,26 @@ package dsl
 
 import "unsafe"
 
-// ------------------------------------------------------------
 // Accumulator: single builder used by the renderer
-// ------------------------------------------------------------
-
 type Acc struct {
-	Buf    []byte
-	Styles []Style
+	html   []byte
+	styles []Style
 }
 
 func (a *Acc) Write(s string) {
-	a.Buf = append(a.Buf, s...)
+	a.html = append(a.html, s...)
 }
 
 func (a *Acc) WriteBytes(b []byte) {
-	a.Buf = append(a.Buf, b...)
+	a.html = append(a.html, b...)
 }
-
-// ------------------------------------------------------------
-// Node: function pointer + data pointer
-// ------------------------------------------------------------
 
 type Accumulator func(*Acc, unsafe.Pointer)
 
+// Node: function pointer + data pointer
 type Node struct {
-	fn       Accumulator
-	data     unsafe.Pointer
-	children []Node
+	fn          Accumulator
+	data        unsafe.Pointer
+	children    []Node
+	isAttribute bool
 }

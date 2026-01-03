@@ -20,5 +20,5 @@ func Styled(child Node, styles ...Style) Node {
 
 func renderStyled(a *Acc, p unsafe.Pointer) {
 	styles := *(*[]Style)(p)
-	a.Styles = append(a.Styles, styles...)
+	a.styles = append(a.styles, styles...)
 }

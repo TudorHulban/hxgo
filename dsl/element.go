@@ -4,24 +4,44 @@ import "unsafe"
 
 // Elements are never attributes
 func El(tag string, children ...Node) Node {
+	data := struct {
+		tag      string
+		children []Node
+	}{tag, children}
+
 	return Node{
-		fn:       renderEl,
-		data:     unsafe.Pointer(&tag),
-		children: children,
+		fn:   renderEl,
+		data: unsafe.Pointer(&data),
 	}
 }
 
 func renderEl(a *Acc, p unsafe.Pointer) {
-	tag := *(*string)(p)
+	d := (*struct {
+		tag      string
+		children []Node
+	})(p)
 
 	a.Write("<")
-	a.Write(tag)
+	a.Write(d.tag)
+
+	// 1. render attributes
+	for i := range d.children {
+		if d.children[i].isAttribute {
+			d.children[i].fn(a, d.children[i].data)
+		}
+	}
+
 	a.Write(">")
 
-	// children are rendered by walk()
+	// 2. render normal children
+	for i := range d.children {
+		if !d.children[i].isAttribute {
+			walk(a, d.children[i])
+		}
+	}
 
 	a.Write("</")
-	a.Write(tag)
+	a.Write(d.tag)
 	a.Write(">")
 }
 

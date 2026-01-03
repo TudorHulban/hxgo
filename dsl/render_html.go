@@ -7,6 +7,10 @@ import (
 )
 
 func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
+	if len(nodes) == 0 {
+		return []byte{}, ""
+	}
+
 	var a Acc
 
 	for i := range nodes {
@@ -14,16 +18,16 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 	}
 
 	// HTML is already fully assembled
-	html := a.Buf
+	html := a.html
 
 	// No styles collected → no CSS
-	if len(a.Styles) == 0 {
+	if len(a.styles) == 0 {
 		return html, ""
 	}
 
 	// Build CSS
 	css := newSmartCSSCollector()
-	for _, s := range a.Styles {
+	for _, s := range a.styles {
 		css.Add(s)
 	}
 
@@ -39,24 +43,25 @@ func HTMLwithDataCSS(html []byte, css string) string {
 	)
 }
 
-// ------------------------------------------------------------
-// Renderer: single-pass traversal
-// ------------------------------------------------------------
-
-func Render(nodes ...Node) []byte {
-	var a Acc
-	for i := range nodes {
-		walk(&a, nodes[i])
-	}
-	return a.Buf
-}
-
 func walk(a *Acc, n Node) {
 	if n.fn == nil {
 		return
 	}
+
 	n.fn(a, n.data)
+
 	for i := range n.children {
 		walk(a, n.children[i])
 	}
+}
+
+// Renderer: single-pass traversal
+func Render(nodes ...Node) []byte {
+	var a Acc
+
+	for i := range nodes {
+		walk(&a, nodes[i])
+	}
+
+	return a.html
 }

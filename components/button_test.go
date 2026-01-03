@@ -86,9 +86,6 @@ func TestButton(t *testing.T) {
 	http.ListenAndServe(":8080", nil)
 }
 
-// interfaces
-// BenchmarkButtonSubmit-16    	  431305	     15555 ns/op	    1792 B/op	      43 allocs/op
-// unsafe
 // BenchmarkButtonSubmit-16    	  420489	      2778 ns/op	     552 B/op	       7 allocs/op
 
 func BenchmarkButtonSubmit(b *testing.B) {

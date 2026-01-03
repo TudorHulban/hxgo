@@ -4,14 +4,13 @@ import "unsafe"
 
 func Text(text string) Node {
 	return Node{
-		fn:   renderText,
+		fn: func(a *Acc, p unsafe.Pointer) {
+			s := *(*string)(p)
+			a.Write(s)
+		},
+
 		data: unsafe.Pointer(&text),
 	}
-}
-
-func renderText(a *Acc, p unsafe.Pointer) {
-	s := *(*string)(p)
-	a.Write(s)
 }
 
 func Raw(s string) Node {
