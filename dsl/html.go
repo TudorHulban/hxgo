@@ -15,7 +15,6 @@ func Aside(children ...Node) Node {
 }
 
 func Class(name string) Node {
-	// Prebuild static fragments once
 	prefix := []byte(` class="`)
 	value := []byte(name)
 	suffix := []byte(`"`)

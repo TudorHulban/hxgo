@@ -5,14 +5,17 @@ import (
 )
 
 func Text(text string) Node {
+	escaped := template.HTMLEscapeString(text)
+	b := []byte(escaped)
+
+	// CHANGED: prebuild the slice once, instead of using a literal in the closure
+	parts := [][]byte{b}
+
 	return func() NodeOutput {
 		return NodeOutput{
-			IsAttr: false,
-			HTMLParts: [][]byte{
-				[]byte(
-					template.HTMLEscapeString(text),
-				),
-			},
+			IsAttr:    false,
+			HTMLParts: parts, // no per-call slice allocation
+			Styles:    nil,
 		}
 	}
 }

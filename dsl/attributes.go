@@ -7,11 +7,9 @@ import (
 func AttrWithValue(name, value string) Node {
 	escaped := template.HTMLEscapeString(value)
 
-	// Prebuild the static fragments ONCE.
-	// These do not allocate per call.
-	prefix := []byte(" " + name + "=\"")
-	suffix := []byte("\"")
+	prefix := []byte(" " + name + `="`)
 	val := []byte(escaped)
+	suffix := []byte(`"`)
 
 	return func() NodeOutput {
 		return NodeOutput{
