@@ -33,6 +33,19 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 			},
 		},
 		{
+			description: "2a. valid HTML input",
+			nodes: []Node{
+				Div(AttrClass("card")),
+			},
+		},
+		{
+			description: "2b. valid HTML input",
+			nodes: []Node{
+				Div(AttrClass("card")),
+				Div(AttrClass("card")),
+			},
+		},
+		{
 			description: "3. valid CSS input",
 			nodes: []Node{
 				Styled(
@@ -70,13 +83,16 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 	}
 
 	for _, tt := range tests {
-		b.Run(tt.description, func(b *testing.B) {
-			b.ReportAllocs()
-			b.ResetTimer()
+		b.Run(
+			tt.description,
+			func(b *testing.B) {
+				b.ReportAllocs()
+				b.ResetTimer()
 
-			for i := 0; i < b.N; i++ {
-				_, _ = RenderHTMLandCSS(tt.nodes...)
-			}
-		})
+				for i := 0; i < b.N; i++ {
+					_, _ = RenderHTMLandCSS(tt.nodes...)
+				}
+			},
+		)
 	}
 }

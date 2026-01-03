@@ -2,10 +2,10 @@ package dsl
 
 import "testing"
 
-func BenchmarkTextCall(b *testing.B) {
+func BenchmarkClassCall(b *testing.B) {
 	b.ReportAllocs()
 
-	node := Text("hi!")
+	node := Class("hi!")
 
 	b.ResetTimer()
 
