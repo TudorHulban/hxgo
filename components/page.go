@@ -11,7 +11,7 @@ type Page struct {
 	Body []dsl.Node
 }
 
-func (p *Page) Build() dsl.Writer {
+func (p *Page) Build() dsl.Node {
 	return dsl.Doctype(
 		dsl.HTML(
 			dsl.Lang(p.Language),

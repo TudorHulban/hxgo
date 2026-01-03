@@ -1,11 +1,9 @@
 package components
 
 import (
-	"bytes"
-	"fmt"
-	"os"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
@@ -24,25 +22,19 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 		},
 	}
 
-	// 	<div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
+	// <div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
 	// <input type="text"  name="label" hx-max=50></div>
 
-	fmt.Println(
-		el.
-			Raw().
-			Render(os.Stdout),
-	)
+	output := el.Raw()
+	require.NotNil(t, output) // TODO: review
 
 	expectedOutput := helpers.Sprintf(
 		`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`,
 		el.LabelElementName,
 	)
 
-	var buf bytes.Buffer
-	styles, err := el.Raw().Render(&buf)
-	require.NoError(t, err, "render error")
-	require.Zero(t, styles)
-
-	actualOutput := buf.String()
-	require.Equal(t, expectedOutput, actualOutput, "unexpected output")
+	require.Equal(t,
+		expectedOutput,
+		string(dsl.Render(output)),
+	)
 }

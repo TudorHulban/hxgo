@@ -135,7 +135,7 @@ func (el InputSimple) wrapDiv(content string) string {
 	)
 }
 
-func (el InputSimple) RawSelect() dsl.Writer {
+func (el InputSimple) RawSelect() dsl.Node {
 	return dsl.Raw(
 		el.tagInput(
 			strings.ToLower(
@@ -148,7 +148,7 @@ func (el InputSimple) RawSelect() dsl.Writer {
 	)
 }
 
-func (el InputSimple) Raw() dsl.Writer {
+func (el InputSimple) Raw() dsl.Node {
 	return dsl.Raw(
 		el.wrapDiv(
 			strings.Join(

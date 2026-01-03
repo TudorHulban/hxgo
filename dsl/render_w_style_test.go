@@ -10,6 +10,7 @@ import (
 func TestStyledDiv(t *testing.T) {
 	element := Div(
 		Styled(
+			Noop,
 			[]Style{
 				{
 					Selector: ".card",
@@ -33,8 +34,7 @@ func TestStyledDiv(t *testing.T) {
 		Div(AttrClass("card")),
 	)
 
-	html, css, errRender := RenderHTMLandCSS(element)
-	require.NoError(t, errRender)
+	html, css := RenderHTMLandCSS(element)
 	require.NotZero(t, html)
 	require.NotZero(t, css, "should have css")
 

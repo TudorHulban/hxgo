@@ -1,33 +1,37 @@
 package dsl
 
 import (
-	"bytes"
 	"encoding/base64"
 
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
-func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
-	var htmlBuf bytes.Buffer
-	collector := newSmartCSSCollector()
-
-	for _, node := range nodes {
-		if node == nil {
-			continue
-		}
-
-		// Single pass: render HTML and get styles
-		styles, errRender := node.Render(&htmlBuf)
-		if errRender != nil {
-			return nil, "", errRender
-		}
-
-		for _, s := range styles {
-			collector.Add(s)
-		}
+func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
+	if len(nodes) == 0 {
+		return []byte{}, ""
 	}
 
-	return htmlBuf.Bytes(), collector.String(), nil
+	var a Acc
+
+	for i := range nodes {
+		walk(&a, nodes[i])
+	}
+
+	// HTML is already fully assembled
+	html := a.html
+
+	// No styles collected → no CSS
+	if len(a.styles) == 0 {
+		return html, ""
+	}
+
+	// Build CSS
+	css := newSmartCSSCollector()
+	for _, s := range a.styles {
+		css.Add(s)
+	}
+
+	return html, css.String()
 }
 
 func HTMLwithDataCSS(html []byte, css string) string {
@@ -37,4 +41,27 @@ func HTMLwithDataCSS(html []byte, css string) string {
 		base64.StdEncoding.EncodeToString([]byte(css)),
 		string(html),
 	)
+}
+
+func walk(a *Acc, n Node) {
+	if n.fn == nil {
+		return
+	}
+
+	n.fn(a, n.data)
+
+	for i := range n.children {
+		walk(a, n.children[i])
+	}
+}
+
+// Renderer: single-pass traversal
+func Render(nodes ...Node) []byte {
+	var a Acc
+
+	for i := range nodes {
+		walk(&a, nodes[i])
+	}
+
+	return a.html
 }

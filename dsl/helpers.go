@@ -1,27 +1,26 @@
 package dsl
 
-import (
-	"io"
-	"text/template"
-)
+import "unsafe"
 
-func Text(text string) Writer {
-	return func(w io.Writer) ([]Style, error) {
-		_, errWrite := w.Write(
-			[]byte(template.HTMLEscapeString(text)),
-		)
+func Text(text string) Node {
+	return Node{
+		fn: func(a *Acc, p unsafe.Pointer) {
+			s := *(*string)(p)
+			a.Write(s)
+		},
 
-		return nil, errWrite
+		data: unsafe.Pointer(&text),
 	}
 }
 
-func Raw(text string) Writer {
-	return func(w io.Writer) ([]Style, error) {
-		_, errWrite := w.Write(
-			[]byte(text),
-		)
+func Raw(text string) Node {
+	return Node{
+		fn: func(a *Acc, p unsafe.Pointer) {
+			s := *(*string)(p)
+			a.Write(s)
+		},
 
-		return nil, errWrite
+		data: unsafe.Pointer(&text),
 	}
 }
 
@@ -30,7 +29,7 @@ func If(condition bool, node Node) Node {
 		return node
 	}
 
-	return nil
+	return Noop
 }
 
 func Ternary(condition bool, node1, node2 Node) Node {

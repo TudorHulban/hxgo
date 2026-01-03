@@ -1,10 +1,7 @@
 package testhtml
 
 import (
-	"bytes"
 	"testing"
-
-	"github.com/TudorHulban/hxgo/dsl"
 )
 
 func AssertRaw(t *testing.T, raw string, expectedHTML string) {
@@ -25,15 +22,13 @@ func AssertRaw(t *testing.T, raw string, expectedHTML string) {
 	}
 }
 
-func AssertNode(t *testing.T, node dsl.Node, expectedHTML string) {
-	t.Helper()
+// func AssertNode(t *testing.T, node dsl.Node, expectedHTML string) {
+// 	t.Helper()
 
-	var buf bytes.Buffer
-	if _, err := node.Render(&buf); err != nil {
-		t.Fatalf("failed to render node: %v", err)
-	}
+// 	out := node()
+// 	got := string(out.HTMLParts[])
 
-	got := buf.String()
-
-	AssertRaw(t, got, expectedHTML)
-}
+// 	if got != expectedHTML {
+// 		t.Fatalf("HTML mismatch:\nexpected: %q\ngot:      %q", expectedHTML, got)
+// 	}
+// }

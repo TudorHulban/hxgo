@@ -12,16 +12,15 @@ func TestNewForm3Containers(t *testing.T) {
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
 		[]dsl.Node{
-			dsl.NodeStyle{
-				Styles: []dsl.Style{
-					{
-						Selector: ".card:hover",
-						Props: map[string]string{
-							"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
-						},
+			dsl.Styled(
+				dsl.Noop,
+				dsl.Style{
+					Selector: ".card:hover",
+					Props: map[string]string{
+						"box-shadow": "0 8px 24px rgba(0,0,0,0.2)",
 					},
 				},
-			},
+			),
 		},
 	)
 
@@ -69,8 +68,7 @@ func TestNewForm3Containers(t *testing.T) {
 		},
 	)
 
-	html, css, errRender := dsl.RenderHTMLandCSS(form)
-	require.NoError(t, errRender)
+	html, css := dsl.RenderHTMLandCSS(form)
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 

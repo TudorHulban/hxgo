@@ -1,16 +1,27 @@
 package dsl
 
-import "io"
+import "unsafe"
 
-type Node interface {
-	isAttribute() bool
-	Render(w io.Writer) ([]Style, error)
+// Accumulator: single builder used by the renderer
+type Acc struct {
+	html   []byte
+	styles []Style
 }
 
-var _ Node = attribute{}
-var _ Node = Writer(
-	func(io.Writer) ([]Style, error) {
-		return nil, nil
-	},
-)
-var _ Node = &NodeStyle{}
+func (a *Acc) Write(s string) {
+	a.html = append(a.html, s...)
+}
+
+func (a *Acc) WriteBytes(b []byte) {
+	a.html = append(a.html, b...)
+}
+
+type Accumulator func(*Acc, unsafe.Pointer)
+
+// Node: function pointer + data pointer
+type Node struct {
+	fn          Accumulator
+	data        unsafe.Pointer
+	children    []Node
+	isAttribute bool
+}

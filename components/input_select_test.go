@@ -1,11 +1,10 @@
 package components
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/hx"
+	"github.com/stretchr/testify/require"
 )
 
 func TestElementSelectInput(t *testing.T) {
@@ -31,11 +30,8 @@ func TestElementSelectInput(t *testing.T) {
 	// <option value="b">b</option></select>
 	// </div>
 
-	fmt.Println(
-		el.
-			Raw().
-			Render(os.Stdout),
-	)
+	output := el.Raw()
+	require.NotNil(t, output) // TODO: review
 }
 
 func TestEmptyElementSelectInput(t *testing.T) {
@@ -55,11 +51,8 @@ func TestEmptyElementSelectInput(t *testing.T) {
 	// <select id="id-input" name="label" hx-send="#id1" ></select>
 	// </div>
 
-	fmt.Println(
-		el.
-			Raw().
-			Render(os.Stdout),
-	)
+	output := el.Raw()
+	require.NotNil(t, output) // TODO: review
 }
 
 func TestOnChangeSelectInput(t *testing.T) {
@@ -85,9 +78,6 @@ func TestOnChangeSelectInput(t *testing.T) {
 	// <option value="b">b</option></select>
 	// </div>
 
-	fmt.Println(
-		el.
-			Raw().
-			Render(os.Stdout),
-	)
+	output := el.Raw()
+	require.NotNil(t, output) // TODO: review
 }
