@@ -15,8 +15,7 @@ func Body(children ...Node) Node {
 }
 
 func Doctype(node Node) Node {
-	// Static fragment, allocated once
-	doctype := []byte("<!doctype html>")
+	doctype := []byte("<!doctype html>") // Static fragment, allocated once
 
 	return func() NodeOutput {
 		child := node()

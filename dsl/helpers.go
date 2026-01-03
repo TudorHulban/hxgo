@@ -38,7 +38,7 @@ func If(condition bool, node Node) Node {
 		return node
 	}
 
-	return nil
+	return Noop
 }
 
 func Ternary(condition bool, node1, node2 Node) Node {

@@ -25,10 +25,15 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 		total += len(p)
 	}
 
-	// single allocation
 	html := make([]byte, 0, total)
 	for _, p := range parts {
 		html = append(html, p...)
+	}
+
+	// skip CSS collector entirely when no styles
+	if len(styles) == 0 {
+		// return a compile‑time constant
+		return html, ""
 	}
 
 	css := newSmartCSSCollector()

@@ -18,16 +18,20 @@ func BenchmarkElCall(b *testing.B) {
 	el := El("div", Text("hi!"))
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_ = el()
 	}
 }
 
 func BenchmarkElWIdCall(b *testing.B) {
 	b.ReportAllocs()
+
 	el := ElWId("div", "myid", Text("hello"))
+
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_ = el()
 	}
 }
@@ -39,7 +43,7 @@ func BenchmarkDiv(b *testing.B) {
 
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		out := div()
 		_ = out.HTMLParts // or out.HTML if interface version
 	}
@@ -51,7 +55,8 @@ func BenchmarkDivRender(b *testing.B) {
 	div := El("div", Text("hello"))
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_, _ = RenderHTMLandCSS(div) // interface or B‑Prime version
 	}
 }
