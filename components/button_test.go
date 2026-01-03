@@ -12,9 +12,9 @@ import (
 
 func TestButton(t *testing.T) {
 	fmt.Println("manual test … skipping")
-	// t.Skip(
-	// 	"manual testing",
-	// )
+	t.Skip(
+		"manual testing",
+	)
 
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{
@@ -86,8 +86,7 @@ func TestButton(t *testing.T) {
 	http.ListenAndServe(":8080", nil)
 }
 
-// BenchmarkButtonSubmit-16    	  420489	      2778 ns/op	     552 B/op	       7 allocs/op
-
+// BenchmarkButtonSubmit-12    	 2054799	       581.2 ns/op	     552 B/op	       7 allocs/op
 func BenchmarkButtonSubmit(b *testing.B) {
 	b.ReportAllocs()
 

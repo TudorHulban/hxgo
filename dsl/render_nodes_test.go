@@ -11,19 +11,13 @@ import (
 // BenchmarkRenderNodes/3._valid_CSS_input-16     	 4227207	       281.9 ns/op	     192 B/op	       3 allocs/op
 // BenchmarkRenderNodes/4._valid_HTML-CSS_input-16         	 2795299	       425.7 ns/op	     208 B/op	       4 allocs/op
 
-// functional
-// BenchmarkRenderHTMLandCSS/1._empty_input-16         	26171468	        45.10 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkRenderHTMLandCSS/2._valid_HTML_input-16    	  550248	      1965 ns/op	     552 B/op	       6 allocs/op
-// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-16     	  157761	      6663 ns/op	    1344 B/op	      15 allocs/op
-// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-16         	  132006	      9041 ns/op	    1896 B/op	      21 allocs/op
-
 // unsafe
-// BenchmarkRenderHTMLandCSS/1._empty_input-16         	32015983	       141.4 ns/op	      48 B/op	       1 allocs/op
-// BenchmarkRenderHTMLandCSS/2._valid_HTML_input-16    	 1726992	       689.1 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-16   	 1695763	       716.2 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-16   	 1000000	      1047 ns/op	     168 B/op	       5 allocs/op
-// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-16     	  165558	      6373 ns/op	    1344 B/op	      15 allocs/op
-// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-16         	  171697	      7070 ns/op	    1400 B/op	      18 allocs/op
+// BenchmarkRenderHTMLandCSS/1._empty_input-12         	336021400	         3.571 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkRenderHTMLandCSS/2._valid_HTML_input-12    	 6889545	       173.5 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-12   	 6375308	       186.5 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-12   	 4329358	       275.6 ns/op	     168 B/op	       5 allocs/op
+// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-12     	  685992	      1534 ns/op	    1344 B/op	      15 allocs/op
+// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-12         	  642200	      1690 ns/op	    1400 B/op	      18 allocs/op
 
 func BenchmarkRenderHTMLandCSS(b *testing.B) {
 	tests := []struct {
