@@ -7,8 +7,8 @@ func BenchmarkElOnly(b *testing.B) {
 
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
-		_ = El("div") // do not call the closure
+	for b.Loop() {
+		_ = El("div")
 	}
 }
 
@@ -56,6 +56,6 @@ func BenchmarkDivRender(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_, _ = RenderHTMLandCSS(div) // interface or B‑Prime version
+		_, _ = RenderHTMLandCSS(div)
 	}
 }

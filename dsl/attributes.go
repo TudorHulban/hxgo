@@ -7,7 +7,7 @@ import (
 
 func AttrWithValue(name, value string) Node {
 	// pack both strings into one small struct
-	data := struct {
+	data := &struct { // intentionally move to heap.
 		name  string
 		value string
 	}{
@@ -17,7 +17,7 @@ func AttrWithValue(name, value string) Node {
 
 	return Node{
 		fn:          renderAttrWithValue,
-		data:        unsafe.Pointer(&data),
+		data:        unsafe.Pointer(data),
 		isAttribute: true,
 	}
 }

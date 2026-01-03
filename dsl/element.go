@@ -2,16 +2,17 @@ package dsl
 
 import "unsafe"
 
-// Elements are never attributes
+// Elements are never attributes.
+// Children slice should be immutable.
 func El(tag string, children ...Node) Node {
-	data := struct {
+	data := &struct { // intentionally move to heap.
 		tag      string
 		children []Node
 	}{tag, children}
 
 	return Node{
 		fn:   renderEl,
-		data: unsafe.Pointer(&data),
+		data: unsafe.Pointer(data),
 	}
 }
 
@@ -45,16 +46,17 @@ func renderEl(a *Acc, p unsafe.Pointer) {
 	a.Write(">")
 }
 
+// Children slice should be immutable.
 func ElWId(tag, cssID string, children ...Node) Node {
 	// pack both strings into a tiny struct so we pass ONE pointer
-	data := struct {
+	data := &struct { // intentionally move to heap.
 		tag   string
 		cssID string
 	}{tag, cssID}
 
 	return Node{
 		fn:       renderElWId,
-		data:     unsafe.Pointer(&data),
+		data:     unsafe.Pointer(data),
 		children: children,
 	}
 }

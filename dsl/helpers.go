@@ -13,16 +13,15 @@ func Text(text string) Node {
 	}
 }
 
-func Raw(s string) Node {
+func Raw(text string) Node {
 	return Node{
-		fn:   renderRaw,
-		data: unsafe.Pointer(&s),
-	}
-}
+		fn: func(a *Acc, p unsafe.Pointer) {
+			s := *(*string)(p)
+			a.Write(s)
+		},
 
-func renderRaw(a *Acc, p unsafe.Pointer) {
-	s := *(*string)(p)
-	a.Write(s) // no escaping, direct write
+		data: unsafe.Pointer(&text),
+	}
 }
 
 func If(condition bool, node Node) Node {

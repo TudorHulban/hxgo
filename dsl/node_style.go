@@ -11,9 +11,11 @@ type Style struct {
 // Style nodes are not attributes.
 // no HTML output, only styles.
 func Styled(child Node, styles ...Style) Node {
+	data := &styles // // intentionally move to heap.
+
 	return Node{
 		fn:       renderStyled,
-		data:     unsafe.Pointer(&styles),
+		data:     unsafe.Pointer(data),
 		children: []Node{child},
 	}
 }
