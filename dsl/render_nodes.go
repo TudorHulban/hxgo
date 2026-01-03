@@ -1,99 +1,93 @@
 package dsl
 
-import (
-	"io"
-)
-
 // Empty nodes still emit tags because the renderer treats
 // the element itself as meaningful, not just its children.
-func renderNodes(w io.Writer, elName string, nodes ...Node) ([]Style, error) {
-	var collected []Style // no allocation if no style nodes. slice growth is a trade-off.
+func renderNodes(name string, nodes ...Node) ([]byte, []Style) {
+	var attrs [][]byte
+	var children [][]byte
+	var styles []Style
 
-	_, _ = io.WriteString(w, "<")
-	_, _ = io.WriteString(w, elName)
-
-	// Render attributes
-	for _, node := range nodes {
-		if node == nil || !node.isAttribute() {
+	// Collect fragments
+	for _, n := range nodes {
+		if n == nil {
 			continue
 		}
-
-		if _, err := node.Render(w); err != nil {
-			return nil, err
+		out := n()
+		if out.IsAttr {
+			attrs = append(attrs, out.HTMLParts...)
+		} else {
+			children = append(children, out.HTMLParts...)
 		}
+		styles = append(styles, out.Styles...)
 	}
 
-	_, _ = io.WriteString(w, ">")
+	// Static fragments
+	openTagStart := []byte("<" + name)
+	closeTag := []byte("</" + name + ">")
+	gt := []byte(">")
 
-	if isTagless(elName) {
-		return collected, nil
+	// Count total size
+	total := len(openTagStart) + len(gt) + len(closeTag)
+	for _, a := range attrs {
+		total += len(a)
+	}
+	for _, c := range children {
+		total += len(c)
 	}
 
-	// Render children and collect their styles in one pass
-	for _, node := range nodes {
-		if node == nil || node.isAttribute() {
-			continue
-		}
+	// Single allocation
+	html := make([]byte, 0, total)
 
-		// Render child HTML and collect its styles (from entire subtree)
-		styles, err := node.Render(w)
-		if err != nil {
-			return nil, err
-		}
-
-		collected = append(collected, styles...)
+	// Build final HTML
+	html = append(html, openTagStart...)
+	for _, a := range attrs {
+		html = append(html, a...)
 	}
+	html = append(html, gt...)
+	for _, c := range children {
+		html = append(html, c...)
+	}
+	html = append(html, closeTag...)
 
-	_, _ = io.WriteString(w, "</")
-	_, _ = io.WriteString(w, elName)
-	_, _ = io.WriteString(w, ">")
-
-	return collected, nil
+	return html, styles
 }
 
-func renderNodesWithCSSId(w io.Writer, elName, cssID string, nodes ...Node) ([]Style, error) {
-	var collected []Style
+func renderNodesWithCSSId(name, cssID string, nodes ...Node) ([][]byte, []Style) {
+	var attrs [][]byte
+	var children [][]byte
+	var styles []Style
 
-	_, _ = io.WriteString(w, "<")
-	_, _ = io.WriteString(w, elName)
+	// Inject id attribute
+	if cssID != "" {
+		idAttr := []byte(` id="` + cssID + `"`)
+		attrs = append(attrs, idAttr)
+	}
 
-	_, _ = AttrIDLength(cssID).Render(w) // introduces one allocation more than wo css ID
-
-	// Render attributes.
-	for _, node := range nodes {
-		if node == nil || !node.isAttribute() {
+	// Collect fragments
+	for _, n := range nodes {
+		if n == nil {
 			continue
 		}
-
-		if _, err := node.Render(w); err != nil {
-			return nil, err
+		out := n()
+		if out.IsAttr {
+			attrs = append(attrs, out.HTMLParts...)
+		} else {
+			children = append(children, out.HTMLParts...)
 		}
+		styles = append(styles, out.Styles...)
 	}
 
-	_, _ = io.WriteString(w, ">")
+	// Build fragment list (NOT concatenated HTML)
+	openTagStart := []byte("<" + name)
+	closeTag := []byte("</" + name + ">")
+	gt := []byte(">")
 
-	if isTagless(elName) {
-		return collected, nil
-	}
+	parts := make([][]byte, 0, 2+len(attrs)+len(children))
+	parts = append(parts, openTagStart)
+	parts = append(parts, attrs...)
+	parts = append(parts, gt)
+	parts = append(parts, children...)
+	parts = append(parts, closeTag)
 
-	// Render children and collect their styles in one pass.
-	for _, node := range nodes {
-		if node == nil || node.isAttribute() {
-			continue
-		}
-
-		// Render child HTML and collect its styles (from entire subtree)
-		styles, err := node.Render(w)
-		if err != nil {
-			return nil, err
-		}
-
-		collected = append(collected, styles...)
-	}
-
-	_, _ = io.WriteString(w, "</")
-	_, _ = io.WriteString(w, elName)
-	_, _ = io.WriteString(w, ">")
-
-	return collected, nil
+	return parts, styles
 }

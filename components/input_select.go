@@ -159,7 +159,7 @@ func (el InputSelect) tagLabel() string {
 	)
 }
 
-func (el InputSelect) RawSelect() dsl.Writer {
+func (el InputSelect) RawSelect() dsl.Node {
 	return dsl.Raw(
 		helpers.Sprintf(
 			`<select %s>%s</select>`,
@@ -170,7 +170,7 @@ func (el InputSelect) RawSelect() dsl.Writer {
 	)
 }
 
-func (el InputSelect) Raw() dsl.Writer {
+func (el InputSelect) Raw() dsl.Node {
 	return dsl.Raw(
 		helpers.Sprintf(
 			`<div%s%s>%s</div>`,

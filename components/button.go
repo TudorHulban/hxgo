@@ -26,7 +26,7 @@ type ParamsButtonSubmit struct {
 	IsNewTab   bool
 }
 
-func ButtonSubmit(params *ParamsButtonSubmit) dsl.Writer {
+func ButtonSubmit(params *ParamsButtonSubmit) dsl.Node {
 	return dsl.Button(
 		dsl.AttrType("submit"),
 		dsl.AttrIDLength(params.CSSID),
@@ -74,7 +74,7 @@ func ButtonSubmit(params *ParamsButtonSubmit) dsl.Writer {
 	)
 }
 
-func ButtonSubmitWCSS(params *ParamsButtonSubmit, css []dsl.Node) dsl.Writer {
+func ButtonSubmitWCSS(params *ParamsButtonSubmit, css []dsl.Node) dsl.Node {
 	return dsl.Button(
 		append(
 			css,

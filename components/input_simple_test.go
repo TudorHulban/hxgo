@@ -1,9 +1,6 @@
 package components
 
 import (
-	"bytes"
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/helpers"
@@ -24,25 +21,22 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 		},
 	}
 
-	// 	<div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
+	// <div  class="class-div">`<label>`+el.LabelElementName+`:</label>`
 	// <input type="text"  name="label" hx-max=50></div>
 
-	fmt.Println(
-		el.
-			Raw().
-			Render(os.Stdout),
-	)
+	output := el.Raw()
+
+	out := output()
+	require.False(t, out.IsAttr)
+	require.NotZero(t, out.HTMLParts)
 
 	expectedOutput := helpers.Sprintf(
 		`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`,
 		el.LabelElementName,
 	)
 
-	var buf bytes.Buffer
-	styles, err := el.Raw().Render(&buf)
-	require.NoError(t, err, "render error")
-	require.Zero(t, styles)
-
-	actualOutput := buf.String()
-	require.Equal(t, expectedOutput, actualOutput, "unexpected output")
+	require.Equal(t,
+		expectedOutput,
+		out.String(),
+	)
 }

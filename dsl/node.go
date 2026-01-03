@@ -1,16 +1,21 @@
 package dsl
 
-import "io"
+import "strings"
 
-type Node interface {
-	isAttribute() bool
-	Render(w io.Writer) ([]Style, error)
+type NodeOutput struct {
+	IsAttr    bool
+	HTMLParts [][]byte // slice of references to static or prebuilt byte slices.
+	Styles    []Style
 }
 
-var _ Node = attribute{}
-var _ Node = Writer(
-	func(io.Writer) ([]Style, error) {
-		return nil, nil
-	},
-)
-var _ Node = &NodeStyle{}
+func (n NodeOutput) String() string {
+	var b strings.Builder
+
+	for _, part := range n.HTMLParts {
+		b.Write(part)
+	}
+
+	return b.String()
+}
+
+type Node func() NodeOutput

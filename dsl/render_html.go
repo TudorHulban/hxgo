@@ -1,33 +1,42 @@
 package dsl
 
 import (
-	"bytes"
 	"encoding/base64"
 
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
-func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
-	var htmlBuf bytes.Buffer
-	collector := newSmartCSSCollector()
+func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
+	var parts [][]byte
+	var styles []Style
 
-	for _, node := range nodes {
-		if node == nil {
+	for _, n := range nodes {
+		if n == nil {
 			continue
 		}
-
-		// Single pass: render HTML and get styles
-		styles, errRender := node.Render(&htmlBuf)
-		if errRender != nil {
-			return nil, "", errRender
-		}
-
-		for _, s := range styles {
-			collector.Add(s)
-		}
+		out := n()
+		parts = append(parts, out.HTMLParts...)
+		styles = append(styles, out.Styles...)
 	}
 
-	return htmlBuf.Bytes(), collector.String(), nil
+	// compute total size
+	total := 0
+	for _, p := range parts {
+		total += len(p)
+	}
+
+	// single allocation
+	html := make([]byte, 0, total)
+	for _, p := range parts {
+		html = append(html, p...)
+	}
+
+	css := newSmartCSSCollector()
+	for _, s := range styles {
+		css.Add(s)
+	}
+
+	return html, css.String()
 }
 
 func HTMLwithDataCSS(html []byte, css string) string {

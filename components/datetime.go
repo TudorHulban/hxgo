@@ -22,7 +22,7 @@ type InputDateTime struct {
 	IsDisabled bool
 }
 
-func (el InputDateTime) Raw() dsl.Writer {
+func (el InputDateTime) Raw() dsl.Node {
 	result := [4]string{
 		helpers.Ternary(
 			len(el.CSSDivClass) == 0,

@@ -7,14 +7,14 @@ import (
 	"github.com/TudorHulban/hxgo/hx"
 )
 
-func AttrHXRedirect(value string) attribute {
+func AttrHXRedirect(value string) Node {
 	return AttrWithValue(
 		hx.HXRedirect,
 		value,
 	)
 }
 
-func AttrHXRedirectLength(value string) attribute {
+func AttrHXRedirectLength(value string) Node {
 	if len(value) > 0 {
 		return AttrWithValue(
 			hx.HXRedirect,
@@ -22,11 +22,11 @@ func AttrHXRedirectLength(value string) attribute {
 		)
 	}
 
-	return attribute{}
+	return Noop
 }
 
-func AttrHXRequire(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXRequire(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXRequire,
@@ -37,8 +37,8 @@ func AttrHXRequire(values ...string) attribute {
 	)
 }
 
-func AttrHXSwap(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXSwap(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXSwap,
@@ -49,8 +49,8 @@ func AttrHXSwap(values ...string) attribute {
 	)
 }
 
-func AttrHXSend(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXSend(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXSend,
@@ -61,8 +61,8 @@ func AttrHXSend(values ...string) attribute {
 	)
 }
 
-func AttrHXEnable(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXEnable(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXDirectEnable,
@@ -73,8 +73,8 @@ func AttrHXEnable(values ...string) attribute {
 	)
 }
 
-func AttrHXDisable(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXDisable(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXDirectDisable,
@@ -85,25 +85,25 @@ func AttrHXDisable(values ...string) attribute {
 	)
 }
 
-func AttrHXUpload(withUpload bool) attribute {
+func AttrHXUpload(withUpload bool) Node {
 	if withUpload {
 		return Attr(
 			hx.HXUpload,
 		)
 	}
 
-	return attribute{}
+	return Noop
 }
 
-func AttrHXPOST(value string) attribute {
+func AttrHXPOST(value string) Node {
 	return AttrWithValue(
 		hx.HXPOST,
 		value,
 	)
 }
 
-func AttrHXShow(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXShow(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXShow,
@@ -114,8 +114,8 @@ func AttrHXShow(values ...string) attribute {
 	)
 }
 
-func AttrHXHide(values ...string) attribute {
-	return AttrWithValueIf(
+func AttrHXHide(values ...string) Node {
+	return AttrIf(
 		len(values) > 0,
 
 		hx.HXHide,

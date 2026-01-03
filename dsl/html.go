@@ -1,41 +1,60 @@
 package dsl
 
-func A(children ...Node) Writer {
+func A(children ...Node) Node {
 	return El(
 		"a",
 		children...,
 	)
 }
 
-func Aside(children ...Node) Writer {
+func Aside(children ...Node) Node {
 	return El(
 		"aside",
 		children...,
 	)
 }
 
-func Div(children ...Node) Writer {
+func Class(name string) Node {
+	// Prebuild static fragments once
+	prefix := []byte(` class="`)
+	value := []byte(name)
+	suffix := []byte(`"`)
+
+	return func() NodeOutput {
+		return NodeOutput{
+			IsAttr: true,
+			HTMLParts: [][]byte{
+				prefix,
+				value,
+				suffix,
+			},
+			Styles: nil,
+		}
+	}
+}
+
+func Div(children ...Node) Node {
 	return El(
 		"div",
 		children...,
 	)
 }
 
-func Label(children ...Node) Writer {
+func Label(children ...Node) Node {
 	return El(
 		"label",
 		children...,
 	)
 }
 
-func Form(children ...Node) Writer {
+func Form(children ...Node) Node {
 	return El(
 		"form",
 		children...,
 	)
 }
 
-func FormWithID(cssID string, children ...Node) Writer {
+func FormWithID(cssID string, children ...Node) Node {
 	return ElWId(
 		"form",
 		cssID,
@@ -43,147 +62,147 @@ func FormWithID(cssID string, children ...Node) Writer {
 	)
 }
 
-func H1(children ...Node) Writer {
+func H1(children ...Node) Node {
 	return El(
 		"h1",
 		children...,
 	)
 }
 
-func H2(children ...Node) Writer {
+func H2(children ...Node) Node {
 	return El(
 		"h2",
 		children...,
 	)
 }
 
-func H3(children ...Node) Writer {
+func H3(children ...Node) Node {
 	return El(
 		"h3",
 		children...,
 	)
 }
 
-func H4(children ...Node) Writer {
+func H4(children ...Node) Node {
 	return El(
 		"h4",
 		children...,
 	)
 }
 
-func H5(children ...Node) Writer {
+func H5(children ...Node) Node {
 	return El(
 		"h5",
 		children...,
 	)
 }
 
-func H6(children ...Node) Writer {
+func H6(children ...Node) Node {
 	return El(
 		"h6",
 		children...,
 	)
 }
 
-func Img(children ...Node) Writer {
+func Img(children ...Node) Node {
 	return El(
 		"img",
 		children...,
 	)
 }
 
-func Input(children ...Node) Writer {
+func Input(children ...Node) Node {
 	return El(
 		"input",
 		children...,
 	)
 }
 
-func Li(children ...Node) Writer {
+func Li(children ...Node) Node {
 	return El(
 		"li",
 		children...,
 	)
 }
 
-func Link(children ...Node) Writer {
+func Link(children ...Node) Node {
 	return El(
 		"link",
 		children...,
 	)
 }
 
-func TextArea(children ...Node) Writer {
+func TextArea(children ...Node) Node {
 	return El(
 		"textarea",
 		children...,
 	)
 }
 
-func Table(children ...Node) Writer {
+func Table(children ...Node) Node {
 	return El(
 		"table",
 		children...,
 	)
 }
 
-func THead(children ...Node) Writer {
+func THead(children ...Node) Node {
 	return El(
 		"thead",
 		children...,
 	)
 }
 
-func TBody(children ...Node) Writer {
+func TBody(children ...Node) Node {
 	return El(
 		"tbody",
 		children...,
 	)
 }
 
-func Th(children ...Node) Writer {
+func Th(children ...Node) Node {
 	return El(
 		"th",
 		children...,
 	)
 }
 
-func Tr(children ...Node) Writer {
+func Tr(children ...Node) Node {
 	return El(
 		"tr",
 		children...,
 	)
 }
 
-func Nav(children ...Node) Writer {
+func Nav(children ...Node) Node {
 	return El(
 		"nav",
 		children...,
 	)
 }
 
-func P(children ...Node) Writer {
+func P(children ...Node) Node {
 	return El(
 		"p",
 		children...,
 	)
 }
 
-func Ul(children ...Node) Writer {
+func Ul(children ...Node) Node {
 	return El(
 		"ul",
 		children...,
 	)
 }
 
-func Ol(children ...Node) Writer {
+func Ol(children ...Node) Node {
 	return El(
 		"ol",
 		children...,
 	)
 }
 
-func Span(children ...Node) Writer {
+func Span(children ...Node) Node {
 	return El(
 		"span",
 		children...,
