@@ -3,6 +3,7 @@ package components
 import (
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
@@ -27,10 +28,15 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 
 	out := output()
 	require.False(t, out.IsAttr)
-	require.Zero(t, out.HTML)
+	require.NotZero(t, out.HTMLParts)
 
-	// expectedOutput := helpers.Sprintf(
-	// 	`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`,
-	// 	el.LabelElementName,
-	// )
+	expectedOutput := helpers.Sprintf(
+		`<div class="class-div"><label>%s:</label><input type="text"  name="label" hx-max=50></div>`,
+		el.LabelElementName,
+	)
+
+	require.Equal(t,
+		expectedOutput,
+		out.String(),
+	)
 }

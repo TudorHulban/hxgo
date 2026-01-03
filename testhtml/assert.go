@@ -2,8 +2,6 @@ package testhtml
 
 import (
 	"testing"
-
-	"github.com/TudorHulban/hxgo/dsl"
 )
 
 func AssertRaw(t *testing.T, raw string, expectedHTML string) {
@@ -24,13 +22,13 @@ func AssertRaw(t *testing.T, raw string, expectedHTML string) {
 	}
 }
 
-func AssertNode(t *testing.T, node dsl.Node, expectedHTML string) {
-	t.Helper()
+// func AssertNode(t *testing.T, node dsl.Node, expectedHTML string) {
+// 	t.Helper()
 
-	out := node()
-	got := string(out.HTML)
+// 	out := node()
+// 	got := string(out.HTMLParts[])
 
-	if got != expectedHTML {
-		t.Fatalf("HTML mismatch:\nexpected: %q\ngot:      %q", expectedHTML, got)
-	}
-}
+// 	if got != expectedHTML {
+// 		t.Fatalf("HTML mismatch:\nexpected: %q\ngot:      %q", expectedHTML, got)
+// 	}
+// }

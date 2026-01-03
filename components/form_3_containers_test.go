@@ -13,7 +13,7 @@ func TestNewForm3Containers(t *testing.T) {
 		&ParamsButtonSubmit{},
 		[]dsl.Node{
 			dsl.Styled(
-				nil,
+				dsl.Noop,
 				dsl.Style{
 					Selector: ".card:hover",
 					Props: map[string]string{
@@ -68,8 +68,7 @@ func TestNewForm3Containers(t *testing.T) {
 		},
 	)
 
-	html, css, errRender := dsl.RenderHTMLandCSS(form)
-	require.NoError(t, errRender)
+	html, css := dsl.RenderHTMLandCSS(form)
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 

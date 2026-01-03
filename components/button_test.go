@@ -58,8 +58,7 @@ func TestButton(t *testing.T) {
 		},
 	)
 
-	html, css, errRender := dsl.RenderHTMLandCSS(el)
-	require.NoError(t, errRender)
+	html, css := dsl.RenderHTMLandCSS(el)
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
@@ -112,6 +111,6 @@ func BenchmarkButtonSubmit(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = ButtonSubmit(params)().HTML
+		_ = ButtonSubmit(params)().HTMLParts
 	}
 }

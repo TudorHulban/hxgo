@@ -6,42 +6,37 @@ import (
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
-func RenderHTMLandCSS(nodes ...Node) ([]byte, string, error) {
-	var htmlParts [][]byte
+func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
+	var parts [][]byte
 	var styles []Style
 
-	// Collect structured output
 	for _, n := range nodes {
 		if n == nil {
 			continue
 		}
-
 		out := n()
-
-		// top-level nodes are always children, never attributes
-		htmlParts = append(htmlParts, out.HTML)
+		parts = append(parts, out.HTMLParts...)
 		styles = append(styles, out.Styles...)
 	}
 
-	// Estimate total size
+	// compute total size
 	total := 0
-	for _, p := range htmlParts {
+	for _, p := range parts {
 		total += len(p)
 	}
 
-	// Concatenate HTML once
+	// single allocation
 	html := make([]byte, 0, total)
-	for _, p := range htmlParts {
+	for _, p := range parts {
 		html = append(html, p...)
 	}
 
-	// CSS collector
-	collector := newSmartCSSCollector()
+	css := newSmartCSSCollector()
 	for _, s := range styles {
-		collector.Add(s)
+		css.Add(s)
 	}
 
-	return html, collector.String(), nil
+	return html, css.String()
 }
 
 func HTMLwithDataCSS(html []byte, css string) string {

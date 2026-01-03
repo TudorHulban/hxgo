@@ -11,11 +11,8 @@ type Style struct {
 func Styled(child Node, style ...Style) Node {
 	return func() NodeOutput {
 		out := child()
+		out.Styles = append(out.Styles, style...)
 
-		return NodeOutput{
-			IsAttr: false,
-			HTML:   out.HTML,
-			Styles: append(out.Styles, style...),
-		}
+		return out
 	}
 }

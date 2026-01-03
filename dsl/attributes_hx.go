@@ -22,7 +22,7 @@ func AttrHXRedirectLength(value string) Node {
 		)
 	}
 
-	return noop
+	return Noop
 }
 
 func AttrHXRequire(values ...string) Node {
@@ -92,7 +92,7 @@ func AttrHXUpload(withUpload bool) Node {
 		)
 	}
 
-	return noop
+	return Noop
 }
 
 func AttrHXPOST(value string) Node {

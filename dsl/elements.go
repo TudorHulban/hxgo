@@ -15,21 +15,21 @@ func Body(children ...Node) Node {
 }
 
 func Doctype(node Node) Node {
+	// Static fragment, allocated once
+	doctype := []byte("<!doctype html>")
+
 	return func() NodeOutput {
-		// Render child node first
 		child := node()
 
-		// Pre-size: "<!doctype html>" + child HTML
-		size := len("<!doctype html>") + len(child.HTML)
-		html := make([]byte, 0, size)
-
-		html = append(html, "<!doctype html>"...)
-		html = append(html, child.HTML...)
+		// Prepend doctype as a fragment
+		parts := make([][]byte, 0, 1+len(child.HTMLParts))
+		parts = append(parts, doctype)
+		parts = append(parts, child.HTMLParts...)
 
 		return NodeOutput{
-			IsAttr: false,
-			HTML:   html,
-			Styles: child.Styles,
+			IsAttr:    false,
+			HTMLParts: parts,
+			Styles:    child.Styles,
 		}
 	}
 }

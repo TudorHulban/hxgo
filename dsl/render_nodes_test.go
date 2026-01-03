@@ -39,7 +39,7 @@ func BenchmarkRenderNodes(b *testing.B) {
 			elName:      "div",
 			nodes: []Node{
 				Styled(
-					noop,
+					Noop,
 					Style{
 						Selector: ".card",
 						Props: map[string]string{
@@ -58,7 +58,7 @@ func BenchmarkRenderNodes(b *testing.B) {
 			nodes: []Node{
 				Div(Class("card")),
 				Styled(
-					noop,
+					Noop,
 					Style{
 						Selector: ".card",
 						Props: map[string]string{
@@ -114,7 +114,7 @@ func BenchmarkRenderNodesWithCSSId(b *testing.B) {
 			elName:      "div",
 			nodes: []Node{
 				Styled(
-					noop,
+					Noop,
 					Style{
 						Selector: ".card",
 						Props: map[string]string{

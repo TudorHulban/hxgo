@@ -6,25 +6,26 @@ import (
 
 func Text(text string) Node {
 	return func() NodeOutput {
-		escaped := template.HTMLEscapeString(text)
-		html := []byte(escaped) // can be optimized to manual escape later
-
 		return NodeOutput{
 			IsAttr: false,
-			HTML:   html,
-			Styles: nil,
+			HTMLParts: [][]byte{
+				[]byte(
+					template.HTMLEscapeString(text),
+				),
+			},
 		}
 	}
 }
 
 func Raw(text string) Node {
 	return func() NodeOutput {
-		html := []byte(text)
-
 		return NodeOutput{
 			IsAttr: false,
-			HTML:   html,
-			Styles: nil,
+			HTMLParts: [][]byte{
+				[]byte(
+					text,
+				),
+			},
 		}
 	}
 }

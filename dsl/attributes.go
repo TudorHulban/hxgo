@@ -5,21 +5,22 @@ import (
 )
 
 func AttrWithValue(name, value string) Node {
+	escaped := template.HTMLEscapeString(value)
+
+	// Prebuild the static fragments ONCE.
+	// These do not allocate per call.
+	prefix := []byte(" " + name + "=\"")
+	suffix := []byte("\"")
+	val := []byte(escaped)
+
 	return func() NodeOutput {
-		escaped := template.HTMLEscapeString(value)
-		// space + name + =" + value + "
-		size := 1 + len(name) + 2 + len(escaped) + 1
-		html := make([]byte, 0, size)
-
-		html = append(html, ' ')
-		html = append(html, name...)
-		html = append(html, '=', '"')
-		html = append(html, escaped...)
-		html = append(html, '"')
-
 		return NodeOutput{
 			IsAttr: true,
-			HTML:   html,
+			HTMLParts: [][]byte{
+				prefix,
+				val,
+				suffix,
+			},
 			Styles: nil,
 		}
 	}
@@ -31,7 +32,7 @@ func Attr(name string) Node {
 
 func AttrIf(condition bool, name, value string) Node {
 	if !condition {
-		return noop
+		return Noop
 	}
 
 	return AttrWithValue(name, value)
@@ -66,7 +67,7 @@ func AttrClassLength(class string) Node {
 		)
 	}
 
-	return noop
+	return Noop
 }
 
 func AttrID(value string) Node {
@@ -84,7 +85,7 @@ func AttrIDIf(condition bool, value string) Node {
 		)
 	}
 
-	return noop
+	return Noop
 }
 
 // AttrIDLength returns css id Node if passed value valid.
@@ -96,7 +97,7 @@ func AttrIDLength(value string) Node {
 		)
 	}
 
-	return noop
+	return Noop
 }
 
 func AttrType(class string) Node {
