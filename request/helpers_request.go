@@ -12,7 +12,7 @@ import (
 )
 
 func getRequestBoundary(requestHeaders map[string][]string) (string, error) {
-	contenType, exists := requestHeaders["Content-Type"]
+	contentType, exists := requestHeaders["Content-Type"]
 	if !exists {
 		return "",
 			goerrors.ErrNilInput{
@@ -20,9 +20,9 @@ func getRequestBoundary(requestHeaders map[string][]string) (string, error) {
 			}
 	}
 
-	mediaType, params, err := mime.ParseMediaType(
-		strings.Join(
-			contenType,
+	mediaType, params, err := mime.ParseMediaType( // TODO: not cheap. overkill? alternatives: manual boundary scan or strings.Index("boundary=")
+		strings.Join( // TODO: allocates. Content-Type has exactly one value so joining might not be needed.
+			contentType,
 			"",
 		),
 	)
@@ -66,16 +66,19 @@ func parseMultipartForm(formData []byte, requestHeaders map[string][]string) (ma
 
 			return nil, err
 		}
-		defer part.Close()
 
 		formField := part.FormName()
 
-		var buf bytes.Buffer
+		var buf bytes.Buffer // TODO: pre-size buffer using Content-Length (if present), sync.Pool, read directly into a []byte slice
 
 		if _, errRead := buf.ReadFrom(part); errRead != nil {
+			part.Close()
+
 			return nil,
 				errRead
 		}
+
+		part.Close()
 
 		formValue := buf.String()
 
