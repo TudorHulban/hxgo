@@ -33,6 +33,15 @@ func (a *Accumulator) Write3(value1, value2, value3 string) {
 	a.html = append(a.html, value3...)
 }
 
+// Fused writes.
+func (a *Accumulator) Write5(value1, value2, value3, value4, value5 string) {
+	a.html = append(a.html, value1...)
+	a.html = append(a.html, value2...)
+	a.html = append(a.html, value3...)
+	a.html = append(a.html, value4...)
+	a.html = append(a.html, value5...)
+}
+
 type Renderer func(*Accumulator, unsafe.Pointer)
 
 // Node: function pointer plus data pointer.

@@ -1,6 +1,8 @@
 package dsl
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 func A(children ...Node) Node {
 	return El(
@@ -23,27 +25,20 @@ func Class(name string) Node {
 	}
 }
 
+// TODO: move to write3?
 func renderClass(a *Accumulator, p unsafe.Pointer) {
 	name := *(*string)(p)
+
 	a.Write1(` class="`)
 	a.Write1(name)
 	a.Write1(`"`)
 }
 
 func Div(children ...Node) Node {
-	return Node{
-		fn:       renderDiv,
-		data:     nil,
-		children: children,
-	}
-}
-
-func renderDiv(a *Accumulator, _ unsafe.Pointer) {
-	a.Write1("<div")
-	// attributes would be rendered by children before closing '>'
-	a.Write1(">")
-	// children rendered by walk()
-	a.Write1("</div>")
+	return El(
+		"div",
+		children...,
+	)
 }
 
 func Label(children ...Node) Node {

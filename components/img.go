@@ -11,7 +11,7 @@ type ParamsImage struct {
 	ImageAlt        string
 }
 
-func Img(params *ParamsImage) dsl.Node {
+func Image(params *ParamsImage) dsl.Node {
 	return dsl.Img(
 		dsl.AttrWithValue(
 			"sizes",

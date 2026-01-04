@@ -44,11 +44,13 @@ func renderAttrWithValue(a *Accumulator, p unsafe.Pointer) {
 		value string
 	})(p)
 
-	a.Write1(" ")
-	a.Write1(d.name)
-	a.Write1(`="`)
-	a.Write1(d.value)
-	a.Write1(`"`)
+	a.Write5(
+		" ",
+		d.name,
+		`="`,
+		d.value,
+		`"`,
+	)
 }
 
 func Attr(name string) Node {
