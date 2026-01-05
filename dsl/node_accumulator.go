@@ -22,7 +22,7 @@ func newAccumulator(estimatedHTMLSize, estimatedCSSRules int) *accumulator {
 		html:   make([]byte, 0, estimatedHTMLSize),
 		styles: make([]Style, 0, estimatedCSSRules),
 
-		registryCSS: make(map[CSSKey]map[*ActualCSS]DesktopFirst),
+		// registryCSS: make(map[CSSKey]map[*ActualCSS]DesktopFirst),
 	}
 }
 

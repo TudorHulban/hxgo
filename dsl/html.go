@@ -1,9 +1,5 @@
 package dsl
 
-import (
-	"unsafe"
-)
-
 func A(children ...Node) Node {
 	return el(
 		"a",
@@ -16,22 +12,6 @@ func Aside(children ...Node) Node {
 		"aside",
 		children...,
 	)
-}
-
-func Class(name string) Node {
-	return Node{
-		fn:   renderClass,
-		data: unsafe.Pointer(&name),
-	}
-}
-
-// TODO: move to write3?
-func renderClass(a *accumulator, p unsafe.Pointer) {
-	name := *(*string)(p)
-
-	a.Write1(` class="`)
-	a.Write1(name)
-	a.Write1(`"`)
 }
 
 func Div(children ...Node) Node {
