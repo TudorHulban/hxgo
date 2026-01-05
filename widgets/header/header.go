@@ -1,41 +1,40 @@
 package wheader
 
 import (
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
 )
 
 type ParamsWidgetHeader struct {
 	Title             string
 	BreadcrumbCaption string
 
-	hxcomponents.ParamsImage
+	components.ParamsImage
 }
 
-func WidgetHeader(params *ParamsWidgetHeader) hxprimitives.Node {
-	return hxhtml.Div(
-		hxprimitives.AttrClass("page-header-info"),
+func WidgetHeader(params *ParamsWidgetHeader) dsl.Node {
+	return dsl.Div(
+		dsl.AttrClass("page-header-info"),
 
-		hxhtml.H1(
-			hxprimitives.AttrClass("entry-title"),
-			hxprimitives.Text(params.Title),
+		dsl.H1(
+			dsl.AttrClass("entry-title"),
+			dsl.Text(params.Title),
 		),
 
-		hxhtml.Div(
-			hxprimitives.AttrClass("header-images"),
+		dsl.Div(
+			dsl.AttrClass("header-images"),
 
-			hxhtml.Img(
-				hxprimitives.AttrWithValue("src", params.ImageSource),
-				hxprimitives.AttrWithValue("alt", params.ImageAlt),
+			dsl.Img(
+				dsl.AttrWithValue("src", params.ImageSource),
+				dsl.AttrWithValue("alt", params.ImageAlt),
 			),
 		),
 
-		hxhtml.Div(
-			hxprimitives.AttrClass("header-breadcrumb"),
+		dsl.Div(
+			dsl.AttrClass("header-breadcrumb"),
 
-			hxhtml.Span(
-				hxprimitives.Text(
+			dsl.Span(
+				dsl.Text(
 					params.BreadcrumbCaption,
 				),
 			),

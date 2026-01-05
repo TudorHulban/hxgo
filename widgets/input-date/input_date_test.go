@@ -1,14 +1,12 @@
 package winputdate
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
-	"github.com/TudorHulban/hx-widgets/helpers"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,39 +25,41 @@ func TestWidgetInputDate(t *testing.T) {
 
 	defer writer.Close()
 
-	page := hxcomponents.Page{
+	page := components.Page{
 		Title: t.Name(),
 
-		Head: []hxprimitives.Node{
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("css_base.css"),
+		Head: []dsl.Node{
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("css_base.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("css_site.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("css_site.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("https://npmcdn.com/flatpickr/dist/themes/dark.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("https://npmcdn.com/flatpickr/dist/themes/dark.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("input_date.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("input_date.css"),
 			),
 		},
 
-		Body: []hxprimitives.Node{
+		Body: []dsl.Node{
 			fragment.LinkJavascript,
 			fragment.HTML,
 		},
 	}
 
-	fmt.Println(
-		page.Build().Render(writer),
+	writer.Write(
+		dsl.Render(
+			page.Build(),
+		),
 	)
 }

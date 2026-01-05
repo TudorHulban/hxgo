@@ -1,13 +1,11 @@
 package wheader
 
 import (
-	"fmt"
 	"testing"
 
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
-	"github.com/TudorHulban/hx-widgets/helpers"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,7 +15,7 @@ func TestHeader(t *testing.T) {
 			Title:             "Washing Head",
 			BreadcrumbCaption: "Barbershop/Washing Head",
 
-			ParamsImage: hxcomponents.ParamsImage{
+			ParamsImage: components.ParamsImage{
 				ImageSquareSize: "160",
 				ImageAlt:        "Washing Head",
 				ImageSource:     "https://themes.getmotopress.com/bro-barbershop/wp-content/uploads/sites/64/2024/01/hero-bg-1.jpg",
@@ -30,30 +28,32 @@ func TestHeader(t *testing.T) {
 
 	defer writer.Close()
 
-	page := hxcomponents.Page{
+	page := components.Page{
 		Title: t.Name(),
 
-		Head: []hxprimitives.Node{
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("css_base.css"),
+		Head: []dsl.Node{
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("css_base.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("css_site.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("css_site.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("header.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("header.css"),
 			),
 		},
 
-		Body: []hxprimitives.Node{
+		Body: []dsl.Node{
 			fragment,
 		},
 	}
 
-	fmt.Println(
-		page.Build().Render(writer),
+	writer.Write(
+		dsl.Render(
+			page.Build(),
+		),
 	)
 }

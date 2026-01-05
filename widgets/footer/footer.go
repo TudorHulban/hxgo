@@ -1,53 +1,52 @@
 package wfooter
 
 import (
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
 	pagecss "github.com/TudorHulban/hx-core/page-css"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
-	"github.com/TudorHulban/hx-widgets/base"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/widgets/base"
 )
 
-func WidgetFooter() hxprimitives.Node {
-	form := hxcomponents.NewFormThreeContainers(
-		&hxcomponents.ParamsNewFormThreeContainers{
-			IDDivEnclosing:  "footer-info",
+func WidgetFooter() dsl.Node {
+	form := components.NewFormThreeContainers(
+		&components.ParamsNewFormThreeContainers{
+			IDEnclosingDiv:  "footer-info",
 			IDForm:          "form-footer",
-			IDDivContainers: "form-footer-info",
+			IDContainersDiv: "form-footer-info",
 
 			IDContainerLeft:   "contact-hours",
 			IDContainerMiddle: "contact-address",
 			IDContainerRight:  "footer-links",
 
-			ElementsInputLeft: []hxprimitives.Node{
-				hxhtml.Span(
-					hxprimitives.Text(
+			ElementsInputLeft: []dsl.Node{
+				dsl.Span(
+					dsl.Text(
 						"Contact and Open Hours",
 					),
 				),
-				hxhtml.Span(
-					hxprimitives.Text(
+				dsl.Span(
+					dsl.Text(
 						"+1234567890",
 					),
 				),
 			},
 
-			ElementsInputMiddle: []hxprimitives.Node{
-				hxhtml.Span(
-					hxprimitives.Text(
+			ElementsInputMiddle: []dsl.Node{
+				dsl.Span(
+					dsl.Text(
 						"Address",
 					),
 				),
-				hxhtml.Span(
-					hxprimitives.Text(
+				dsl.Span(
+					dsl.Text(
 						"Lorem ipsum 3",
 					),
 				),
 			},
 
-			ElementsInputRight: []hxprimitives.Node{
-				hxhtml.Span(
-					hxprimitives.Text(
+			ElementsInputRight: []dsl.Node{
+				dsl.Span(
+					dsl.Text(
 						"Book an appointment",
 					),
 				),
@@ -55,20 +54,20 @@ func WidgetFooter() hxprimitives.Node {
 		},
 	)
 
-	return hxhtml.Div(
-		hxprimitives.AttrClass(
+	return dsl.Div(
+		dsl.AttrClass(
 			"page-footer",
 		),
 
 		form,
 
-		hxhtml.Div(
-			hxprimitives.AttrID(
+		dsl.Div(
+			dsl.AttrID(
 				"copyright",
 			),
 
-			hxhtml.H4(
-				hxprimitives.Text(
+			dsl.H4(
+				dsl.Text(
 					"Barbershop ©2025",
 				),
 			),

@@ -3,10 +3,9 @@ package winputdate
 import (
 	"time"
 
-	hxhelpers "github.com/TudorHulban/hx-core/helpers"
-	hxhtml "github.com/TudorHulban/hx-core/html"
 	pagecss "github.com/TudorHulban/hx-core/page-css"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 )
 
 type ParamsWidgetInputDate struct {
@@ -17,17 +16,17 @@ type ParamsWidgetInputDate struct {
 }
 
 type ResponseWidgetInputDate struct {
-	HTML           hxprimitives.Node
-	LinkJavascript hxprimitives.Node
+	HTML           dsl.Node
+	LinkJavascript dsl.Node
 }
 
 func WidgetInputDate(params *ParamsWidgetInputDate) *ResponseWidgetInputDate {
 	return &ResponseWidgetInputDate{
-		HTML: hxhtml.Div(
-			hxprimitives.AttrClass("input-date"),
+		HTML: dsl.Div(
+			dsl.AttrClass("input-date"),
 
-			hxprimitives.Raw(
-				hxhelpers.Sprintf(
+			dsl.Raw(
+				helpers.Sprintf(
 					`<input class="flatpickr-input" type="text" id="%s" value="%s" min="%s" max="%s"/>`,
 
 					params.CSSID,
@@ -37,8 +36,8 @@ func WidgetInputDate(params *ParamsWidgetInputDate) *ResponseWidgetInputDate {
 				),
 			),
 
-			hxprimitives.Raw(
-				hxhelpers.Sprintf(
+			dsl.Raw(
+				helpers.Sprintf(
 					`<script>
 					document.addEventListener('DOMContentLoaded', function() {
 					const inputElement = document.getElementById('%s');
@@ -59,7 +58,7 @@ func WidgetInputDate(params *ParamsWidgetInputDate) *ResponseWidgetInputDate {
 			),
 		),
 
-		LinkJavascript: hxprimitives.Raw(
+		LinkJavascript: dsl.Raw(
 			`<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>`,
 		),
 	}

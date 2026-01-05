@@ -1,12 +1,11 @@
 package wappointment
 
 import (
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
 	pagecss "github.com/TudorHulban/hx-core/page-css"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
-	winputdate "github.com/TudorHulban/hx-widgets/input-date"
-	winputslots "github.com/TudorHulban/hx-widgets/input-slots"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
+	winputdate "github.com/TudorHulban/hxgo/widgets/input-date"
+	winputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
 )
 
 type ParamsWidgetAppointment struct {
@@ -16,12 +15,12 @@ type ParamsWidgetAppointment struct {
 	SelectLabel  string
 	SelectValues []string
 
-	hxcomponents.ParamsButtonSubmit
+	components.ParamsButtonSubmit
 }
 
 type ResponseWidgetAppointment struct {
-	HTML           hxprimitives.Node
-	LinkJavascript hxprimitives.Node
+	HTML           dsl.Node
+	LinkJavascript dsl.Node
 
 	CSS []func() *pagecss.CSSElement
 }
@@ -31,7 +30,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 		&params.ParamsWidgetInputDate,
 	)
 
-	inputSimple := hxcomponents.InputSelect{
+	inputSimple := components.InputSelect{
 		CSSDivID: "resource-selection",
 
 		LabelElementName: params.SelectLabel,
@@ -48,20 +47,20 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 			CSSAppointment,
 		},
 
-		HTML: hxhtml.Div(
-			hxprimitives.AttrClass(
+		HTML: dsl.Div(
+			dsl.AttrClass(
 				"appointment-container",
 			),
 
-			hxhtml.Div(
-				hxprimitives.AttrCSS(
+			dsl.Div(
+				dsl.AttrCSS(
 					`display: flex; flex-wrap: nowrap; gap: 0.2em;`,
 				),
 
 				nodesInputDate.HTML,
 
-				hxhtml.Div(
-					hxprimitives.AttrCSS(
+				dsl.Div(
+					dsl.AttrCSS(
 						`display: flex; flex-direction: column; gap: 0.1em;`,
 					),
 
@@ -73,7 +72,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 				),
 			),
 
-			hxcomponents.ButtonSubmit(
+			components.ButtonSubmit(
 				&params.ParamsButtonSubmit,
 			),
 		),

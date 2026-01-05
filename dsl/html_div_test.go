@@ -1,61 +1,39 @@
 package dsl
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func BenchmarkElOnly(b *testing.B) {
-	b.ReportAllocs()
+func Test01Div(t *testing.T) {
+	el := el("div", Text("hi!"))
 
-	b.ResetTimer()
-
-	for b.Loop() {
-		_ = El("div")
-	}
+	fmt.Println(
+		string(Render(el)), // <div>hi!</div>
+	)
 }
 
-func BenchmarkElCall(b *testing.B) {
-	b.ReportAllocs()
+func Test02Div(t *testing.T) {
+	el := Div(
+		Text("hi!"),
+	)
 
-	el := El("div", Text("hi!"))
-
-	b.ResetTimer()
-
-	for b.Loop() {
-		_ = Render(el)
-	}
+	fmt.Println(
+		string(Render(el)), // <div>hi!</div>
+	)
 }
 
-func BenchmarkElWIdCall(b *testing.B) {
-	b.ReportAllocs()
+func Test03Div(t *testing.T) {
+	el := Div(
+		Text("hi"),
+		Div(
+			Span(
+				Text("!"),
+			),
+		),
+	)
 
-	el := ElWId("div", "myid", Text("hello"))
-
-	b.ResetTimer()
-
-	for b.Loop() {
-		_ = Render(el)
-	}
-}
-
-func BenchmarkDiv(b *testing.B) {
-	b.ReportAllocs()
-
-	el := El("div", Text("hi!"))
-
-	b.ResetTimer()
-
-	for b.Loop() {
-		_ = Render(el)
-	}
-}
-
-func BenchmarkDivRender(b *testing.B) {
-	b.ReportAllocs()
-
-	div := El("div", Text("hello"))
-
-	b.ResetTimer()
-
-	for b.Loop() {
-		_, _ = RenderHTMLandCSS(div)
-	}
+	fmt.Println(
+		string(Render(el)), // <div>hi<div><span>!</span></div></div>
+	)
 }

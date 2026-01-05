@@ -4,7 +4,7 @@ import "unsafe"
 
 func Text(text string) Node {
 	return Node{
-		fn: func(a *Accumulator, p unsafe.Pointer) {
+		fn: func(a *accumulator, p unsafe.Pointer) {
 			s := *(*string)(p)
 			a.Write1(s)
 		},
@@ -15,7 +15,7 @@ func Text(text string) Node {
 
 func Raw(text string) Node {
 	return Node{
-		fn: func(a *Accumulator, p unsafe.Pointer) {
+		fn: func(a *accumulator, p unsafe.Pointer) {
 			s := *(*string)(p)
 			a.Write1(s)
 		},

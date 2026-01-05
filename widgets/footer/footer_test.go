@@ -1,40 +1,38 @@
 package wfooter
 
 import (
-	"fmt"
 	"testing"
 
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
 	pagecss "github.com/TudorHulban/hx-core/page-css"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
-	"github.com/TudorHulban/hx-widgets/base"
-	"github.com/TudorHulban/hx-widgets/helpers"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
+	"github.com/TudorHulban/hxgo/widgets/base"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFooter(t *testing.T) {
-	fragment := WidgetFooter()
+	el := WidgetFooter()
 
-	page := hxcomponents.Page{
+	page := components.Page{
 		Title: t.Name(),
 
-		Head: []hxprimitives.Node{
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("generated.css"),
+		Head: []dsl.Node{
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("generated.css"),
 			),
 		},
 
-		Body: []hxprimitives.Node{
-			fragment,
+		Body: []dsl.Node{
+			el,
 		},
 	}
 
-	writerCSS, errWriterCSS := helpers.GetFileWriter("generated.css")
+	writer, errWriterCSS := helpers.GetFileWriter("generated.css")
 	require.NoError(t, errWriterCSS)
 
-	defer writerCSS.Close()
+	defer writer.Close()
 
 	cssPage := pagecss.NewCSSPage(
 		base.CSSBase,
@@ -43,7 +41,7 @@ func TestFooter(t *testing.T) {
 	)
 
 	cssPage.GetCSSAccurateBeautifiedTo(
-		writerCSS,
+		writer,
 		&pagecss.ParamsSpaces{
 			NumberSpaces:              5,
 			IncrementWithNumberSpaces: 2,
@@ -55,7 +53,9 @@ func TestFooter(t *testing.T) {
 
 	defer writerHTML.Close()
 
-	fmt.Println(
-		page.Build().Render(writerHTML),
+	writer.Write(
+		dsl.Render(
+			page.Build(),
+		),
 	)
 }

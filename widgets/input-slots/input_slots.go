@@ -3,10 +3,9 @@ package winputslots
 import (
 	"fmt"
 
-	hxhelpers "github.com/TudorHulban/hx-core/helpers"
-	hxhtml "github.com/TudorHulban/hx-core/html"
 	pagecss "github.com/TudorHulban/hx-core/page-css"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 )
 
 const (
@@ -47,10 +46,10 @@ type ParamsWidgetSlots struct {
 	NumberColumns  uint8
 }
 
-func WidgetSlots(params *ParamsWidgetSlots) hxprimitives.Node {
-	element := func(slot *InfoSlot) hxprimitives.Node {
-		return hxprimitives.Raw(
-			hxhelpers.Sprintf(
+func WidgetSlots(params *ParamsWidgetSlots) dsl.Node {
+	element := func(slot *InfoSlot) dsl.Node {
+		return dsl.Raw(
+			helpers.Sprintf(
 				`<button class=%s id="%s" type="button" onclick="handletimeclick('%s')">%s</button>`,
 
 				ButtonSubmitCSSClass,
@@ -61,8 +60,8 @@ func WidgetSlots(params *ParamsWidgetSlots) hxprimitives.Node {
 		)
 	}
 
-	rows := []hxprimitives.Node{
-		hxprimitives.Raw(
+	rows := []dsl.Node{
+		dsl.Raw(
 			fmt.Sprintf(
 				`<script>
 			function handletimeclick(data){
@@ -101,7 +100,7 @@ func WidgetSlots(params *ParamsWidgetSlots) hxprimitives.Node {
 		),
 	}
 
-	currentRow := make([]hxprimitives.Node, 0)
+	currentRow := make([]dsl.Node, 0)
 
 	for ix, slot := range params.SlotsInfo {
 		currentRow = append(
@@ -112,10 +111,10 @@ func WidgetSlots(params *ParamsWidgetSlots) hxprimitives.Node {
 		if (ix+1)%int(params.NumberColumns) == 0 || ix == len(params.SlotsInfo)-1 {
 			rows = append(
 				rows,
-				hxhtml.Div(
+				dsl.Div(
 					append(
-						[]hxprimitives.Node{
-							hxprimitives.AttrClass("hours-row"),
+						[]dsl.Node{
+							dsl.AttrClass("hours-row"),
 						},
 
 						currentRow...,
@@ -127,10 +126,10 @@ func WidgetSlots(params *ParamsWidgetSlots) hxprimitives.Node {
 		}
 	}
 
-	return hxhtml.Div(
+	return dsl.Div(
 		append(
-			[]hxprimitives.Node{
-				hxprimitives.AttrClass("hours-grid"),
+			[]dsl.Node{
+				dsl.AttrClass("hours-grid"),
 			},
 			rows...,
 		)...,

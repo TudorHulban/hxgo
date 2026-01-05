@@ -38,7 +38,7 @@ func AttrWithValue(name, value string) Node {
 	}
 }
 
-func renderAttrWithValue(a *Accumulator, p unsafe.Pointer) {
+func renderAttrWithValue(a *accumulator, p unsafe.Pointer) {
 	d := (*struct {
 		name  string
 		value string

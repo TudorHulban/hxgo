@@ -1,18 +1,16 @@
 package wappointment
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	hxcomponents "github.com/TudorHulban/hx-core/components"
-	hxhtml "github.com/TudorHulban/hx-core/html"
 	pagecss "github.com/TudorHulban/hx-core/page-css"
-	hxprimitives "github.com/TudorHulban/hx-core/primitives"
-	"github.com/TudorHulban/hx-widgets/base"
-	"github.com/TudorHulban/hx-widgets/helpers"
-	winputdate "github.com/TudorHulban/hx-widgets/input-date"
-	winputslots "github.com/TudorHulban/hx-widgets/input-slots"
+	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
+	"github.com/TudorHulban/hxgo/widgets/base"
+	winputdate "github.com/TudorHulban/hxgo/widgets/input-date"
+	winputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
 	"github.com/stretchr/testify/require"
 )
 
@@ -58,7 +56,7 @@ func TestAppointment(t *testing.T) {
 				DateValue:   time.Now(),
 				HowManyDays: 3,
 			},
-			ParamsButtonSubmit: hxcomponents.ParamsButtonSubmit{
+			ParamsButtonSubmit: components.ParamsButtonSubmit{
 				Label:    "Submit",
 				CSSClass: "btn-submit",
 				CSSID:    winputslots.ButtonSubmitCSSID,
@@ -66,34 +64,34 @@ func TestAppointment(t *testing.T) {
 		},
 	)
 
-	page := hxcomponents.Page{
+	page := components.Page{
 		Title: t.Name(),
 
-		Head: []hxprimitives.Node{
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("generated.css"),
+		Head: []dsl.Node{
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("generated.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"),
 			),
-			hxhtml.Link(
-				hxprimitives.Rel("stylesheet"),
-				hxprimitives.Href("https://npmcdn.com/flatpickr/dist/themes/dark.css"),
+			dsl.Link(
+				dsl.Rel("stylesheet"),
+				dsl.Href("https://npmcdn.com/flatpickr/dist/themes/dark.css"),
 			),
 		},
 
-		Body: []hxprimitives.Node{
+		Body: []dsl.Node{
 			fragment.LinkJavascript,
 			fragment.HTML,
 		},
 	}
 
-	writerCSS, errWriterCSS := helpers.GetFileWriter("generated.css")
+	writer, errWriterCSS := helpers.GetFileWriter("generated.css")
 	require.NoError(t, errWriterCSS)
 
-	defer writerCSS.Close()
+	defer writer.Close()
 
 	cssPage := pagecss.NewCSSPage(
 		append(
@@ -106,7 +104,7 @@ func TestAppointment(t *testing.T) {
 	)
 
 	cssPage.GetCSSAccurateBeautifiedTo(
-		writerCSS,
+		writer,
 		&pagecss.ParamsSpaces{
 			NumberSpaces:              5,
 			IncrementWithNumberSpaces: 2,
@@ -118,7 +116,9 @@ func TestAppointment(t *testing.T) {
 
 	defer writerHTML.Close()
 
-	fmt.Println(
-		page.Build().Render(writerHTML),
+	writer.Write(
+		dsl.Render(
+			page.Build(),
+		),
 	)
 }
