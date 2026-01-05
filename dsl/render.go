@@ -35,10 +35,44 @@ func Render(nodes ...Node) []byte {
 	return a.html
 }
 
+// RenderHX introduces
+// the separator needed by HX client for parsing the response.
+func RenderHX(nodes ...Node) []byte {
+	if len(nodes) == 0 {
+		return []byte{}
+	}
+
+	var a Accumulator
+
+	for i := range nodes {
+		walk(&a, nodes[i])
+		a.Write1("|\n")
+	}
+
+	// HTML is already fully assembled
+	return a.html
+}
+
 // RenderHTMLWithCapacity renders nodes to HTML with pre-allocated capacity.
 // estimatedSize should be the approximate output size in bytes.
 // This reduces allocations significantly for known output sizes.
 func RenderHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
+	if len(nodes) == 0 {
+		return []byte{}
+	}
+
+	a := NewAccumulator(estimatedSize, 0)
+
+	for i := range nodes {
+		walk(a, nodes[i])
+	}
+
+	return a.html
+}
+
+// RenderHXHTMLWithCapacity introduces
+// the separator needed by HX client for parsing the response.
+func RenderHXHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 	if len(nodes) == 0 {
 		return []byte{}
 	}

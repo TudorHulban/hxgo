@@ -1,6 +1,7 @@
 # hxgo
 
-Typed, server-side hypermedia domain specific language (DSL) that renders to HTMX-compatible HTML
+Typed, server-side hypermedia domain specific language (DSL) that renders to HTMX-compatible HTML.  
+Incorporates concepts from [htmx](https://htmx.org) and [gomponents.com](https://www.gomponents.com/).
 
 ## 1. Introduction
 
@@ -16,6 +17,7 @@ hxgo is not a template engine, a client-side framework, or a code generator. It 
 hxgo intentionally trades generality for correctness, predictability, and performance. It assumes that UI interactions originate from hxgo-generated HTML and that hypermedia contracts are respected. As a result, hxgo is not designed to be a general-purpose HTTP parsing framework or a drop-in replacement for defensive, open-world middleware.
 
 These constraints allow hxgo to:
+
 - minimize runtime checks
 - reduce allocations
 - simplify request parsing
@@ -47,15 +49,11 @@ hxgo renders UI using a single-pass, depth-first traversal of a typed node tree.
 
 Rendering has the following properties:
 
-Single-pass traversal
-
-No template execution or AST interpretation
-
-No virtual DOM or diffing
-
-Deterministic output for a given node tree
-
-Minimal allocations through pre-sized accumulators
+- Single-pass traversal
+- No template execution or AST interpretation
+- No virtual DOM
+- Deterministic output for a given node tree
+- Minimal allocations through pre-sized accumulators
 
 Because rendering is a pure transformation from Nodes to HTML, the same rendering logic applies uniformly to full pages, fragments, and component updates.
 

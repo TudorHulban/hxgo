@@ -7,7 +7,7 @@ import "unsafe"
 //
 //go:inline
 func El(tag string, children ...Node) Node {
-	var attrs []Node // Separate attributes from children during construction
+	var attrs []Node // Separate attributes from children during construction.
 	var nodes []Node
 
 	for i := range children {
