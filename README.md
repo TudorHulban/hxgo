@@ -1,15 +1,31 @@
 # hxgo
 
-Typed, server-side hypermedia domain specific language (DSL) that compiles to HTMX-compatible HTML
+Typed, server-side hypermedia domain specific language (DSL) that renders to HTMX-compatible HTML.  
+Incorporates concepts from [htmx](https://htmx.org) and [gomponents.com](https://www.gomponents.com/).
 
 ## 1. Introduction
 
 ### A. What hxgo is
 
-hxgo is a typed, server‑side hypermedia DSL implemented as a Go library.
+hxgo is a typed, server‑side hypermedia typed UI language implemented as a Go library.
 It provides a structured way to build user interfaces by expressing HTML, behavior, and interaction semantics through pure Go code.
-The DSL compiles these typed constructs into HTMX‑compatible HTML, enabling interactive, server‑driven applications without templates or handwritten JavaScript.
+The DSL renders these typed constructs into HTMX‑compatible HTML, enabling interactive, server‑driven applications without templates or handwritten JavaScript.
 By treating UI construction as a language rather than a collection of helpers, hxgo offers a predictable, composable, and Go‑native approach to building modern web interfaces.
+
+hxgo is not a template engine, a client-side framework, or a code generator. It does not interpret markup, parse templates, or generate Go source files. Instead, hxgo treats user interfaces as typed Go values and renders them directly into HTML at runtime with deterministic semantics and minimal allocation.
+
+hxgo intentionally trades generality for correctness, predictability, and performance. It assumes that UI interactions originate from hxgo-generated HTML and that hypermedia contracts are respected. As a result, hxgo is not designed to be a general-purpose HTTP parsing framework or a drop-in replacement for defensive, open-world middleware.
+
+These constraints allow hxgo to:
+
+- minimize runtime checks
+- reduce allocations
+- simplify request parsing
+- enforce stronger invariants through types
+
+A request is handled by a server handler, which constructs a tree of typed Nodes. These Nodes are rendered in a single pass into HTML. HTMX interprets the hypermedia controls in that HTML and issues the next request. The server handler responds by constructing a new Node tree, rendering it to HTML, and returning it for client-side DOM replacement.
+
+Request → Handler → Node(s) → Render → HTML → HTMX → Request → Handler → Node(s) → Render → HTML → HTMX swap
 
 ### B. Why it exists
 
@@ -19,11 +35,27 @@ By contrast, hxgo expresses UI structure and behavior as pure Go values, enablin
 
 ### C. The one‑sentence pitch
 
-hxgo provides a typed, server‑side hypermedia DSL that compiles pure Go code into HTMX‑compatible HTML, eliminating templates and the npm ecosystem while relying only on minimal vanilla JavaScript, offering Go‑native testing, a significantly narrower attack surface, and extremely low loading times for single‑page applications.
+hxgo provides a typed, server‑side hypermedia embedded language that renders pure Go code into HTMX‑compatible HTML, eliminating templates and the npm ecosystem while relying only on minimal vanilla JavaScript, offering Go‑native testing, a significantly narrower attack surface, and extremely low loading times for single‑page applications.
 
 ### D. The mental model (typed HTML + typed hypermedia controls)
 
-hxgo is designed around a typed mental model in which user interfaces are expressed as pure Go values rather than templates, strings, or JavaScript. HTML elements are constructed through typed functions, attributes are represented as typed values, and hypermedia behavior is encoded through structured hx‑controls rather than free‑form strings. This approach treats UI construction as a declarative language embedded in Go, where each element, attribute, and interaction is validated at compile time. The result is a system in which UI structure, behavior, and server‑side logic form a single, coherent model that is easy to reason about, straightforward to test, and free from the fragility of template parsing or client‑side scripting.
+hxgo is designed around a typed mental model in which user interfaces are expressed as pure Go values rather than templates, strings, or JavaScript. HTML elements are constructed through typed functions, attributes are represented as typed values, and hypermedia behavior is encoded through structured hx‑controls rather than free‑form strings. This approach treats UI construction as a declarative language embedded in Go, where each element, attribute, and interaction is validated through typed construction, with illegal states unrepresentable. The result is a system in which UI structure, behavior, and server‑side logic form a single, coherent model that is easy to reason about, straightforward to test, and free from the fragility of template parsing or client‑side scripting.
+
+hxgo follows a contract-driven hypermedia model: the server defines both the structure of the UI and the shape of the interactions that return to it. Requests are treated as continuations of server-emitted contracts rather than arbitrary inputs.
+
+Rendering model
+
+hxgo renders UI using a single-pass, depth-first traversal of a typed node tree. Each node contributes its HTML representation directly into a shared accumulator, producing a contiguous HTML byte stream with no intermediate buffers or interpretation steps.
+
+Rendering has the following properties:
+
+- Single-pass traversal
+- No template execution or AST interpretation
+- No virtual DOM
+- Deterministic output for a given node tree
+- Minimal allocations through pre-sized accumulators
+
+Because rendering is a pure transformation from Nodes to HTML, the same rendering logic applies uniformly to full pages, fragments, and component updates.
 
 ## 2. The Economics of Hypermedia
 
@@ -99,6 +131,8 @@ Consistent behavior encoding across components.
 Compile‑time safety for all hx‑attributes.  
 Elimination of malformed attributes and runtime surprises.
 
+In string-based HTMX usage, invalid or contradictory attributes such as hx-get and hx-post on the same element are syntactically legal but semantically incorrect, and errors surface only at runtime. In hxgo, such invalid states cannot be constructed, because hypermedia interactions are encoded as typed values with enforced invariants.
+
 ### C. Server‑side rendering
 
 All UI is rendered on the server, producing HTMX‑compatible HTML fragments that the client can swap into the DOM.
@@ -143,6 +177,10 @@ No template injection.
 No inline JavaScript.  
 No user‑controlled markup.  
 Narrower attack surface through typed constructs.
+
+### H. Typed request continuation
+
+hxgo treats incoming requests as typed continuations of previously emitted hypermedia actions rather than as arbitrary payloads. Because forms and actions are generated by hxgo itself, request parsing can rely on narrower, well-defined contracts, enabling simpler parsing logic, fewer allocations, and predictable performance without sacrificing correctness.
 
 ## 4. Quick Example
 
@@ -310,6 +348,14 @@ This model keeps the UI and backend unified in a single language and eliminates 
 ### Narrow attack surface
 
 ## 12. Comparison
+
+The comparisons below focus on architectural intent rather than surface syntax. hxgo occupies a different design space than template engines and client-side frameworks by modeling hypermedia interactions as typed server-side constructs rather than as strings or client-side state machines.
+
+templ → “typed markup, string-based hypermedia”
+
+React → “client-side state machine”
+
+HTMX templates → “string-assembled hypermedia”
 
 ### hxgo vs HTMX templates
 

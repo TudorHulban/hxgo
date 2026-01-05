@@ -86,6 +86,7 @@ func TestButton(t *testing.T) {
 	http.ListenAndServe(":8080", nil)
 }
 
+// BenchmarkButtonSubmit-12    	 2860005	       420.4 ns/op	     432 B/op	       3 allocs/op
 func BenchmarkButtonSubmit(b *testing.B) {
 	b.ReportAllocs()
 

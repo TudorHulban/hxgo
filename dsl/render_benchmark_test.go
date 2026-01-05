@@ -11,12 +11,12 @@ import (
 // BenchmarkRenderNodes/4._valid_HTML-CSS_input-16         	 2795299	       425.7 ns/op	     208 B/op	       4 allocs/op
 
 // unsafe
-// BenchmarkRenderHTMLandCSS/1._empty_input-12         	353758345	         3.370 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkRenderHTMLandCSS/2._valid_HTML_input-12    	 7120750	       168.4 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-12   	 6338114	       186.2 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-12   	 4354882	       274.5 ns/op	     168 B/op	       5 allocs/op
-// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-12     	  754402	      1353 ns/op	    1360 B/op	      15 allocs/op
-// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-12         	  702580	      1516 ns/op	    1416 B/op	      18 allocs/op
+// BenchmarkRenderHTMLandCSS/1._empty_input-12         	355249774	         3.381 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-12   	 7262638	       164.0 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-12   	 6672134	       177.0 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2c._valid_HTML_input-12   	 4571163	       259.8 ns/op	     168 B/op	       5 allocs/op
+// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-12     	  764766	      1345 ns/op	    1360 B/op	      15 allocs/op
+// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-12         	  710091	      1508 ns/op	    1416 B/op	      18 allocs/op
 
 // BenchmarkRenderHTMLandCSS/1._empty_input-16         	232883731	        15.32 ns/op	       0 B/op	       0 allocs/op
 // BenchmarkRenderHTMLandCSS/2._valid_HTML_input-16    	 1781386	       674.5 ns/op	     104 B/op	       4 allocs/op
@@ -38,19 +38,19 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 			nodes:       nil,
 		},
 		{
-			description: "2. valid HTML input",
+			description: "2a. valid HTML input",
 			nodes: []Node{
 				Div(Class("card")),
 			},
 		},
 		{
-			description: "2a. valid HTML input",
+			description: "2b. valid HTML input",
 			nodes: []Node{
 				Div(AttrClass("card")),
 			},
 		},
 		{
-			description: "2b. valid HTML input",
+			description: "2c. valid HTML input",
 			nodes: []Node{
 				Div(AttrClass("card")),
 				Div(AttrClass("card")),
