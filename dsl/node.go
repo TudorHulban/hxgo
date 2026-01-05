@@ -11,8 +11,9 @@ type renderer func(*accumulator, unsafe.Pointer)
 // No interface dispatch.
 // No virtual method tables.
 type Node struct {
-	fn          renderer
-	data        unsafe.Pointer
+	fn   renderer
+	data unsafe.Pointer
+
 	children    []Node
 	isAttribute bool
 }

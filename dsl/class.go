@@ -6,6 +6,8 @@ func Class(name string) Node {
 	return Node{
 		fn:   renderClass,
 		data: unsafe.Pointer(&name),
+
+		isAttribute: true,
 	}
 }
 
