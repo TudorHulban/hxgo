@@ -6,8 +6,8 @@ import "unsafe"
 // Children slice should be immutable.
 //
 //go:inline
-func El(tag string, children ...Node) Node {
-	var attrs []Node // Separate attributes from children during construction.
+func el(tag string, children ...Node) Node {
+	var attrs []Node // Separate attributes from children during construction
 	var nodes []Node
 
 	for i := range children {
@@ -30,7 +30,7 @@ func El(tag string, children ...Node) Node {
 	}
 }
 
-func renderEl(a *Accumulator, p unsafe.Pointer) {
+func renderEl(a *accumulator, p unsafe.Pointer) {
 	d := (*struct {
 		tag      string
 		attrs    []Node
@@ -52,11 +52,11 @@ func renderEl(a *Accumulator, p unsafe.Pointer) {
 		walk(a, d.children[i])
 	}
 
-	a.Write3("<", d.tag, ">")
+	a.Write3("</", d.tag, ">")
 }
 
 // Children slice should be immutable.
-func ElWId(tag, cssID string, children ...Node) Node {
+func elWId(tag, cssID string, children ...Node) Node {
 	// Separate attributes from children during construction
 	var attrs []Node
 	var nodes []Node
@@ -82,7 +82,7 @@ func ElWId(tag, cssID string, children ...Node) Node {
 	}
 }
 
-func renderElWId(a *Accumulator, p unsafe.Pointer) {
+func renderElWId(a *accumulator, p unsafe.Pointer) {
 	d := (*struct {
 		tag      string
 		cssID    string

@@ -6,7 +6,7 @@ import (
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
-func walk(a *Accumulator, n Node) {
+func walk(a *accumulator, n Node) {
 	if n.fn == nil {
 		return
 	}
@@ -25,7 +25,7 @@ func Render(nodes ...Node) []byte {
 		return []byte{}
 	}
 
-	var a Accumulator
+	var a accumulator
 
 	for i := range nodes {
 		walk(&a, nodes[i])
@@ -61,7 +61,7 @@ func RenderHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 		return []byte{}
 	}
 
-	a := NewAccumulator(estimatedSize, 0)
+	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
 		walk(a, nodes[i])
@@ -91,7 +91,7 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 		return []byte{}, ""
 	}
 
-	var a Accumulator
+	var a accumulator
 
 	for i := range nodes {
 		walk(&a, nodes[i])
@@ -118,7 +118,7 @@ func RenderHTMLandCSSWithCapacity(estimatedHTMLSize, estimatedCSSRules int, node
 		return []byte{}, ""
 	}
 
-	a := NewAccumulator(estimatedHTMLSize, estimatedCSSRules)
+	a := newAccumulator(estimatedHTMLSize, estimatedCSSRules)
 
 	for i := range nodes {
 		walk(a, nodes[i])

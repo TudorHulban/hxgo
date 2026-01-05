@@ -1,16 +1,18 @@
 package dsl
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 func A(children ...Node) Node {
-	return El(
+	return el(
 		"a",
 		children...,
 	)
 }
 
 func Aside(children ...Node) Node {
-	return El(
+	return el(
 		"aside",
 		children...,
 	)
@@ -23,45 +25,38 @@ func Class(name string) Node {
 	}
 }
 
-func renderClass(a *Accumulator, p unsafe.Pointer) {
+// TODO: move to write3?
+func renderClass(a *accumulator, p unsafe.Pointer) {
 	name := *(*string)(p)
+
 	a.Write1(` class="`)
 	a.Write1(name)
 	a.Write1(`"`)
 }
 
 func Div(children ...Node) Node {
-	return Node{
-		fn:       renderDiv,
-		data:     nil,
-		children: children,
-	}
-}
-
-func renderDiv(a *Accumulator, _ unsafe.Pointer) {
-	a.Write1("<div")
-	// attributes would be rendered by children before closing '>'
-	a.Write1(">")
-	// children rendered by walk()
-	a.Write1("</div>")
+	return el(
+		"div",
+		children...,
+	)
 }
 
 func Label(children ...Node) Node {
-	return El(
+	return el(
 		"label",
 		children...,
 	)
 }
 
 func Form(children ...Node) Node {
-	return El(
+	return el(
 		"form",
 		children...,
 	)
 }
 
 func FormWithID(cssID string, children ...Node) Node {
-	return ElWId(
+	return elWId(
 		"form",
 		cssID,
 		children...,
@@ -69,147 +64,147 @@ func FormWithID(cssID string, children ...Node) Node {
 }
 
 func H1(children ...Node) Node {
-	return El(
+	return el(
 		"h1",
 		children...,
 	)
 }
 
 func H2(children ...Node) Node {
-	return El(
+	return el(
 		"h2",
 		children...,
 	)
 }
 
 func H3(children ...Node) Node {
-	return El(
+	return el(
 		"h3",
 		children...,
 	)
 }
 
 func H4(children ...Node) Node {
-	return El(
+	return el(
 		"h4",
 		children...,
 	)
 }
 
 func H5(children ...Node) Node {
-	return El(
+	return el(
 		"h5",
 		children...,
 	)
 }
 
 func H6(children ...Node) Node {
-	return El(
+	return el(
 		"h6",
 		children...,
 	)
 }
 
 func Img(children ...Node) Node {
-	return El(
+	return el(
 		"img",
 		children...,
 	)
 }
 
 func Input(children ...Node) Node {
-	return El(
+	return el(
 		"input",
 		children...,
 	)
 }
 
 func Li(children ...Node) Node {
-	return El(
+	return el(
 		"li",
 		children...,
 	)
 }
 
 func Link(children ...Node) Node {
-	return El(
+	return el(
 		"link",
 		children...,
 	)
 }
 
 func TextArea(children ...Node) Node {
-	return El(
+	return el(
 		"textarea",
 		children...,
 	)
 }
 
 func Table(children ...Node) Node {
-	return El(
+	return el(
 		"table",
 		children...,
 	)
 }
 
 func THead(children ...Node) Node {
-	return El(
+	return el(
 		"thead",
 		children...,
 	)
 }
 
 func TBody(children ...Node) Node {
-	return El(
+	return el(
 		"tbody",
 		children...,
 	)
 }
 
 func Th(children ...Node) Node {
-	return El(
+	return el(
 		"th",
 		children...,
 	)
 }
 
 func Tr(children ...Node) Node {
-	return El(
+	return el(
 		"tr",
 		children...,
 	)
 }
 
 func Nav(children ...Node) Node {
-	return El(
+	return el(
 		"nav",
 		children...,
 	)
 }
 
 func P(children ...Node) Node {
-	return El(
+	return el(
 		"p",
 		children...,
 	)
 }
 
 func Ul(children ...Node) Node {
-	return El(
+	return el(
 		"ul",
 		children...,
 	)
 }
 
 func Ol(children ...Node) Node {
-	return El(
+	return el(
 		"ol",
 		children...,
 	)
 }
 
 func Span(children ...Node) Node {
-	return El(
+	return el(
 		"span",
 		children...,
 	)

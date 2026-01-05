@@ -125,19 +125,19 @@ func BenchmarkRenderHTML(b *testing.B) {
 			nodes:       nil,
 		},
 		{
-			description: "2. valid HTML input",
+			description: "2a. valid HTML input",
 			nodes: []Node{
 				Div(Class("card")),
 			},
 		},
 		{
-			description: "2a. valid HTML input",
+			description: "2b. valid HTML input",
 			nodes: []Node{
 				Div(AttrClass("card")),
 			},
 		},
 		{
-			description: "2b. valid HTML input",
+			description: "2c. valid HTML input",
 			nodes: []Node{
 				Div(AttrClass("card")),
 				Div(AttrClass("card")),
