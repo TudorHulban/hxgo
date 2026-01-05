@@ -12,9 +12,9 @@ import (
 
 func TestButton(t *testing.T) {
 	fmt.Println("manual test … skipping")
-	t.Skip(
-		"manual testing",
-	)
+	// t.Skip(
+	// 	"manual testing",
+	// )
 
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{
@@ -83,7 +83,7 @@ func TestButton(t *testing.T) {
 		"Open http://localhost:8080 and press Ctrl-C when done",
 	)
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 }
 
 // BenchmarkButtonSubmit-12    	 2860005	       420.4 ns/op	     432 B/op	       3 allocs/op

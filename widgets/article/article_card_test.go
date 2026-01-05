@@ -12,7 +12,7 @@ import (
 )
 
 func TestWidgetArticleCard(t *testing.T) {
-	fragment := WidgetArticleCard(
+	widget := WidgetArticleCard(
 		&ParamsWidgetArticleCard{
 			Category:       "category-g1",
 			Title:          "Article-title",
@@ -60,7 +60,7 @@ func TestWidgetArticleCard(t *testing.T) {
 		},
 
 		Body: []dsl.Node{
-			fragment,
+			widget,
 		},
 	}
 

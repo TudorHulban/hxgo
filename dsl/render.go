@@ -42,7 +42,7 @@ func RenderHX(nodes ...Node) []byte {
 		return []byte{}
 	}
 
-	var a Accumulator
+	var a accumulator
 
 	for i := range nodes {
 		walk(&a, nodes[i])
@@ -77,7 +77,7 @@ func RenderHXHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 		return []byte{}
 	}
 
-	a := NewAccumulator(estimatedSize, 0)
+	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
 		walk(a, nodes[i])
