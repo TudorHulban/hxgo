@@ -16,6 +16,7 @@ func Test01Div(t *testing.T) {
 func Test02Div(t *testing.T) {
 	el := Div(
 		Text("hi!"),
+		Class("css-class"),
 	)
 
 	fmt.Println(

@@ -97,17 +97,17 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 		walk(&a, nodes[i])
 	}
 
-	if len(a.css) == 0 {
+	if len(a.styles) == 0 {
 		return a.html, "" // HTML is already fully assembled
 	}
 
-	// Build CSS
-	css := newSmartCSSCollector()
-	for _, s := range a.css {
-		css.Add(s)
+	// Build styles
+	styles := newStylesCollector()
+	for _, s := range a.styles {
+		styles.Add(s)
 	}
 
-	return a.html, css.String()
+	return a.html, styles.String()
 }
 
 // RenderHTMLandCSSWithCapacity renders nodes with pre-allocated capacity.
@@ -124,12 +124,12 @@ func RenderHTMLandCSSWithCapacity(estimatedHTMLSize, estimatedCSSRules int, node
 		walk(a, nodes[i])
 	}
 
-	if len(a.css) == 0 {
+	if len(a.styles) == 0 {
 		return a.html, "" // HTML is already fully assembled
 	}
 
-	css := newSmartCSSCollector()
-	for _, s := range a.css {
+	css := newStylesCollector()
+	for _, s := range a.styles {
 		css.Add(s)
 	}
 

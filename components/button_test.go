@@ -12,9 +12,9 @@ import (
 
 func TestButton(t *testing.T) {
 	fmt.Println("manual test … skipping")
-	// t.Skip(
-	// 	"manual testing",
-	// )
+	t.Skip(
+		"manual testing",
+	)
 
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{

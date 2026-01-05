@@ -225,6 +225,12 @@ During this process the components CSS is accumulated and consolidated.
 The final result is a byte slice or string containing valid HTML, ready to be sent to the client, together with the CSS the components need.  
 This rendering model ensures that UI generation is pure, testable, and free from side effects.
 
+#### CSS
+
+CSS is ccumulated as styles or CSS.  
+Styles could be embedded directly in the request answer.  
+CSS end goal is generating real `.css` files.  
+
 ### Elements
 
 An Element is a Node that represents a HTML tag. Elements contain:

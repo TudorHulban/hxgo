@@ -5,25 +5,25 @@ import (
 	"strings"
 )
 
-type cssRuleKey struct {
+type styleRuleKey struct {
 	selector string
 	media    string
 }
 
-type smartCSSCollector struct {
-	rules map[cssRuleKey]map[string]string // merged properties
-	order []cssRuleKey                     // preserve insertion order (component order)
+type registryStyles struct {
+	rules map[styleRuleKey]map[string]string // merged properties
+	order []styleRuleKey                     // preserve insertion order (component order)
 }
 
-func newSmartCSSCollector() *smartCSSCollector {
-	return &smartCSSCollector{
-		rules: make(map[cssRuleKey]map[string]string),
-		order: make([]cssRuleKey, 0),
+func newStylesCollector() *registryStyles {
+	return &registryStyles{
+		rules: make(map[styleRuleKey]map[string]string),
+		order: make([]styleRuleKey, 0),
 	}
 }
 
-func (c *smartCSSCollector) Add(style Style) {
-	key := cssRuleKey{
+func (c *registryStyles) Add(style Style) {
+	key := styleRuleKey{
 		selector: style.Selector,
 		media:    style.Media,
 	}
@@ -40,7 +40,7 @@ func (c *smartCSSCollector) Add(style Style) {
 	}
 }
 
-func (c *smartCSSCollector) String() string {
+func (c *registryStyles) String() string {
 	if len(c.rules) == 0 {
 		return ""
 	}
