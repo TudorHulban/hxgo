@@ -12,10 +12,10 @@ type CSSKey struct {
 }
 
 type CSS struct {
-	Selector         string
-	InflexionPointPX uint16
-	DesktopFirst     DesktopFirst
-	ActualCSS        ActualCSS
+	CSSKey
+
+	DesktopFirst DesktopFirst
+	ActualCSS    ActualCSS
 }
 
 func CSSNode(rules ...CSS) Node {
