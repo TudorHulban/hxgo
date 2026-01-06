@@ -39,10 +39,10 @@ func renderCSS(a *accumulator, p unsafe.Pointer) {
 		}
 
 		// ensure map for this key exists
-		bucket, exists := a.registryCSS[key]
+		bucket, exists := a.cssWidgets[key]
 		if !exists {
 			bucket = make(map[*ActualCSS]DesktopFirst)
-			a.registryCSS[key] = bucket
+			a.cssWidgets[key] = bucket
 		}
 
 		// dedupe by function pointer identity

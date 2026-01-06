@@ -7,10 +7,10 @@ import "strconv"
 // For better performance,
 // use NewAcc with an estimated size based on the typical output.
 type accumulator struct {
-	html   []byte
-	styles []Style
+	html []byte
 
-	registryCSS map[CSSKey]map[*ActualCSS]DesktopFirst
+	cssComponents []Style
+	cssWidgets    map[CSSKey]map[*ActualCSS]DesktopFirst
 }
 
 // newAccumulator creates an Accumulator with pre-allocated capacity.
@@ -19,16 +19,16 @@ type accumulator struct {
 // Example: for a typical page of ~10KB, use newAccumulator(10240, 16)
 func newAccumulator(estimatedHTMLSize, estimatedCSSRules int) *accumulator {
 	return &accumulator{
-		html:   make([]byte, 0, estimatedHTMLSize),
-		styles: make([]Style, 0, estimatedCSSRules),
+		html:          make([]byte, 0, estimatedHTMLSize),
+		cssComponents: make([]Style, 0, estimatedCSSRules),
 
 		// registryCSS: make(map[CSSKey]map[*ActualCSS]DesktopFirst),
 	}
 }
 
 func (a *accumulator) initialize() {
-	if a.registryCSS == nil {
-		a.registryCSS = make(map[CSSKey]map[*ActualCSS]DesktopFirst)
+	if a.cssWidgets == nil {
+		a.cssWidgets = make(map[CSSKey]map[*ActualCSS]DesktopFirst)
 	}
 }
 
@@ -52,8 +52,48 @@ func (a *accumulator) Write5(value1, value2, value3, value4, value5 string) {
 	a.html = append(a.html, value5...)
 }
 
-func (a *accumulator) BuildCSS(estimatedCSS ...int) []byte {
-	if len(a.registryCSS) == 0 {
+func (a *accumulator) BuildComponentCSS() []byte {
+	if len(a.cssComponents) == 0 {
+		return nil
+	}
+
+	out := make([]byte, 0, 256)
+
+	for i := range a.cssComponents {
+		s := a.cssComponents[i]
+
+		// selector
+		out = append(out, s.Selector...)
+		out = append(out, '{')
+
+		// props
+		for _, kv := range s.Props {
+			out = append(out, kv[0]...)
+			out = append(out, ':')
+			out = append(out, kv[1]...)
+			out = append(out, ';')
+		}
+
+		out = append(out, '}')
+
+		// optional media
+		if s.Media != "" {
+			wrapped := make([]byte, 0, len(out)+32)
+			wrapped = append(wrapped, "@media "...)
+			wrapped = append(wrapped, s.Media...)
+			wrapped = append(wrapped, '{')
+			wrapped = append(wrapped, out...)
+			wrapped = append(wrapped, '}')
+			out = wrapped
+		}
+	}
+
+	return out
+}
+
+// TODO: to be tested.
+func (a *accumulator) BuildWidgetCSS(estimatedCSS ...int) []byte {
+	if len(a.cssWidgets) == 0 {
 		return nil
 	}
 
@@ -64,7 +104,7 @@ func (a *accumulator) BuildCSS(estimatedCSS ...int) []byte {
 
 	result := make([]byte, 0, cssLength)
 
-	for key, bucket := range a.registryCSS {
+	for key, bucket := range a.cssWidgets {
 		for fnPtr, desktopFirst := range bucket {
 			css := (*fnPtr)()
 

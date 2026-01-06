@@ -59,7 +59,7 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				Styled(
+				GetStyledNode(
 					Noop,
 					Style{
 						Selector: ".card",
@@ -77,7 +77,7 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
 				Div(Class("card")),
-				Styled(
+				GetStyledNode(
 					Noop,
 					Style{
 						Selector: ".card",
@@ -101,7 +101,7 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 				b.ResetTimer()
 
 				for i := 0; i < b.N; i++ {
-					_, _ = RenderHTMLandCSS(tt.nodes...)
+					_, _ = RenderHTMLandStyles(tt.nodes...)
 				}
 			},
 		)
@@ -146,7 +146,7 @@ func BenchmarkRenderHTML(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				Styled(
+				GetStyledNode(
 					Noop,
 					Style{
 						Selector: ".card",
@@ -164,7 +164,7 @@ func BenchmarkRenderHTML(b *testing.B) {
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
 				Div(Class("card")),
-				Styled(
+				GetStyledNode(
 					Noop,
 					Style{
 						Selector: ".card",
@@ -237,7 +237,7 @@ func BenchmarkRenderHTMLWCapacity(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				Styled(
+				GetStyledNode(
 					Noop,
 					Style{
 						Selector: ".card",
@@ -255,7 +255,7 @@ func BenchmarkRenderHTMLWCapacity(b *testing.B) {
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
 				Div(Class("card")),
-				Styled(
+				GetStyledNode(
 					Noop,
 					Style{
 						Selector: ".card",

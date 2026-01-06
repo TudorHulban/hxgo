@@ -56,6 +56,6 @@ func BenchmarkDivRender(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_, _ = RenderHTMLandCSS(div)
+		_, _ = RenderHTMLandStyles(div)
 	}
 }

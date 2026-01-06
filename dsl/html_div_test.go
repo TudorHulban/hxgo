@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -48,5 +49,35 @@ func Test03Div(t *testing.T) {
 		string(Render(el)),
 
 		string(Render(el)),
+	)
+}
+
+func Test04Div(t *testing.T) {
+	cssClass := "css-class"
+
+	el := Div(
+		Class(cssClass),
+		Text("hi!"),
+	)
+
+	elWithStyles := GetStyledNode(
+		el,
+		Style{
+			Selector: "." + cssClass,
+			Props: [][2]string{
+				{"padding", "10px 18px"},
+			},
+		},
+	)
+
+	html, styles := RenderHTMLandStyles(elWithStyles)
+	require.NotZero(t, html)
+	require.NotZero(t, styles, "should have style")
+
+	fmt.Println(
+		string(html),
+	)
+	fmt.Println(
+		styles,
 	)
 }

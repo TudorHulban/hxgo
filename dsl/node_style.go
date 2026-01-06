@@ -10,17 +10,20 @@ type Style struct {
 
 // Style nodes are not attributes.
 // no HTML output, only styles.
-func Styled(child Node, styles ...Style) Node {
+//
+// Create the node first and then apply styles to it.
+func GetStyledNode(child Node, styles ...Style) Node {
 	data := &styles // // intentionally move to heap.
 
 	return Node{
-		fn:       renderStyled,
+		fn:       renderStyles,
 		data:     unsafe.Pointer(data),
 		children: []Node{child},
 	}
 }
 
-func renderStyled(a *accumulator, p unsafe.Pointer) {
+func renderStyles(a *accumulator, p unsafe.Pointer) {
 	styles := *(*[]Style)(p)
-	a.styles = append(a.styles, styles...)
+
+	a.cssComponents = append(a.cssComponents, styles...)
 }

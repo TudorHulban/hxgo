@@ -81,12 +81,13 @@ func RenderHXHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 
 	for i := range nodes {
 		walk(a, nodes[i])
+		a.Write1("|\n")
 	}
 
 	return a.html
 }
 
-func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
+func RenderHTMLandStyles(nodes ...Node) ([]byte, string) {
 	if len(nodes) == 0 {
 		return []byte{}, ""
 	}
@@ -97,23 +98,23 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 		walk(&a, nodes[i])
 	}
 
-	if len(a.styles) == 0 {
+	if len(a.cssComponents) == 0 {
 		return a.html, "" // HTML is already fully assembled
 	}
 
 	// Build styles
 	styles := newStylesCollector()
-	for _, s := range a.styles {
+	for _, s := range a.cssComponents {
 		styles.Add(s)
 	}
 
 	return a.html, styles.String()
 }
 
-// RenderHTMLandCSSWithCapacity renders nodes with pre-allocated capacity.
+// RenderHTMLandStylesWithCapacity renders nodes with pre-allocated capacity.
 // estimatedHTMLSize: approximate HTML output size in bytes
 // estimatedCSSRules: approximate number of CSS rules
-func RenderHTMLandCSSWithCapacity(estimatedHTMLSize, estimatedCSSRules int, nodes ...Node) ([]byte, string) {
+func RenderHTMLandStylesWithCapacity(estimatedHTMLSize, estimatedCSSRules int, nodes ...Node) ([]byte, string) {
 	if len(nodes) == 0 {
 		return []byte{}, ""
 	}
@@ -124,12 +125,12 @@ func RenderHTMLandCSSWithCapacity(estimatedHTMLSize, estimatedCSSRules int, node
 		walk(a, nodes[i])
 	}
 
-	if len(a.styles) == 0 {
+	if len(a.cssComponents) == 0 {
 		return a.html, "" // HTML is already fully assembled
 	}
 
 	css := newStylesCollector()
-	for _, s := range a.styles {
+	for _, s := range a.cssComponents {
 		css.Add(s)
 	}
 

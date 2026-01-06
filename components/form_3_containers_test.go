@@ -12,7 +12,7 @@ func TestNewForm3Containers(t *testing.T) {
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
 		[]dsl.Node{
-			dsl.Styled(
+			dsl.GetStyledNode(
 				dsl.Noop,
 				dsl.Style{
 					Selector: ".card:hover",
@@ -68,7 +68,7 @@ func TestNewForm3Containers(t *testing.T) {
 		},
 	)
 
-	html, css := dsl.RenderHTMLandCSS(form)
+	html, css := dsl.RenderHTMLandStyles(form)
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 

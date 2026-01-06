@@ -17,7 +17,7 @@ func BenchmarkStyleOnly(b *testing.B) {
 func BenchmarkStyleCall(b *testing.B) {
 	b.ReportAllocs()
 
-	el := Styled(
+	el := GetStyledNode(
 		Text("hello"),
 		Style{
 			Selector: "div",

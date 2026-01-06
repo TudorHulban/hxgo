@@ -12,7 +12,7 @@ func TestAllocGuard_EmptyInput(t *testing.T) {
 	allocs := testing.AllocsPerRun(
 		1000,
 		func() {
-			_, _ = RenderHTMLandCSS()
+			_, _ = RenderHTMLandStyles()
 		},
 	)
 
@@ -34,7 +34,7 @@ func TestAllocGuard_HTMLOnly(t *testing.T) {
 	allocs := testing.AllocsPerRun(
 		1000,
 		func() {
-			_, _ = RenderHTMLandCSS(node)
+			_, _ = RenderHTMLandStyles(node)
 		},
 	)
 
@@ -49,7 +49,7 @@ func TestAllocGuard_HTMLOnly(t *testing.T) {
 func TestAllocGuard_CSSOnly(t *testing.T) {
 	const maxAllocs = 12
 
-	n := Styled(
+	n := GetStyledNode(
 		Noop,
 		Style{
 			Selector: ".card",
@@ -62,7 +62,7 @@ func TestAllocGuard_CSSOnly(t *testing.T) {
 	allocs := testing.AllocsPerRun(
 		200,
 		func() {
-			_, _ = RenderHTMLandCSS(n)
+			_, _ = RenderHTMLandStyles(n)
 		},
 	)
 
@@ -79,7 +79,7 @@ func TestAllocGuard_HTMLAndCSS(t *testing.T) {
 
 	node := Div(
 		Class("card"),
-		Styled(
+		GetStyledNode(
 			Noop,
 			Style{
 				Selector: ".card",
@@ -93,7 +93,7 @@ func TestAllocGuard_HTMLAndCSS(t *testing.T) {
 	allocs := testing.AllocsPerRun(
 		200,
 		func() {
-			_, _ = RenderHTMLandCSS(node)
+			_, _ = RenderHTMLandStyles(node)
 		},
 	)
 

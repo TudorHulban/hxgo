@@ -24,8 +24,9 @@ func TestButton(t *testing.T) {
 			CSSID:            t.Name(),
 		},
 		[]dsl.Node{
-			dsl.Styled(
+			dsl.GetStyledNode(
 				dsl.Div(), // child node (empty div or whatever wrapper you expect)
+
 				dsl.Style{
 					Selector: "#" + t.Name(),
 					Props: [][2]string{
@@ -58,7 +59,7 @@ func TestButton(t *testing.T) {
 		},
 	)
 
-	html, css := dsl.RenderHTMLandCSS(el)
+	html, css := dsl.RenderHTMLandStyles(el)
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
