@@ -55,10 +55,11 @@ func (a *accumulator) Write5(value1, value2, value3, value4, value5 string) {
 	a.html = append(a.html, value5...)
 }
 
-func normalizeCSS(s string) string {
-	s = strings.TrimSpace(s)
+func normalizeCSS(text string) string {
+	text = strings.TrimSpace(text)
 
-	lines := strings.Split(s, "\n")
+	lines := strings.Split(text, "\n")
+
 	for i := range lines {
 		lines[i] = strings.TrimSpace(lines[i])
 	}

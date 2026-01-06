@@ -52,7 +52,7 @@ func Test03Div(t *testing.T) {
 	)
 }
 
-func Test04Div(t *testing.T) {
+func Test04DivStyles(t *testing.T) {
 	cssClass := "css-class"
 
 	el := Div(
@@ -102,7 +102,7 @@ func Test04Div(t *testing.T) {
 	)
 }
 
-func Test05Div(t *testing.T) {
+func Test05DivFull(t *testing.T) {
 	cssClassComponent := "css-class"
 	cssClassWidget := "css-widget"
 
@@ -163,6 +163,7 @@ func Test05Div(t *testing.T) {
 		elWithStyles,
 		Text("-------"),
 		elWithStyles,
+		elWithCSS,
 		elWithCSS,
 	)
 

@@ -303,7 +303,7 @@ For caching do not store Nodes but HTML.
 
 ## 4. Quick Example
 
-Nodes should not be shared across go routines.  
+Nodes should not be shared across goroutines.  
 Nodes can be created in a presentation layer, using below the handler for keeping code concise:
 
 ```go
@@ -311,8 +311,8 @@ Nodes can be created in a presentation layer, using below the handler for keepin
 func handler(w http.ResponseWriter, r *http.Request) {
     // 1. Build fresh Node tree
     ui := el("div",
-        el("p", Text("Hello")),
-        el("p", Text("World")),
+        el("p", Text("Hi")),
+        el("p", Text("World!")),
     )
     
     // 2. Render immediately (same goroutine)
@@ -323,16 +323,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
     // 4. ui goes out of scope → GC can collect
 }
 ```
-
-### A minimal “Good morning World!”
-
-#### Page
-
-#### Button
-
-#### Backend Endpoint
-
-#### The resulting behavior
 
 ## 5. Installation
 
@@ -367,7 +357,7 @@ This rendering model ensures that UI generation is pure, testable, and free from
 
 #### CSS
 
-CSS is ccumulated as styles or CSS.  
+CSS is accumulated as styles or CSS.  
 Styles could be embedded directly in the request answer.  
 CSS end goal is generating real `.css` files.  
 
@@ -449,19 +439,7 @@ This model keeps the UI and backend unified in a single language and eliminates 
 
 ## 8. Hypermedia Controls (hx-attributes)
 
-### hx-post
-
-### hx-get
-
-### hx-swap
-
-### hx-send
-
-### hx-require
-
-### hx-upload
-
-### UI toggles
+See [HX Attributes](./js/README.md).
 
 ## 9. Widgets
 
@@ -521,11 +499,7 @@ HTMX templates → “string-assembled hypermedia”
 
 ## 14. Contributing
 
-### How to contribute
-
-### Coding style
-
-### Module boundaries
+See [Contributing](Contributing.md).
 
 ## 15. License
 
