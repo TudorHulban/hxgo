@@ -1,6 +1,9 @@
 package dsl
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 // Single builder used by the renderer.
 // accumulator accumulates HTML bytes and CSS styles during rendering.
@@ -52,7 +55,29 @@ func (a *accumulator) Write5(value1, value2, value3, value4, value5 string) {
 	a.html = append(a.html, value5...)
 }
 
-// TODO: to be tested.
+func normalizeCSS(s string) string {
+	s = strings.TrimSpace(s)
+
+	lines := strings.Split(s, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimSpace(lines[i])
+	}
+
+	return strings.Join(lines, "\n")
+}
+
+func stripTrailingBraces(text string) string {
+	text = strings.TrimRight(text, " \t\r\n") // Remove trailing whitespace
+
+	// Remove ALL trailing braces
+	for len(text) > 0 && text[len(text)-1] == '}' {
+		text = text[:len(text)-1]
+		text = strings.TrimRight(text, " \t\r\n")
+	}
+
+	return text
+}
+
 func (a *accumulator) buildWidgetCSS(estimatedCSS ...int) []byte {
 	if len(a.cssWidgets) == 0 {
 		return nil
@@ -67,31 +92,52 @@ func (a *accumulator) buildWidgetCSS(estimatedCSS ...int) []byte {
 
 	for key, bucket := range a.cssWidgets {
 		for fnPtr, desktopFirst := range bucket {
-			css := (*fnPtr)()
 
-			// no media query
+			// Normalize + strip trailing braces from widget CSS
+			css := normalizeCSS((*fnPtr)())
+			css = stripTrailingBraces(css)
+
+			// -----------------------------------------
+			// CASE 1: no media query
+			// -----------------------------------------
 			if key.InflexionPointPX == 0 {
 				result = append(result, key.Selector...)
 				result = append(result, '{')
 				result = append(result, css...)
 				result = append(result, '}')
-
 				continue
 			}
 
-			// media query
+			// -----------------------------------------
+			// CASE 2: media query
+			// -----------------------------------------
+
+			// @media (min|max-width:
 			if desktopFirst {
 				result = append(result, "@media (min-width:"...)
 			} else {
 				result = append(result, "@media (max-width:"...)
 			}
 
+			// @media (min-width:1024
 			result = strconv.AppendUint(result, uint64(key.InflexionPointPX), 10)
-			result = append(result, "px) {"...)
+
+			// @media (min-width:1024px) {
+			result = append(result, "px) {\n"...)
+
+			// .selector {
 			result = append(result, key.Selector...)
-			result = append(result, '{')
+			result = append(result, " {\n"...)
+
+			// css content
 			result = append(result, css...)
-			result = append(result, "}}"...)
+			result = append(result, '\n')
+
+			// close selector }
+			result = append(result, "}\n"...)
+
+			// close media }
+			result = append(result, "}\n}"...)
 		}
 	}
 

@@ -132,7 +132,6 @@ func Test05Div(t *testing.T) {
 
 	actualCSS := func() string {
 		return `
-		.css-widget {
 			text-align: right;
 			width: fit-content;
 			background-color:rgb(134, 146, 138);
@@ -144,17 +143,17 @@ func Test05Div(t *testing.T) {
 			.hours-grid {
 				width: 100%;
 			}
-		}
 		`
 	}
 
 	cssRule := CSS{
 		CSSKey: CSSKey{
-			Selector:         cssClassWidget,
-			InflexionPointPX: 768,
+			Selector:         "." + cssClassWidget,
+			InflexionPointPX: 1024,
 		},
 
 		ActualCSS: actualCSS,
+		// DesktopFirst: true,
 	}
 
 	elWithCSS := GetCSSNode(cssRule)
@@ -167,9 +166,10 @@ func Test05Div(t *testing.T) {
 		elWithCSS,
 	)
 
-	html, styles := RenderHTMLandStyles(widget)
+	html, styles, css := RenderFull(widget)
 	require.NotZero(t, html)
 	require.NotZero(t, styles, "should have style")
+	require.NotZero(t, css, "should have css")
 
 	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
 	//   .css-class {
@@ -181,5 +181,11 @@ func Test05Div(t *testing.T) {
 	)
 	fmt.Println(
 		styles,
+	)
+	fmt.Println(
+		"-----------------",
+	)
+	fmt.Println(
+		string(css),
 	)
 }
