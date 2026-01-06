@@ -111,6 +111,30 @@ func RenderHTMLandStyles(nodes ...Node) ([]byte, string) {
 	return a.html, styles.String()
 }
 
+func RenderFull(nodes ...Node) ([]byte, string, []byte) {
+	if len(nodes) == 0 {
+		return nil, "", nil
+	}
+
+	var a accumulator
+
+	for i := range nodes {
+		walk(&a, nodes[i])
+	}
+
+	if len(a.cssComponents) == 0 {
+		return a.html, "", nil // HTML is already fully assembled
+	}
+
+	// Build styles
+	styles := newStylesCollector()
+	for _, s := range a.cssComponents {
+		styles.Add(s)
+	}
+
+	return a.html, styles.String(), a.buildWidgetCSS()
+}
+
 // RenderHTMLandStylesWithCapacity renders nodes with pre-allocated capacity.
 // estimatedHTMLSize: approximate HTML output size in bytes
 // estimatedCSSRules: approximate number of CSS rules

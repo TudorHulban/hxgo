@@ -18,10 +18,12 @@ type CSS struct {
 	ActualCSS    ActualCSS
 }
 
-func CSSNode(rules ...CSS) Node {
+func GetCSSNode(rules ...CSS) Node {
+	data := &rules
+
 	return Node{
 		fn:   renderCSS,
-		data: unsafe.Pointer(&rules),
+		data: unsafe.Pointer(data),
 	}
 }
 

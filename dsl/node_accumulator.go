@@ -52,47 +52,8 @@ func (a *accumulator) Write5(value1, value2, value3, value4, value5 string) {
 	a.html = append(a.html, value5...)
 }
 
-func (a *accumulator) BuildComponentCSS() []byte {
-	if len(a.cssComponents) == 0 {
-		return nil
-	}
-
-	out := make([]byte, 0, 256)
-
-	for i := range a.cssComponents {
-		s := a.cssComponents[i]
-
-		// selector
-		out = append(out, s.Selector...)
-		out = append(out, '{')
-
-		// props
-		for _, kv := range s.Props {
-			out = append(out, kv[0]...)
-			out = append(out, ':')
-			out = append(out, kv[1]...)
-			out = append(out, ';')
-		}
-
-		out = append(out, '}')
-
-		// optional media
-		if s.Media != "" {
-			wrapped := make([]byte, 0, len(out)+32)
-			wrapped = append(wrapped, "@media "...)
-			wrapped = append(wrapped, s.Media...)
-			wrapped = append(wrapped, '{')
-			wrapped = append(wrapped, out...)
-			wrapped = append(wrapped, '}')
-			out = wrapped
-		}
-	}
-
-	return out
-}
-
 // TODO: to be tested.
-func (a *accumulator) BuildWidgetCSS(estimatedCSS ...int) []byte {
+func (a *accumulator) buildWidgetCSS(estimatedCSS ...int) []byte {
 	if len(a.cssWidgets) == 0 {
 		return nil
 	}
