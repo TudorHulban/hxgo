@@ -2,52 +2,23 @@ package dsl
 
 import "unsafe"
 
-// Single builder used by the renderer.
-// accumulator accumulates HTML bytes and CSS styles during rendering.
-// For better performance,
-// use NewAcc with an estimated size based on the typical output.
-type accumulator struct {
-	html []byte
-	css  []Style
-}
-
-// newAccumulator creates an Accumulator with pre-allocated capacity.
-// estimatedHTMLSize should be the approximate size of the rendered HTML in bytes.
-// Pre-allocating reduces memory allocations during rendering.
-// Example: for a typical page of ~10KB, use newAccumulator(10240, 16)
-func newAccumulator(estimatedHTMLSize, estimatedCSSRules int) *accumulator {
-	return &accumulator{
-		html: make([]byte, 0, estimatedHTMLSize),
-		css:  make([]Style, 0, estimatedCSSRules),
-	}
-}
-
-func (a *accumulator) Write1(value string) {
-	a.html = append(a.html, value...)
-}
-
-// Fused writes.
-func (a *accumulator) Write3(value1, value2, value3 string) {
-	a.html = append(a.html, value1...)
-	a.html = append(a.html, value2...)
-	a.html = append(a.html, value3...)
-}
-
-// Fused writes.
-func (a *accumulator) Write5(value1, value2, value3, value4, value5 string) {
-	a.html = append(a.html, value1...)
-	a.html = append(a.html, value2...)
-	a.html = append(a.html, value3...)
-	a.html = append(a.html, value4...)
-	a.html = append(a.html, value5...)
-}
-
 type renderer func(*accumulator, unsafe.Pointer)
 
 // Node: function pointer plus data pointer.
+//
+// Data-oriented design.
+// Manual control over execution.
+// No interface dispatch.
+// No virtual method tables.
 type Node struct {
-	fn          renderer
-	data        unsafe.Pointer
+	fn   renderer
+	data unsafe.Pointer
+
 	children    []Node
 	isAttribute bool
+	isCSS       bool
+}
+
+func (n *Node) Add(children ...Node) {
+	n.children = append(n.children, children...)
 }

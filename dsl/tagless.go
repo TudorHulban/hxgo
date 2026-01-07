@@ -11,6 +11,7 @@ var tagless = map[string]struct{}{
 	"source": {},
 }
 
+// TODO: should be used.
 func isTagless(elName string) bool {
 	_, exists := tagless[elName]
 

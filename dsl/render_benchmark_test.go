@@ -18,12 +18,12 @@ import (
 // BenchmarkRenderHTMLandCSS/3._valid_CSS_input-12     	  764766	      1345 ns/op	    1360 B/op	      15 allocs/op
 // BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-12         	  710091	      1508 ns/op	    1416 B/op	      18 allocs/op
 
-// BenchmarkRenderHTMLandCSS/1._empty_input-16         	232883731	        15.32 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkRenderHTMLandCSS/2._valid_HTML_input-16    	 1781386	       674.5 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-16   	 1669910	       730.1 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-16   	 1000000	      1062 ns/op	     168 B/op	       5 allocs/op
-// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-16     	  201258	      5630 ns/op	    1360 B/op	      15 allocs/op
-// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-16         	  192531	      6258 ns/op	    1416 B/op	      18 allocs/op
+// BenchmarkRenderHTMLandCSS/1._empty_input-16         	99964186	        12.75 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkRenderHTMLandCSS/2a._valid_HTML_input-16   	 1619826	       711.1 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2b._valid_HTML_input-16   	 1610301	       733.4 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTMLandCSS/2c._valid_HTML_input-16   	 1000000	      1131 ns/op	     168 B/op	       5 allocs/op
+// BenchmarkRenderHTMLandCSS/3._valid_CSS_input-16     	  182564	      6128 ns/op	    1504 B/op	      16 allocs/op
+// BenchmarkRenderHTMLandCSS/4._valid_HTML-CSS_input-16         	  183285	      6048 ns/op	    1504 B/op	      16 allocs/op
 
 // go test -bench=RenderHTMLandCSS -benchmem -run=^$ -memprofile=mem.pprof
 // go tool pprof -pdf mem.pprof > mem.pdf
@@ -59,36 +59,23 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				Styled(
-					Noop,
-					Style{
-						Selector: ".card",
-						Props: [][2]string{
-							{"padding", "20px"},
-							{"border-radius", "8px"},
-							{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-						},
-						Media: "min-width: 768px",
-					},
-				),
+				NewCSSFor(".card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					Radius("8px").
+					AsNode(),
 			},
 		},
 		{
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
-				Div(Class("card")),
-				Styled(
-					Noop,
-					Style{
-						Selector: ".card",
-						Props: [][2]string{
-							{"padding", "20px"},
-							{"border-radius", "8px"},
-							{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-						},
-						Media: "min-width: 768px",
-					},
-				),
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					AsNode(),
 			},
 		},
 	}
@@ -101,19 +88,19 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 				b.ResetTimer()
 
 				for i := 0; i < b.N; i++ {
-					_, _ = RenderHTMLandCSS(tt.nodes...)
+					_, _ = RenderHTMLandStyles(tt.nodes...)
 				}
 			},
 		)
 	}
 }
 
-// BenchmarkRenderHTML/1._empty_input-16         	578539513	        11.02 ns/op	       0 B/op	       0 allocs/op
-// BenchmarkRenderHTML/2._valid_HTML_input-16    	 1758493	       655.0 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTML/2a._valid_HTML_input-16   	 1703469	       700.0 ns/op	     104 B/op	       4 allocs/op
-// BenchmarkRenderHTML/2b._valid_HTML_input-16   	 1142584	      1042 ns/op	     168 B/op	       5 allocs/op
-// BenchmarkRenderHTML/3._valid_CSS_input-16     	 2417344	       488.9 ns/op	     112 B/op	       2 allocs/op
-// BenchmarkRenderHTML/4._valid_HTML-CSS_input-16         	 1182656	      1027 ns/op	     168 B/op	       5 allocs/op
+// BenchmarkRenderHTML/1._empty_input-16         	93749204	        12.07 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkRenderHTML/2a._valid_HTML_input-16   	 1688866	       728.2 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTML/2b._valid_HTML_input-16   	 1576878	       763.5 ns/op	     104 B/op	       4 allocs/op
+// BenchmarkRenderHTML/2c._valid_HTML_input-16   	 1033178	      1174 ns/op	     168 B/op	       5 allocs/op
+// BenchmarkRenderHTML/3._valid_CSS_input-16     	 2327839	       526.4 ns/op	     144 B/op	       2 allocs/op
+// BenchmarkRenderHTML/4._valid_HTML-CSS_input-16         	 2352422	       513.6 ns/op	     144 B/op	       2 allocs/op
 
 func BenchmarkRenderHTML(b *testing.B) {
 	tests := []struct {
@@ -146,36 +133,23 @@ func BenchmarkRenderHTML(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				Styled(
-					Noop,
-					Style{
-						Selector: ".card",
-						Props: [][2]string{
-							{"padding", "20px"},
-							{"border-radius", "8px"},
-							{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-						},
-						Media: "min-width: 768px",
-					},
-				),
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					AsNode(),
 			},
 		},
 		{
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
-				Div(Class("card")),
-				Styled(
-					Noop,
-					Style{
-						Selector: ".card",
-						Props: [][2]string{
-							{"padding", "20px"},
-							{"border-radius", "8px"},
-							{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-						},
-						Media: "min-width: 768px",
-					},
-				),
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					AsNode(),
 			},
 		},
 	}
@@ -237,36 +211,23 @@ func BenchmarkRenderHTMLWCapacity(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				Styled(
-					Noop,
-					Style{
-						Selector: ".card",
-						Props: [][2]string{
-							{"padding", "20px"},
-							{"border-radius", "8px"},
-							{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-						},
-						Media: "min-width: 768px",
-					},
-				),
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					AsNode(),
 			},
 		},
 		{
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
-				Div(Class("card")),
-				Styled(
-					Noop,
-					Style{
-						Selector: ".card",
-						Props: [][2]string{
-							{"padding", "20px"},
-							{"border-radius", "8px"},
-							{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-						},
-						Media: "min-width: 768px",
-					},
-				),
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					AsNode(),
 			},
 			capacityBytes: 128,
 		},

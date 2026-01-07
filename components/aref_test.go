@@ -6,7 +6,7 @@ import (
 )
 
 func TestARef(t *testing.T) {
-	element := ARefRaw(
+	el := ARefRaw(
 		&ParamsARef{
 			Route:   "/home",
 			Caption: "Home",
@@ -14,6 +14,6 @@ func TestARef(t *testing.T) {
 	)
 
 	fmt.Println(
-		element,
+		el,
 	)
 }

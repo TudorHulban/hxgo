@@ -23,42 +23,37 @@ func TestButton(t *testing.T) {
 			HXActionEndpoint: "/",
 			CSSID:            t.Name(),
 		},
-		[]dsl.Node{
-			dsl.Styled(
-				dsl.Div(), // child node (empty div or whatever wrapper you expect)
-				dsl.Style{
-					Selector: "#" + t.Name(),
-					Props: [][2]string{
-						{"display", "inline-block"},
-						{"padding", "10px 18px"},
-						{"background", "#4a6cf7"},
-						{"color", "white"},
-						{"border", "none"},
-						{"border-radius", "6px"},
-						{"font-size", "45px"},
-						{"cursor", "pointer"},
-						{"transition", "background 0.2s ease, box-shadow 0.2s ease"},
-					},
-				},
-				dsl.Style{
-					Selector: "#" + t.Name() + ":hover",
-					Props: [][2]string{
-						{"background", "#3d5be0"},
-						{"box-shadow", "0 4px 14px rgba(0,0,0,0.15)"},
-					},
-				},
-				dsl.Style{
-					Selector: "#" + t.Name() + ":active",
-					Props: [][2]string{
-						{"background", "#344fcc"},
-						{"box-shadow", "0 2px 8px rgba(0,0,0,0.2)"},
-					},
-				},
-			),
-		},
 	)
 
-	html, css := dsl.RenderHTMLandCSS(el)
+	el.Add(
+		dsl.NewCSSFor("#"+t.Name()).
+			WithBreakpoint("768px").
+			Background("#4a6cf7").
+			Border("none").
+			Color("white").
+			Cursor("pointer").
+			Display("inline-block").
+			FontSize("45px").
+			Padding("10px 18px").
+			Radius("6px").
+			Transition("background 0.2s ease, box-shadow 0.2s ease").
+			ShadowBox("0 4px 14px rgba(0,0,0,0.15)").
+			AsNode(),
+
+		dsl.NewCSSFor("#"+t.Name()+":hover").
+			WithBreakpoint("768px").
+			Background("#3d5be0").
+			ShadowBox("0 4px 14px rgba(0,0,0,0.15)").
+			AsNode(),
+
+		dsl.NewCSSFor("#"+t.Name()+":active").
+			WithBreakpoint("768px").
+			Background("#344fcc").
+			ShadowBox("0 2px 8px rgba(0,0,0,0.2)").
+			AsNode(),
+	)
+
+	html, css := dsl.RenderHTMLandStyles(el)
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
@@ -83,7 +78,7 @@ func TestButton(t *testing.T) {
 		"Open http://localhost:8080 and press Ctrl-C when done",
 	)
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 }
 
 // BenchmarkButtonSubmit-12    	 2860005	       420.4 ns/op	     432 B/op	       3 allocs/op

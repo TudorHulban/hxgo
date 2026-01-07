@@ -12,7 +12,7 @@ func TestAllocGuard_EmptyInput(t *testing.T) {
 	allocs := testing.AllocsPerRun(
 		1000,
 		func() {
-			_, _ = RenderHTMLandCSS()
+			_, _ = RenderHTMLandStyles()
 		},
 	)
 
@@ -34,7 +34,7 @@ func TestAllocGuard_HTMLOnly(t *testing.T) {
 	allocs := testing.AllocsPerRun(
 		1000,
 		func() {
-			_, _ = RenderHTMLandCSS(node)
+			_, _ = RenderHTMLandStyles(node)
 		},
 	)
 
@@ -47,22 +47,19 @@ func TestAllocGuard_HTMLOnly(t *testing.T) {
 }
 
 func TestAllocGuard_CSSOnly(t *testing.T) {
-	const maxAllocs = 12
+	const maxAllocs = 16
 
-	n := Styled(
-		Noop,
-		Style{
-			Selector: ".card",
-			Props: [][2]string{
-				{"padding", "20px"},
-			},
-		},
-	)
+	node := NewCSSForClass("card").
+		WithBreakpoint("768px").
+		Padding("20px").
+		Radius("8px").
+		ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+		AsNode()
 
 	allocs := testing.AllocsPerRun(
 		200,
 		func() {
-			_, _ = RenderHTMLandCSS(n)
+			_, _ = RenderHTMLandStyles(node)
 		},
 	)
 
@@ -75,25 +72,22 @@ func TestAllocGuard_CSSOnly(t *testing.T) {
 }
 
 func TestAllocGuard_HTMLAndCSS(t *testing.T) {
-	const maxAllocations = 15
+	const maxAllocations = 9
 
 	node := Div(
 		Class("card"),
-		Styled(
-			Noop,
-			Style{
-				Selector: ".card",
-				Props: [][2]string{
-					{"padding", "20px"},
-				},
-			},
-		),
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("20px").
+			Radius("8px").
+			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+			AsNode(),
 	)
 
 	allocs := testing.AllocsPerRun(
 		200,
 		func() {
-			_, _ = RenderHTMLandCSS(node)
+			_, _ = RenderHTMLandStyles(node)
 		},
 	)
 

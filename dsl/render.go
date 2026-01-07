@@ -42,7 +42,7 @@ func RenderHX(nodes ...Node) []byte {
 		return []byte{}
 	}
 
-	var a Accumulator
+	var a accumulator
 
 	for i := range nodes {
 		walk(&a, nodes[i])
@@ -77,16 +77,17 @@ func RenderHXHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 		return []byte{}
 	}
 
-	a := NewAccumulator(estimatedSize, 0)
+	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
 		walk(a, nodes[i])
+		a.Write1("|\n")
 	}
 
 	return a.html
 }
 
-func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
+func RenderHTMLandStyles(nodes ...Node) ([]byte, string) {
 	if len(nodes) == 0 {
 		return []byte{}, ""
 	}
@@ -101,19 +102,39 @@ func RenderHTMLandCSS(nodes ...Node) ([]byte, string) {
 		return a.html, "" // HTML is already fully assembled
 	}
 
-	// Build CSS
-	css := newSmartCSSCollector()
-	for _, s := range a.css {
-		css.Add(s)
-	}
-
-	return a.html, css.String()
+	return a.html, a.EmitStyles()
 }
 
-// RenderHTMLandCSSWithCapacity renders nodes with pre-allocated capacity.
+func RenderFull(nodes ...Node) ([]byte, string, string) {
+	if len(nodes) == 0 {
+		return nil, "", ""
+	}
+
+	var a accumulator
+
+	for i := range nodes {
+		walk(&a, nodes[i])
+	}
+
+	if len(a.css) == 0 {
+		return a.html, "", "" // HTML is already fully assembled
+	}
+
+	// // Build styles
+	// styles := newStylesCollector()
+	// for _, s := range a.cssComponents {
+	// 	styles.Add(s)
+	// }
+
+	styles, css := a.BuildCSS()
+
+	return a.html, styles, css
+}
+
+// RenderHTMLandStylesWithCapacity renders nodes with pre-allocated capacity.
 // estimatedHTMLSize: approximate HTML output size in bytes
 // estimatedCSSRules: approximate number of CSS rules
-func RenderHTMLandCSSWithCapacity(estimatedHTMLSize, estimatedCSSRules int, nodes ...Node) ([]byte, string) {
+func RenderHTMLandStylesWithCapacity(estimatedHTMLSize, estimatedCSSRules int, nodes ...Node) ([]byte, string) {
 	if len(nodes) == 0 {
 		return []byte{}, ""
 	}
@@ -128,12 +149,7 @@ func RenderHTMLandCSSWithCapacity(estimatedHTMLSize, estimatedCSSRules int, node
 		return a.html, "" // HTML is already fully assembled
 	}
 
-	css := newSmartCSSCollector()
-	for _, s := range a.css {
-		css.Add(s)
-	}
-
-	return a.html, css.String()
+	return a.html, a.EmitStyles()
 }
 
 func HTMLwithDataCSS(html []byte, css string) string {

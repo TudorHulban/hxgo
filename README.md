@@ -1,7 +1,8 @@
 # hxgo
 
 Typed, server-side hypermedia domain specific language (DSL) that renders to HTMX-compatible HTML.  
-Incorporates concepts from [htmx](https://htmx.org) and [gomponents.com](https://www.gomponents.com/).
+hxgo treats HTML as a render target rather than a source language, using a typed Node graph as an intermediate representation that deterministically lowers Go values into hypermedia.  
+hxgo incorporates concepts from [htmx](https://htmx.org) and [gomponents.com](https://www.gomponents.com/).
 
 ## 1. Introduction
 
@@ -56,6 +57,112 @@ Rendering has the following properties:
 - Minimal allocations through pre-sized accumulators
 
 Because rendering is a pure transformation from Nodes to HTML, the same rendering logic applies uniformly to full pages, fragments, and component updates.
+
+### E. Design Constraints
+
+hxgo is intentionally designed around a small set of explicit constraints. These constraints are not limitations in the traditional sense; they are architectural choices that enable determinism, performance, and strong guarantees about correctness.
+
+#### 1. Closed-world UI construction
+
+hxgo assumes a closed world for UI construction: all UI elements, attributes, hypermedia controls, and CSS rules are defined within the Go program at compile time.
+
+There is no support for:
+
+- runtime injection of arbitrary HTML,
+- user-provided markup,
+- dynamic evaluation of template strings.
+- This constraint allows hxgo to:
+- guarantee structural correctness of generated HTML,
+- prevent malformed or unsafe hypermedia attributes,
+- eliminate entire classes of injection vulnerabilities,
+- reason about the complete UI graph at render time.
+
+Because the UI surface is known ahead of time, hxgo can safely apply optimizations such as deduplication, deterministic ordering, and single-pass rendering.
+
+#### 2. HTML as a render target, not a source language
+
+hxgo does not parse, interpret, or manipulate HTML templates. Instead, HTML is treated strictly as a serialization format emitted by the renderer.
+
+UI structure is expressed exclusively as typed Go values.
+HTML is the output, never the input.
+
+This design:
+
+- avoids template parsing and runtime evaluation,
+- removes ambiguity between data and markup,
+- guarantees deterministic output for a given Node graph,
+- enables compile-time validation of UI structure and behavior.
+
+#### 3. Typed hypermedia semantics
+
+All hypermedia interactions (hx-get, hx-post, swaps, requirements, enables/disables, uploads, redirects) are expressed as typed constructs.
+
+Free-form string-based hypermedia attributes are deliberately avoided.
+
+This constraint ensures:
+
+- invalid or incomplete hypermedia configurations cannot be constructed,
+- interaction semantics are consistent across the entire UI,
+- hypermedia behavior is testable using standard Go tooling,
+- server-side handlers and client-side behavior remain aligned.
+
+#### 4. Deterministic rendering and ordering
+
+Rendering in hxgo is deterministic by design. Given the same Node graph, the renderer will always emit identical HTML and CSS.
+
+This is enforced through:
+
+- fixed traversal order of Node graphs,
+- stable attribute emission order,
+- controlled CSS accumulation and deduplication,
+- absence of reflection-based rendering.
+
+Determinism enables:
+
+- reliable snapshot testing,
+- predictable caching behavior,
+- reproducible builds and responses.
+
+#### 5. Server-driven state transitions
+
+hxgo does not model client-side state machines. All state transitions are driven by server responses and expressed through hypermedia.
+
+Client-side JavaScript is limited to HTMX’s minimal runtime or optional, or declarative browser APIs (e.g. window.open).
+
+This constraint:
+
+- avoids hydration and reconciliation layers,
+- eliminates client-side state divergence,
+- keeps all authoritative state on the server,
+- aligns with RESTful hypermedia principles.
+
+#### 6. Controlled extensibility
+
+Extensibility in hxgo is achieved through:
+
+- new Node constructors,
+- new typed attributes,
+- new widgets composed from existing primitives.
+
+The core renderer and accumulator are intentionally unexported. This prevents external code from mutating internal invariants and ensures that all extensions preserve correctness and determinism.
+
+Advanced features such as CSS registries, media-query handling, and deduplication are implemented internally and exposed only through stable, typed APIs.
+
+#### 7. Go-first developer experience
+
+hxgo is designed for Go developers who prefer:
+
+- static typing,
+- explicit control flow,
+- standard tooling (go test, go vet, pprof),
+- minimal build pipelines.
+
+As a result:
+
+- no JavaScript tooling is required,
+- no template files are introduced,
+- UI logic can be tested without browsers or DOM emulators,
+- performance characteristics are transparent and measurable.
 
 ## 2. The Economics of Hypermedia
 
@@ -182,17 +289,40 @@ Narrower attack surface through typed constructs.
 
 hxgo treats incoming requests as typed continuations of previously emitted hypermedia actions rather than as arbitrary payloads. Because forms and actions are generated by hxgo itself, request parsing can rely on narrower, well-defined contracts, enabling simpler parsing logic, fewer allocations, and predictable performance without sacrificing correctness.
 
+### K. Memory Safety Guarantees
+
+hxgo uses `unsafe.Pointer` internally but maintains memory safety through:
+
+1. **Request-Scoped Construction**: Node trees are built and rendered within a single request handler
+2. **No Cross-Goroutine Sharing**: Each Node tree is owned by exactly one goroutine
+3. **Immediate Rendering**: Nodes are rendered immediately after construction
+4. **Heap Allocation**: Escape analysis ensures all Node data lives on the heap
+
+This combination allows performance optimizations while preserving safety.  
+For caching do not store Nodes but HTML.
+
 ## 4. Quick Example
 
-### A minimal “Good morning World!”
+Nodes should not be shared across goroutines.  
+Nodes can be created in a presentation layer, using below the handler for keeping code concise:
 
-#### Page
-
-#### Button
-
-#### Backend Endpoint
-
-#### The resulting behavior
+```go
+// Request handler (single goroutine)
+func handler(w http.ResponseWriter, r *http.Request) {
+    // 1. Build fresh Node tree
+    ui := el("div",
+        el("p", Text("Hi")),
+        el("p", Text("World!")),
+    )
+    
+    // 2. Render immediately (same goroutine)
+    html := Render(ui)
+    
+    // 3. Send response
+    w.Write(html)
+    // 4. ui goes out of scope → GC can collect
+}
+```
 
 ## 5. Installation
 
@@ -206,7 +336,7 @@ hxgo is built on a small set of composable primitives. These primitives form the
 
 ### Nodes
 
-A Node is the fundamental unit of hxgo. Every piece of UI — elements, text, attributes, CSS, widgets — ultimately resolves to a Node. Nodes form a tree that mirrors the structure of the resulting HTML.
+A Node is the fundamental unit of hxgo. Every piece of UI — elements, text, attributes, CSS, widgets — ultimately resolves to a Node. Nodes form a tree that mirrors the structure of the resulting HTML. It represents a typed intermediate representation executed via a deterministic accumulator, as opposed to an interface-based render method. This design enables CSS deduplication, predictable attribute order, and first-class hypermedia controls, which are beyond the scope of simple HTML rendering.
 
 Unified representation: all UI constructs reduce to a Node.  
 Tree‑structured output: Nodes compose into hierarchical HTML.  
@@ -224,6 +354,12 @@ During this process the components CSS is accumulated and consolidated.
 
 The final result is a byte slice or string containing valid HTML, ready to be sent to the client, together with the CSS the components need.  
 This rendering model ensures that UI generation is pure, testable, and free from side effects.
+
+#### CSS
+
+CSS is accumulated as styles or CSS.  
+Styles could be embedded directly in the request answer.  
+CSS end goal is generating real `.css` files.  
 
 ### Elements
 
@@ -303,19 +439,7 @@ This model keeps the UI and backend unified in a single language and eliminates 
 
 ## 8. Hypermedia Controls (hx-attributes)
 
-### hx-post
-
-### hx-get
-
-### hx-swap
-
-### hx-send
-
-### hx-require
-
-### hx-upload
-
-### UI toggles
+See [HX Attributes](./js/README.md).
 
 ## 9. Widgets
 
@@ -375,11 +499,7 @@ HTMX templates → “string-assembled hypermedia”
 
 ## 14. Contributing
 
-### How to contribute
-
-### Coding style
-
-### Module boundaries
+See [Contributing](Contributing.md).
 
 ## 15. License
 

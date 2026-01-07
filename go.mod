@@ -7,7 +7,6 @@ require (
 	github.com/TudorHulban/go-errors v0.0.0-20250526111805-0875506117af
 	github.com/TudorHulban/hx-core v0.0.0-20250521103423-ecc9e510e693
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/net v0.48.0
 )
 
 require (

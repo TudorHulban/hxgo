@@ -9,32 +9,22 @@ import (
 
 func TestStyledDiv(t *testing.T) {
 	element := Div(
-		Styled(
-			Noop,
-			[]Style{
-				{
-					Selector: ".card",
-					Props: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("20px").
+			Radius("8px").
+			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+			AsNode(),
 
-					Media: "min-width: 768px",
-				},
-				{
-					Selector: ".card:hover",
-					Props: [][2]string{
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				},
-			}...,
-		),
+		NewCSSForClass("card").
+			WithBreakpoint("1024px").
+			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+			AsNode(),
 
 		Div(AttrClass("card")),
 	)
 
-	html, css := RenderHTMLandCSS(element)
+	html, css := RenderHTMLandStyles(element)
 	require.NotZero(t, html)
 	require.NotZero(t, css, "should have css")
 
