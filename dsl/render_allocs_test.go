@@ -49,17 +49,11 @@ func TestAllocGuard_HTMLOnly(t *testing.T) {
 func TestAllocGuard_CSSOnly(t *testing.T) {
 	const maxAllocs = 16
 
-	node := CSSContribution{
-		CSSContributionKey: CSSContributionKey{
-			Selector:       ".card",
-			InflexionPoint: "768px",
-		},
-		DeclarativeStyle: [][2]string{
-			{"padding", "20px"},
-			{"border-radius", "8px"},
-			{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-		},
-	}.
+	node := NewCSSForClass("card").
+		WithBreakpoint("768px").
+		Padding("20px").
+		Radius("8px").
+		ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 		AsNode()
 
 	allocs := testing.AllocsPerRun(
@@ -78,20 +72,15 @@ func TestAllocGuard_CSSOnly(t *testing.T) {
 }
 
 func TestAllocGuard_HTMLAndCSS(t *testing.T) {
-	const maxAllocations = 19
+	const maxAllocations = 9
 
 	node := Div(
 		Class("card"),
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector: ".card",
-			},
-			DeclarativeStyle: [][2]string{
-				{"padding", "20px"},
-				{"border-radius", "8px"},
-				{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-			},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("20px").
+			Radius("8px").
+			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 			AsNode(),
 	)
 

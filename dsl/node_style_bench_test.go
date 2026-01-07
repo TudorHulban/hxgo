@@ -7,12 +7,7 @@ func BenchmarkStyleOnly(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector: "div",
-			},
-			DeclarativeStyle: [][2]string{{"color", "red"}},
-		}
+		_ = NewCSSFor("div").Color("red")
 	}
 }
 
@@ -21,13 +16,7 @@ func BenchmarkHTMLCall(b *testing.B) {
 
 	el := Div(
 		Text("hello"),
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector: "div",
-			},
-			DeclarativeStyle: [][2]string{{"color", "red"}},
-		}.
-			AsNode(),
+		NewCSSFor("div").Color("red").AsNode(),
 	)
 
 	b.ResetTimer()
@@ -42,13 +31,7 @@ func BenchmarkCSSCall(b *testing.B) {
 
 	el := Div(
 		Text("hello"),
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector: "div",
-			},
-			DeclarativeStyle: [][2]string{{"color", "red"}},
-		}.
-			AsNode(),
+		NewCSSFor("div").Color("red").AsNode(),
 	)
 
 	b.ResetTimer()

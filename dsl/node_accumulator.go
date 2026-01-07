@@ -106,14 +106,14 @@ func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContr
 			continue
 		}
 
-		if key.InflexionPoint != "" {
+		if key.Breakpoint != "" {
 			sb.WriteString("@media (")
 			if key.DesktopFirst {
 				sb.WriteString("min-width:")
 			} else {
 				sb.WriteString("max-width:")
 			}
-			sb.WriteString(key.InflexionPoint)
+			sb.WriteString(key.Breakpoint)
 			sb.WriteString(") {\n")
 		}
 
@@ -138,7 +138,7 @@ func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContr
 
 		sb.WriteString("  }\n")
 
-		if key.InflexionPoint != "" {
+		if key.Breakpoint != "" {
 			sb.WriteString("}\n")
 		}
 	}
@@ -162,7 +162,7 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 			// ----------------------------------------------------
 			// CASE 1: No media query
 			// ----------------------------------------------------
-			if key.InflexionPoint == "" {
+			if key.Breakpoint == "" {
 				// GLOBAL CSS (no selector)
 				if key.Selector == "" {
 					sb.WriteString(raw)
@@ -189,7 +189,7 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 			} else {
 				sb.WriteString("max-width:")
 			}
-			sb.WriteString(key.InflexionPoint)
+			sb.WriteString(key.Breakpoint)
 			sb.WriteString(") {\n")
 
 			// GLOBAL CSS inside media query
@@ -214,50 +214,6 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 
 	return sb.String()
 }
-
-// func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
-// 	var sb strings.Builder
-
-// 	for _, key := range order {
-// 		g := groups[key]
-// 		if len(g.Procedural.order) == 0 {
-// 			continue
-// 		}
-
-// 		for _, fn := range g.Procedural.order {
-// 			raw := normalizeCSS(fn())
-// 			raw = stripTrailingBraces(raw)
-
-// 			if key.InflexionPoint == "" {
-// 				sb.WriteString(key.Selector)
-// 				sb.WriteString("{")
-// 				sb.WriteString(raw)
-// 				sb.WriteString("}\n")
-// 				continue
-// 			}
-
-// 			sb.WriteString("@media (")
-// 			if key.DesktopFirst {
-// 				sb.WriteString("min-width:")
-// 			} else {
-// 				sb.WriteString("max-width:")
-// 			}
-// 			sb.WriteString(key.InflexionPoint)
-// 			sb.WriteString(") {\n")
-
-// 			sb.WriteString("  ")
-// 			sb.WriteString(key.Selector)
-// 			sb.WriteString(" {\n")
-// 			sb.WriteString("    ")
-// 			sb.WriteString(raw)
-// 			sb.WriteString("\n  }\n")
-
-// 			sb.WriteString("}\n")
-// 		}
-// 	}
-
-// 	return sb.String()
-// }
 
 func (a *accumulator) EmitStyles() string {
 	return a.emitStyles(

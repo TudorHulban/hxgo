@@ -9,27 +9,16 @@ import (
 
 func TestStyledDiv(t *testing.T) {
 	element := Div(
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector:       ".card",
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"padding", "20px"},
-				{"border-radius", "8px"},
-				{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-			},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("20px").
+			Radius("8px").
+			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 			AsNode(),
 
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector: ".card",
-			},
-			DeclarativeStyle: [][2]string{
-				{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-			},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("1024px").
+			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 			AsNode(),
 
 		Div(AttrClass("card")),

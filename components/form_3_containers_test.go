@@ -11,15 +11,11 @@ import (
 func TestNewForm3Containers(t *testing.T) {
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
-		dsl.CSSContribution{
-			CSSContributionKey: dsl.CSSContributionKey{
-				Selector:       ".card:hover",
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"box-shadow", "0 8px 24px rgba(0,0,0,0.2)"},
-			},
-		}.
+
+		dsl.NewCSSForClass("card:hover").
+			WithBreakpoint("768px").
+			Padding("10px 18px").
+			ShadowBox("0 8px 24px rgba(0,0,0,0.2)").
 			AsNode(),
 	)
 

@@ -61,26 +61,14 @@ func Test04DivStyles(t *testing.T) {
 	)
 
 	el.Add(
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector:       "." + cssClass,
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"padding", "10px 18px"},
-			},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("10px 18px").
 			AsNode(),
 
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector:       "." + cssClass,
-				InflexionPoint: "1028px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"padding", "15px 18px"},
-			},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("1028px").
+			Padding("15px 18px").
 			AsNode(),
 	)
 
@@ -128,36 +116,19 @@ func Test05DivFull(t *testing.T) {
 	}
 
 	el.Add(
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector:       "." + cssClassComponent,
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"padding", "10px 18px"},
-			},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("10px 18px").
 			AsNode(),
 
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector:       "." + cssClassComponent,
-				InflexionPoint: "1028px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"padding", "12px 18px"},
-			},
-			ProceduralCSS: []CSS{actualCSS},
-		}.
+		NewCSSForClass("card").
+			WithBreakpoint("1028px").
+			Padding("15px 18px").
 			AsNode(),
 
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				Selector:       "." + cssClassComponent,
-				InflexionPoint: "1920px",
-			},
-			ProceduralCSS: []CSS{actualCSS},
-		}.
+		NewCSSForClass(cssClassComponent).
+			WithBreakpoint("1920px").
+			AddCSS(actualCSS).
 			AsNode(),
 	)
 
@@ -205,9 +176,8 @@ func Test06DivCSS(t *testing.T) {
 	}
 
 	el.Add(
-		CSSContribution{
-			ProceduralCSS: []CSS{actualCSS},
-		}.
+		NewGeneralCSS().
+			AddCSS(actualCSS).
 			AsNode(),
 	)
 
@@ -241,12 +211,9 @@ func Test07DivCSS(t *testing.T) {
 	}
 
 	el.Add(
-		CSSContribution{
-			CSSContributionKey: CSSContributionKey{
-				InflexionPoint: "768px",
-			},
-			ProceduralCSS: []CSS{actualCSS},
-		}.
+		NewGeneralCSS().
+			WithBreakpoint("768px").
+			AddCSS(actualCSS).
 			AsNode(),
 	)
 

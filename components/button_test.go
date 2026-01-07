@@ -26,47 +26,30 @@ func TestButton(t *testing.T) {
 	)
 
 	el.Add(
-		dsl.CSSContribution{
-			CSSContributionKey: dsl.CSSContributionKey{
-				Selector:       "#" + t.Name(),
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"display", "inline-block"},
-				{"padding", "10px 18px"},
-				{"background", "#4a6cf7"},
-				{"color", "white"},
-				{"border", "none"},
-				{"border-radius", "6px"},
-				{"font-size", "45px"},
-				{"cursor", "pointer"},
-				{"transition", "background 0.2s ease, box-shadow 0.2s ease"},
-			},
-		}.
+		dsl.NewCSSFor("#"+t.Name()).
+			WithBreakpoint("768px").
+			Background("#4a6cf7").
+			Border("none").
+			Color("white").
+			Cursor("pointer").
+			Display("inline-block").
+			FontSize("45px").
+			Padding("10px 18px").
+			Radius("6px").
+			Transition("background 0.2s ease, box-shadow 0.2s ease").
+			ShadowBox("0 4px 14px rgba(0,0,0,0.15)").
 			AsNode(),
 
-		dsl.CSSContribution{
-			CSSContributionKey: dsl.CSSContributionKey{
-				Selector:       "#" + t.Name() + ":hover",
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"background", "#3d5be0"},
-				{"box-shadow", "0 4px 14px rgba(0,0,0,0.15)"},
-			},
-		}.
+		dsl.NewCSSFor("#"+t.Name()+":hover").
+			WithBreakpoint("768px").
+			Background("#3d5be0").
+			ShadowBox("0 4px 14px rgba(0,0,0,0.15)").
 			AsNode(),
 
-		dsl.CSSContribution{
-			CSSContributionKey: dsl.CSSContributionKey{
-				Selector:       "#" + t.Name() + ":active",
-				InflexionPoint: "768px",
-			},
-			DeclarativeStyle: [][2]string{
-				{"background", "#344fcc"},
-				{"box-shadow", "0 2px 8px rgba(0,0,0,0.2)"},
-			},
-		}.
+		dsl.NewCSSFor("#"+t.Name()+":active").
+			WithBreakpoint("768px").
+			Background("#344fcc").
+			ShadowBox("0 2px 8px rgba(0,0,0,0.2)").
 			AsNode(),
 	)
 

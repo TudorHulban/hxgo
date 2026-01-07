@@ -1,14 +1,16 @@
 package dsl
 
 import (
-	"reflect"
+	"fmt"
 	"unsafe"
+
+	"github.com/TudorHulban/hxgo/helpers"
 )
 
 type CSSContributionKey struct {
-	Selector       string
-	InflexionPoint string
-	DesktopFirst   bool
+	Selector     string
+	Breakpoint   string
+	DesktopFirst bool
 }
 
 type CSS func() string
@@ -20,18 +22,153 @@ type CSSContribution struct {
 	ProceduralCSS    []CSS
 }
 
-func NewCSSContribution(params CSSContributionKey) *CSSContribution {
+func NewGeneralCSS() *CSSContribution {
+	return &CSSContribution{}
+}
+
+func NewCSSFor(selector string) *CSSContribution {
 	return &CSSContribution{
-		CSSContributionKey: params,
+		CSSContributionKey: CSSContributionKey{
+			Selector: selector,
+		},
 	}
 }
 
-func (co *CSSContribution) AddStyles(styles ...[2]string) {
-	co.DeclarativeStyle = append(co.DeclarativeStyle, styles...)
+func NewCSSForClass(class string) *CSSContribution {
+	return &CSSContribution{
+		CSSContributionKey: CSSContributionKey{
+			Selector: "." + helpers.RemoveBeforeFirstLetter(class),
+		},
+	}
 }
 
-func (co *CSSContribution) AddCSS(css ...CSS) {
+func NewCSSForID(id string) *CSSContribution {
+	return &CSSContribution{
+		CSSContributionKey: CSSContributionKey{
+			Selector: "#" + helpers.RemoveBeforeFirstLetter(id),
+		},
+	}
+}
+
+func (co *CSSContribution) AddStyles(styles ...[2]string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle, styles...)
+
+	return co
+}
+
+func (co *CSSContribution) AddCSS(css ...CSS) *CSSContribution {
 	co.ProceduralCSS = append(co.ProceduralCSS, css...)
+
+	return co
+}
+
+func (co *CSSContribution) AtMin(px int) *CSSContribution {
+	co.Breakpoint = fmt.Sprintf("%dpx", px)
+	co.DesktopFirst = true
+
+	return co
+}
+
+func (co *CSSContribution) Display(v string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle,
+		[2]string{"display", v},
+	)
+	return co
+}
+
+func (co *CSSContribution) Background(v string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle,
+		[2]string{"background", v},
+	)
+	return co
+}
+
+func (co *CSSContribution) Border(v string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle,
+		[2]string{"border", v},
+	)
+	return co
+}
+
+func (co *CSSContribution) FontSize(v string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle,
+		[2]string{"font-size", v},
+	)
+	return co
+}
+
+func (co *CSSContribution) Cursor(v string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle,
+		[2]string{"cursor", v},
+	)
+	return co
+}
+
+func (co *CSSContribution) Transition(v string) *CSSContribution {
+	co.DeclarativeStyle = append(co.DeclarativeStyle,
+		[2]string{"transition", v},
+	)
+	return co
+}
+
+func (co *CSSContribution) Color(value string) *CSSContribution {
+	co.DeclarativeStyle = append(
+		co.DeclarativeStyle,
+		[2]string{
+			"color",
+			value,
+		},
+	)
+
+	return co
+}
+
+func (co *CSSContribution) ShadowBox(value string) *CSSContribution {
+	co.DeclarativeStyle = append(
+		co.DeclarativeStyle,
+		[2]string{
+			"box-shadow",
+			value,
+		},
+	)
+
+	return co
+}
+
+func (co *CSSContribution) Padding(value string) *CSSContribution {
+	co.DeclarativeStyle = append(
+		co.DeclarativeStyle,
+		[2]string{
+			"padding",
+			value,
+		},
+	)
+
+	return co
+}
+
+func (co *CSSContribution) Radius(value string) *CSSContribution {
+	co.DeclarativeStyle = append(
+		co.DeclarativeStyle,
+		[2]string{
+			"border-radius",
+			value,
+		},
+	)
+
+	return co
+}
+
+func (co *CSSContribution) WithBreakpoint(point string) *CSSContribution {
+	co.Breakpoint = point
+
+	return co
+}
+
+func (co *CSSContribution) WithStyles(styles ...[2]string) Node {
+	co.DeclarativeStyle = append(co.DeclarativeStyle, styles...)
+
+	return co.AsNode()
 }
 
 func renderCSSContribution(a *accumulator, data unsafe.Pointer) {
@@ -40,49 +177,10 @@ func renderCSSContribution(a *accumulator, data unsafe.Pointer) {
 	a.css = append(a.css, *co)
 }
 
-// TODO: review
-func (co CSSContribution) AsNode() Node {
-	data := &co
-
+func (co *CSSContribution) AsNode() Node {
 	return Node{
 		fn:    renderCSSContribution,
-		data:  unsafe.Pointer(data),
+		data:  unsafe.Pointer(co),
 		isCSS: true,
-	}
-}
-
-// internal grouping structures
-type procBucket struct {
-	seen  map[uintptr]struct{}
-	order []func() string
-}
-
-func newProcBucket() *procBucket {
-	return &procBucket{
-		seen:  make(map[uintptr]struct{}),
-		order: make([]func() string, 0),
-	}
-}
-
-func (b *procBucket) Add(fn func() string) {
-	ptr := reflect.ValueOf(fn).Pointer() // TODO: review
-
-	if _, exists := b.seen[ptr]; exists {
-		return
-	}
-
-	b.seen[ptr] = struct{}{}
-	b.order = append(b.order, fn)
-}
-
-type group struct {
-	Declarative map[string]string // prop -> value
-	Procedural  *procBucket
-}
-
-func newGroup() *group {
-	return &group{
-		Declarative: make(map[string]string),
-		Procedural:  newProcBucket(),
 	}
 }

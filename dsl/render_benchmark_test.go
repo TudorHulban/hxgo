@@ -59,34 +59,22 @@ func BenchmarkRenderHTMLandCSS(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				CSSContribution{
-					CSSContributionKey: CSSContributionKey{
-						Selector:       ".card",
-						InflexionPoint: "768px",
-					},
-					DeclarativeStyle: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				}.
+				NewCSSFor(".card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+					Radius("8px").
 					AsNode(),
 			},
 		},
 		{
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
-				CSSContribution{
-					CSSContributionKey: CSSContributionKey{
-						Selector:       ".card",
-						InflexionPoint: "768px",
-					},
-					DeclarativeStyle: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				}.
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 					AsNode(),
 			},
 		},
@@ -145,34 +133,22 @@ func BenchmarkRenderHTML(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				CSSContribution{
-					CSSContributionKey: CSSContributionKey{
-						Selector:       ".card",
-						InflexionPoint: "768px",
-					},
-					DeclarativeStyle: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				}.
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 					AsNode(),
 			},
 		},
 		{
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
-				CSSContribution{
-					CSSContributionKey: CSSContributionKey{
-						Selector:       ".card",
-						InflexionPoint: "768px",
-					},
-					DeclarativeStyle: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				}.
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 					AsNode(),
 			},
 		},
@@ -235,34 +211,22 @@ func BenchmarkRenderHTMLWCapacity(b *testing.B) {
 		{
 			description: "3. valid CSS input",
 			nodes: []Node{
-				CSSContribution{
-					CSSContributionKey: CSSContributionKey{
-						Selector:       ".card",
-						InflexionPoint: "768px",
-					},
-					DeclarativeStyle: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				}.
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 					AsNode(),
 			},
 		},
 		{
 			description: "4. valid HTML-CSS input",
 			nodes: []Node{
-				CSSContribution{
-					CSSContributionKey: CSSContributionKey{
-						Selector:       ".card",
-						InflexionPoint: "768px",
-					},
-					DeclarativeStyle: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				}.
+				NewCSSForClass("card").
+					WithBreakpoint("768px").
+					Padding("20px").
+					Radius("8px").
+					ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
 					AsNode(),
 			},
 			capacityBytes: 128,
