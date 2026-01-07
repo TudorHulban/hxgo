@@ -9,27 +9,28 @@ import (
 
 func TestStyledDiv(t *testing.T) {
 	element := Div(
-		GetStyledNode(
-			Noop,
-			[]Style{
-				{
-					Selector: ".card",
-					Props: [][2]string{
-						{"padding", "20px"},
-						{"border-radius", "8px"},
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector:       ".card",
+				InflexionPoint: "768px",
+			},
+			DeclarativeStyle: [][2]string{
+				{"padding", "20px"},
+				{"border-radius", "8px"},
+				{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
+			},
+		}.
+			AsNode(),
 
-					Media: "min-width: 768px",
-				},
-				{
-					Selector: ".card:hover",
-					Props: [][2]string{
-						{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
-					},
-				},
-			}...,
-		),
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector: ".card",
+			},
+			DeclarativeStyle: [][2]string{
+				{"box-shadow", "0 4px 12px rgba(0,0,0,0.1)"},
+			},
+		}.
+			AsNode(),
 
 		Div(AttrClass("card")),
 	)

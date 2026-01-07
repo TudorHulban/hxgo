@@ -11,17 +11,16 @@ import (
 func TestNewForm3Containers(t *testing.T) {
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
-		[]dsl.Node{
-			dsl.GetStyledNode(
-				dsl.Noop,
-				dsl.Style{
-					Selector: ".card:hover",
-					Props: [][2]string{
-						{"box-shadow", "0 8px 24px rgba(0,0,0,0.2)"},
-					},
-				},
-			),
-		},
+		dsl.CSSContribution{
+			CSSContributionKey: dsl.CSSContributionKey{
+				Selector:       ".card:hover",
+				InflexionPoint: "768px",
+			},
+			DeclarativeStyle: [][2]string{
+				{"box-shadow", "0 8px 24px rgba(0,0,0,0.2)"},
+			},
+		}.
+			AsNode(),
 	)
 
 	form := NewFormThreeContainers(

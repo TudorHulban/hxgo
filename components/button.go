@@ -74,7 +74,7 @@ func ButtonSubmit(params *ParamsButtonSubmit) dsl.Node {
 	)
 }
 
-func ButtonSubmitWCSS(params *ParamsButtonSubmit, css []dsl.Node) dsl.Node {
+func ButtonSubmitWCSS(params *ParamsButtonSubmit, css ...dsl.Node) dsl.Node {
 	return dsl.Button(
 		append(
 			css,

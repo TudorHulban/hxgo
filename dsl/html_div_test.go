@@ -60,34 +60,41 @@ func Test04DivStyles(t *testing.T) {
 		Text("hi!"),
 	)
 
-	elWithStyles := GetStyledNode(
-		el,
-		Style{
-			Selector: "." + cssClass,
-			Props: [][2]string{
+	el.Add(
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector:       "." + cssClass,
+				InflexionPoint: "768px",
+			},
+			DeclarativeStyle: [][2]string{
 				{"padding", "10px 18px"},
 			},
-			Media: "768px",
-		},
-		Style{
-			Selector: "." + cssClass,
-			Props: [][2]string{
+		}.
+			AsNode(),
+
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector:       "." + cssClass,
+				InflexionPoint: "1028px",
+			},
+			DeclarativeStyle: [][2]string{
 				{"padding", "15px 18px"},
 			},
-			Media: "1028px",
-		},
+		}.
+			AsNode(),
 	)
 
 	// elWithStyles x2 but only one style emitted.
 	compound := Div(
-		elWithStyles,
+		el,
 		Text("-------"),
-		elWithStyles,
+		el,
 	)
 
-	html, styles := RenderHTMLandStyles(compound)
+	html, styles, css := RenderFull(compound)
 	require.NotZero(t, html)
 	require.NotZero(t, styles, "should have style")
+	require.Zero(t, css)
 
 	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
 	//   .css-class {
@@ -112,59 +119,52 @@ func Test05DivFull(t *testing.T) {
 		Text("hi!"),
 	)
 
-	elWithStyles := GetStyledNode(
-		el,
-		Style{
-			Selector: "." + cssClassComponent,
-			Props: [][2]string{
-				{"padding", "10px 18px"},
-			},
-			Media: "768px",
-		},
-		Style{
-			Selector: "." + cssClassComponent,
-			Props: [][2]string{
-				{"padding", "15px 18px"},
-			},
-			Media: "1028px",
-		},
-	)
-
 	actualCSS := func() string {
 		return `
 			text-align: right;
 			width: fit-content;
 			background-color:rgb(134, 146, 138);
-
-			#resource-selection {
-				padding-top: 2.1em;
-			}
-
-			.hours-grid {
-				width: 100%;
-			}
 		`
 	}
 
-	cssRule := CSS{
-		CSSKey: CSSKey{
-			Selector:         "." + cssClassWidget,
-			InflexionPointPX: 1024,
-		},
+	el.Add(
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector:       "." + cssClassComponent,
+				InflexionPoint: "768px",
+			},
+			DeclarativeStyle: [][2]string{
+				{"padding", "10px 18px"},
+			},
+		}.
+			AsNode(),
 
-		ActualCSS: actualCSS,
-		// DesktopFirst: true,
-	}
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector:       "." + cssClassComponent,
+				InflexionPoint: "1028px",
+			},
+			DeclarativeStyle: [][2]string{
+				{"padding", "12px 18px"},
+			},
+			ProceduralCSS: []CSS{actualCSS},
+		}.
+			AsNode(),
 
-	elWithCSS := GetCSSNode(cssRule)
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				Selector:       "." + cssClassComponent,
+				InflexionPoint: "1920px",
+			},
+			ProceduralCSS: []CSS{actualCSS},
+		}.
+			AsNode(),
+	)
 
-	// elWithStyles x2 but only one style emitted.
 	widget := Div(
-		elWithStyles,
+		el,
 		Text("-------"),
-		elWithStyles,
-		elWithCSS,
-		elWithCSS,
+		el,
 	)
 
 	html, styles, css := RenderFull(widget)
@@ -188,5 +188,80 @@ func Test05DivFull(t *testing.T) {
 	)
 	fmt.Println(
 		string(css),
+	)
+}
+
+func Test06DivCSS(t *testing.T) {
+	el := Div(
+		Text("hi!"),
+	)
+
+	actualCSS := func() string {
+		return `
+			text-align: right;
+			width: fit-content;
+			background-color:rgb(134, 146, 138);
+		`
+	}
+
+	el.Add(
+		CSSContribution{
+			ProceduralCSS: []CSS{actualCSS},
+		}.
+			AsNode(),
+	)
+
+	html, styles, css := RenderFull(el)
+	require.NotZero(t, html)
+	require.Zero(t, styles, "no styles")
+	require.NotZero(t, css, "should have css")
+
+	fmt.Println(
+		string(html), // <div>hi!</div>
+	)
+	fmt.Println(
+		"-----------------",
+	)
+	fmt.Println(
+		css,
+	)
+}
+
+func Test07DivCSS(t *testing.T) {
+	el := Div(
+		Text("hi!"),
+	)
+
+	actualCSS := func() string {
+		return `
+			text-align: right;
+			width: fit-content;
+			background-color:rgb(134, 146, 138);
+		`
+	}
+
+	el.Add(
+		CSSContribution{
+			CSSContributionKey: CSSContributionKey{
+				InflexionPoint: "768px",
+			},
+			ProceduralCSS: []CSS{actualCSS},
+		}.
+			AsNode(),
+	)
+
+	html, styles, css := RenderFull(el)
+	require.NotZero(t, html)
+	require.Zero(t, styles, "no styles")
+	require.NotZero(t, css, "should have css")
+
+	fmt.Println(
+		string(html), // <div>hi!</div>
+	)
+	fmt.Println(
+		"-----------------",
+	)
+	fmt.Println(
+		css,
 	)
 }

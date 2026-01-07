@@ -1,7 +1,7 @@
 package dsl
 
 import (
-	"strconv"
+	"sort"
 	"strings"
 )
 
@@ -11,9 +11,7 @@ import (
 // use NewAcc with an estimated size based on the typical output.
 type accumulator struct {
 	html []byte
-
-	cssComponents []Style
-	cssWidgets    map[CSSKey]map[*ActualCSS]DesktopFirst
+	css  []CSSContribution
 }
 
 // newAccumulator creates an Accumulator with pre-allocated capacity.
@@ -22,16 +20,8 @@ type accumulator struct {
 // Example: for a typical page of ~10KB, use newAccumulator(10240, 16)
 func newAccumulator(estimatedHTMLSize, estimatedCSSRules int) *accumulator {
 	return &accumulator{
-		html:          make([]byte, 0, estimatedHTMLSize),
-		cssComponents: make([]Style, 0, estimatedCSSRules),
-
-		// registryCSS: make(map[CSSKey]map[*ActualCSS]DesktopFirst),
-	}
-}
-
-func (a *accumulator) initialize() {
-	if a.cssWidgets == nil {
-		a.cssWidgets = make(map[CSSKey]map[*ActualCSS]DesktopFirst)
+		html: make([]byte, 0, estimatedHTMLSize),
+		css:  make([]CSSContribution, 0, estimatedCSSRules),
 	}
 }
 
@@ -79,68 +69,213 @@ func stripTrailingBraces(text string) string {
 	return text
 }
 
-func (a *accumulator) buildWidgetCSS(estimatedCSS ...int) []byte {
-	if len(a.cssWidgets) == 0 {
-		return nil
-	}
+func (a *accumulator) groupCSS() (order []CSSContributionKey, groups map[CSSContributionKey]*group) {
+	groups = make(map[CSSContributionKey]*group)
+	order = make([]CSSContributionKey, 0, len(a.css))
 
-	cssLength := 512
-	if len(estimatedCSS) == 1 {
-		cssLength = estimatedCSS[0]
-	}
+	for _, contribution := range a.css {
+		key := contribution.CSSContributionKey
 
-	result := make([]byte, 0, cssLength)
+		g, exists := groups[key]
+		if !exists {
+			g = newGroup()
+			groups[key] = g
+			order = append(order, key)
+		}
 
-	for key, bucket := range a.cssWidgets {
-		for fnPtr, desktopFirst := range bucket {
+		// merge declarative
+		for _, pair := range contribution.DeclarativeStyle {
+			g.Declarative[pair[0]] = pair[1]
+		}
 
-			// Normalize + strip trailing braces from widget CSS
-			css := normalizeCSS((*fnPtr)())
-			css = stripTrailingBraces(css)
-
-			// -----------------------------------------
-			// CASE 1: no media query
-			// -----------------------------------------
-			if key.InflexionPointPX == 0 {
-				result = append(result, key.Selector...)
-				result = append(result, '{')
-				result = append(result, css...)
-				result = append(result, '}')
-				continue
-			}
-
-			// -----------------------------------------
-			// CASE 2: media query
-			// -----------------------------------------
-
-			// @media (min|max-width:
-			if desktopFirst {
-				result = append(result, "@media (min-width:"...)
-			} else {
-				result = append(result, "@media (max-width:"...)
-			}
-
-			// @media (min-width:1024
-			result = strconv.AppendUint(result, uint64(key.InflexionPointPX), 10)
-
-			// @media (min-width:1024px) {
-			result = append(result, "px) {\n"...)
-
-			// .selector {
-			result = append(result, key.Selector...)
-			result = append(result, " {\n"...)
-
-			// css content
-			result = append(result, css...)
-			result = append(result, '\n')
-
-			// close selector }
-			result = append(result, "}\n"...)
-
-			// close media }
-			result = append(result, "}\n}"...)
+		// dedupe procedural
+		for _, fn := range contribution.ProceduralCSS {
+			g.Procedural.Add(fn)
 		}
 	}
 
-	return result
+	return order, groups
+}
+
+func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+	var sb strings.Builder
+
+	for _, key := range order {
+		g := groups[key]
+		if len(g.Declarative) == 0 {
+			continue
+		}
+
+		if key.InflexionPoint != "" {
+			sb.WriteString("@media (")
+			if key.DesktopFirst {
+				sb.WriteString("min-width:")
+			} else {
+				sb.WriteString("max-width:")
+			}
+			sb.WriteString(key.InflexionPoint)
+			sb.WriteString(") {\n")
+		}
+
+		sb.WriteString("  ")
+		sb.WriteString(key.Selector)
+		sb.WriteString(" {\n")
+
+		names := make([]string, 0, len(g.Declarative))
+
+		for k := range g.Declarative {
+			names = append(names, k)
+		}
+		sort.Strings(names)
+
+		for _, name := range names {
+			sb.WriteString("    ")
+			sb.WriteString(name)
+			sb.WriteString(": ")
+			sb.WriteString(g.Declarative[name])
+			sb.WriteString(";\n")
+		}
+
+		sb.WriteString("  }\n")
+
+		if key.InflexionPoint != "" {
+			sb.WriteString("}\n")
+		}
+	}
+
+	return sb.String()
+}
+
+func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+	var sb strings.Builder
+
+	for _, key := range order {
+		g := groups[key]
+		if len(g.Procedural.order) == 0 {
+			continue
+		}
+
+		for _, fn := range g.Procedural.order {
+			raw := normalizeCSS(fn())
+			raw = stripTrailingBraces(raw)
+
+			// ----------------------------------------------------
+			// CASE 1: No media query
+			// ----------------------------------------------------
+			if key.InflexionPoint == "" {
+				// GLOBAL CSS (no selector)
+				if key.Selector == "" {
+					sb.WriteString(raw)
+					sb.WriteString("\n")
+					continue
+				}
+
+				// SELECTOR CSS
+				sb.WriteString(key.Selector)
+				sb.WriteString("{")
+				sb.WriteString(raw)
+				sb.WriteString("}\n")
+				continue
+			}
+
+			// ----------------------------------------------------
+			// CASE 2: Media query
+			// ----------------------------------------------------
+
+			// @media (min|max-width: X)
+			sb.WriteString("@media (")
+			if key.DesktopFirst {
+				sb.WriteString("min-width:")
+			} else {
+				sb.WriteString("max-width:")
+			}
+			sb.WriteString(key.InflexionPoint)
+			sb.WriteString(") {\n")
+
+			// GLOBAL CSS inside media query
+			if key.Selector == "" {
+				sb.WriteString(raw)
+				sb.WriteString("\n")
+				sb.WriteString("}\n")
+				continue
+			}
+
+			// SELECTOR CSS inside media query
+			sb.WriteString("  ")
+			sb.WriteString(key.Selector)
+			sb.WriteString(" {\n")
+			sb.WriteString("    ")
+			sb.WriteString(raw)
+			sb.WriteString("\n  }\n")
+
+			sb.WriteString("}\n")
+		}
+	}
+
+	return sb.String()
+}
+
+// func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+// 	var sb strings.Builder
+
+// 	for _, key := range order {
+// 		g := groups[key]
+// 		if len(g.Procedural.order) == 0 {
+// 			continue
+// 		}
+
+// 		for _, fn := range g.Procedural.order {
+// 			raw := normalizeCSS(fn())
+// 			raw = stripTrailingBraces(raw)
+
+// 			if key.InflexionPoint == "" {
+// 				sb.WriteString(key.Selector)
+// 				sb.WriteString("{")
+// 				sb.WriteString(raw)
+// 				sb.WriteString("}\n")
+// 				continue
+// 			}
+
+// 			sb.WriteString("@media (")
+// 			if key.DesktopFirst {
+// 				sb.WriteString("min-width:")
+// 			} else {
+// 				sb.WriteString("max-width:")
+// 			}
+// 			sb.WriteString(key.InflexionPoint)
+// 			sb.WriteString(") {\n")
+
+// 			sb.WriteString("  ")
+// 			sb.WriteString(key.Selector)
+// 			sb.WriteString(" {\n")
+// 			sb.WriteString("    ")
+// 			sb.WriteString(raw)
+// 			sb.WriteString("\n  }\n")
+
+// 			sb.WriteString("}\n")
+// 		}
+// 	}
+
+// 	return sb.String()
+// }
+
+func (a *accumulator) EmitStyles() string {
+	return a.emitStyles(
+		a.groupCSS(),
+	)
+}
+
+func (a *accumulator) EmitProcedural() string {
+	return a.emitProcedural(
+		a.groupCSS(),
+	)
+}
+
+func (a *accumulator) BuildCSS() (styles string, css string) {
+	order, groups := a.groupCSS()
+
+	styles = a.emitStyles(order, groups)
+	css = a.emitProcedural(order, groups)
+
+	return styles, css
 }

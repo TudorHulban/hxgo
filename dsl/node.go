@@ -16,4 +16,9 @@ type Node struct {
 
 	children    []Node
 	isAttribute bool
+	isCSS       bool
+}
+
+func (n *Node) Add(children ...Node) {
+	n.children = append(n.children, children...)
 }

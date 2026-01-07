@@ -98,22 +98,16 @@ func RenderHTMLandStyles(nodes ...Node) ([]byte, string) {
 		walk(&a, nodes[i])
 	}
 
-	if len(a.cssComponents) == 0 {
+	if len(a.css) == 0 {
 		return a.html, "" // HTML is already fully assembled
 	}
 
-	// Build styles
-	styles := newStylesCollector()
-	for _, s := range a.cssComponents {
-		styles.Add(s)
-	}
-
-	return a.html, styles.String()
+	return a.html, a.EmitStyles()
 }
 
-func RenderFull(nodes ...Node) ([]byte, string, []byte) {
+func RenderFull(nodes ...Node) ([]byte, string, string) {
 	if len(nodes) == 0 {
-		return nil, "", nil
+		return nil, "", ""
 	}
 
 	var a accumulator
@@ -122,17 +116,19 @@ func RenderFull(nodes ...Node) ([]byte, string, []byte) {
 		walk(&a, nodes[i])
 	}
 
-	if len(a.cssComponents) == 0 {
-		return a.html, "", nil // HTML is already fully assembled
+	if len(a.css) == 0 {
+		return a.html, "", "" // HTML is already fully assembled
 	}
 
-	// Build styles
-	styles := newStylesCollector()
-	for _, s := range a.cssComponents {
-		styles.Add(s)
-	}
+	// // Build styles
+	// styles := newStylesCollector()
+	// for _, s := range a.cssComponents {
+	// 	styles.Add(s)
+	// }
 
-	return a.html, styles.String(), a.buildWidgetCSS()
+	styles, css := a.BuildCSS()
+
+	return a.html, styles, css
 }
 
 // RenderHTMLandStylesWithCapacity renders nodes with pre-allocated capacity.
@@ -149,16 +145,11 @@ func RenderHTMLandStylesWithCapacity(estimatedHTMLSize, estimatedCSSRules int, n
 		walk(a, nodes[i])
 	}
 
-	if len(a.cssComponents) == 0 {
+	if len(a.css) == 0 {
 		return a.html, "" // HTML is already fully assembled
 	}
 
-	css := newStylesCollector()
-	for _, s := range a.cssComponents {
-		css.Add(s)
-	}
-
-	return a.html, css.String()
+	return a.html, a.EmitStyles()
 }
 
 func HTMLwithDataCSS(html []byte, css string) string {
