@@ -184,3 +184,24 @@ func (co *CSSContribution) AsNode() Node {
 		isCSS: true,
 	}
 }
+
+// media
+
+func (co *CSSContribution) Mobile() *CSSContribution  { return co.AtMin(0) }
+func (co *CSSContribution) Tablet() *CSSContribution  { return co.AtMin(768) }
+func (co *CSSContribution) Desktop() *CSSContribution { return co.AtMin(1024) }
+func (co *CSSContribution) Large() *CSSContribution   { return co.AtMin(1280) }
+
+// pseudo classes
+
+func (co *CSSContribution) Hover() *CSSContribution {
+	co.Selector = co.Selector + ":hover"
+
+	return co
+}
+
+func (co *CSSContribution) Active() *CSSContribution {
+	co.Selector = co.Selector + ":active"
+
+	return co
+}

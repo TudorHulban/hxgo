@@ -97,6 +97,34 @@ func Test04DivStyles(t *testing.T) {
 	)
 }
 
+func Test04aTailwind(t *testing.T) {
+	el := Div(
+		Class("bg-blue-500 p-4 rounded shadow"),
+		Text("hi!"),
+	)
+
+	compound := Div(
+		el,
+	)
+
+	html, styles, css := RenderFull(compound)
+	require.NotZero(t, html)
+	require.Zero(t, styles)
+	require.Zero(t, css)
+
+	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
+	//   .css-class {
+	//     padding: 10px 18px;
+	//   }
+
+	fmt.Println(
+		string(html),
+	)
+	fmt.Println(
+		styles,
+	)
+}
+
 func Test05DivFull(t *testing.T) {
 	cssClassComponent := "css-class"
 	cssClassWidget := "css-widget"
