@@ -18,4 +18,6 @@ func TestRequest(t *testing.T) {
 	require.Zero(t, formData)
 
 	// _, _ = formData.ExtractMandatoryEpochID("some data")
+
+	t.Log() // added for linter.
 }

@@ -8,6 +8,7 @@ import "unsafe"
 //go:inline
 func el(tag string, children ...Node) Node {
 	var attrs []Node // Separate attributes from children during construction
+
 	var nodes []Node
 
 	for i := range children {
@@ -59,6 +60,7 @@ func renderEl(a *accumulator, p unsafe.Pointer) {
 func elWId(tag, cssID string, children ...Node) Node {
 	// Separate attributes from children during construction
 	var attrs []Node
+
 	var nodes []Node
 
 	for i := range children {

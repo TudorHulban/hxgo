@@ -13,6 +13,8 @@ func ForEachValue[T, R any](values []T, process func(T) R) []R {
 }
 
 func ForEachTest[T any](t *testing.T, values []T, process func(T, *testing.T)) {
+	t.Helper()
+
 	for _, value := range values {
 		process(value, t)
 	}

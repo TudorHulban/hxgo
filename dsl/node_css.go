@@ -73,6 +73,7 @@ func (co *CSSContribution) Display(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"display", v},
 	)
+
 	return co
 }
 
@@ -80,6 +81,7 @@ func (co *CSSContribution) Background(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"background", v},
 	)
+
 	return co
 }
 
@@ -87,6 +89,7 @@ func (co *CSSContribution) Border(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border", v},
 	)
+
 	return co
 }
 
@@ -94,6 +97,7 @@ func (co *CSSContribution) FontSize(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"font-size", v},
 	)
+
 	return co
 }
 
@@ -101,6 +105,7 @@ func (co *CSSContribution) Cursor(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"cursor", v},
 	)
+
 	return co
 }
 
@@ -108,6 +113,7 @@ func (co *CSSContribution) Transition(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"transition", v},
 	)
+
 	return co
 }
 
