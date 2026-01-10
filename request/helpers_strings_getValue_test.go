@@ -64,6 +64,7 @@ func TestGetValueFromParentheses(t *testing.T) {
 					require.Error(t, err)
 
 					var inputErr goerrors.ErrInvalidInput
+
 					require.ErrorAs(t, err, &inputErr)
 					require.Contains(t, err.Error(), "invalid input")
 

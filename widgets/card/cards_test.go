@@ -1,4 +1,4 @@
-package wcard
+package card
 
 import (
 	"testing"

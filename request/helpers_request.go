@@ -2,7 +2,7 @@ package request
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -37,7 +37,7 @@ func getRequestBoundary(requestHeaders map[string][]string) (string, error) {
 	}
 
 	return "",
-		fmt.Errorf("no boundary found in Content-Type")
+		errors.New("no boundary found in Content-Type")
 }
 
 func parseMultipartForm(formData []byte, requestHeaders map[string][]string) (map[string]string, error) {
@@ -72,13 +72,13 @@ func parseMultipartForm(formData []byte, requestHeaders map[string][]string) (ma
 		var buf bytes.Buffer // TODO: pre-size buffer using Content-Length (if present), sync.Pool, read directly into a []byte slice
 
 		if _, errRead := buf.ReadFrom(part); errRead != nil {
-			part.Close()
+			_ = part.Close()
 
 			return nil,
 				errRead
 		}
 
-		part.Close()
+		_ = part.Close()
 
 		formValue := buf.String()
 

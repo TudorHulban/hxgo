@@ -1,4 +1,4 @@
-package wfooter
+package footer
 
 import (
 	"testing"

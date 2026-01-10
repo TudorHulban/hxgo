@@ -121,6 +121,7 @@ func TestParseBool(t *testing.T) {
 				if tc.expectUnknownValue {
 					require.Error(t, err)
 					require.ErrorIs(t, err, goerrors.ErrUnknownValue)
+
 					return
 				}
 

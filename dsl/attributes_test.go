@@ -6,7 +6,7 @@ func BenchmarkAttrWithValueOnly(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = AttrWithValue("data-x", "hi!")
 	}
 }
@@ -18,7 +18,7 @@ func BenchmarkAttrWithValueCall(b *testing.B) {
 
 	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = Render(el)
 	}
 }

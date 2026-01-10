@@ -186,7 +186,7 @@ func Test05DivFull(t *testing.T) {
 		"-----------------",
 	)
 	fmt.Println(
-		string(css),
+		css,
 	)
 }
 

@@ -1,4 +1,4 @@
-package warticle
+package article
 
 import (
 	"fmt"
@@ -9,8 +9,9 @@ import (
 )
 
 type ArticleMeta struct {
-	Author         string
-	LastUpdate     time.Time
+	LastUpdate time.Time
+	Author     string
+
 	NumberComments uint16
 }
 
@@ -25,14 +26,14 @@ func (meta ArticleMeta) String() string {
 }
 
 type ParamsWidgetArticleCard struct {
-	components.ParamsImage
-	components.ParamsButtonSubmit
-
 	Category       string
 	Title          string
 	ArticleExcerpt string
 
+	components.ParamsImage
 	ArticleMeta
+
+	components.ParamsButtonSubmit
 }
 
 func WidgetArticleCard(params *ParamsWidgetArticleCard) dsl.Node {

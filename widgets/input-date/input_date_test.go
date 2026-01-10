@@ -1,4 +1,4 @@
-package winputdate
+package inputdate
 
 import (
 	"testing"

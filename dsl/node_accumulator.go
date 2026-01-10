@@ -69,9 +69,9 @@ func stripTrailingBraces(text string) string {
 	return text
 }
 
-func (a *accumulator) groupCSS() (order []CSSContributionKey, groups map[CSSContributionKey]*group) {
-	groups = make(map[CSSContributionKey]*group)
-	order = make([]CSSContributionKey, 0, len(a.css))
+func (a *accumulator) groupCSS() ([]CSSContributionKey, map[CSSContributionKey]*group) {
+	groups := make(map[CSSContributionKey]*group)
+	order := make([]CSSContributionKey, 0, len(a.css))
 
 	for _, contribution := range a.css {
 		key := contribution.CSSContributionKey
@@ -80,6 +80,7 @@ func (a *accumulator) groupCSS() (order []CSSContributionKey, groups map[CSSCont
 		if !exists {
 			g = newGroup()
 			groups[key] = g
+
 			order = append(order, key)
 		}
 
@@ -97,7 +98,7 @@ func (a *accumulator) groupCSS() (order []CSSContributionKey, groups map[CSSCont
 	return order, groups
 }
 
-func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+func (*accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
 	var sb strings.Builder
 
 	for _, key := range order {
@@ -108,11 +109,13 @@ func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContr
 
 		if key.Breakpoint != "" {
 			sb.WriteString("@media (")
+
 			if key.DesktopFirst {
 				sb.WriteString("min-width:")
 			} else {
 				sb.WriteString("max-width:")
 			}
+
 			sb.WriteString(key.Breakpoint)
 			sb.WriteString(") {\n")
 		}
@@ -126,6 +129,7 @@ func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContr
 		for k := range g.Declarative {
 			names = append(names, k)
 		}
+
 		sort.Strings(names)
 
 		for _, name := range names {
@@ -146,7 +150,7 @@ func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContr
 	return sb.String()
 }
 
-func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+func (*accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
 	var sb strings.Builder
 
 	for _, key := range order {
@@ -167,6 +171,7 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 				if key.Selector == "" {
 					sb.WriteString(raw)
 					sb.WriteString("\n")
+
 					continue
 				}
 
@@ -175,6 +180,7 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 				sb.WriteString("{")
 				sb.WriteString(raw)
 				sb.WriteString("}\n")
+
 				continue
 			}
 
@@ -184,11 +190,13 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 
 			// @media (min|max-width: X)
 			sb.WriteString("@media (")
+
 			if key.DesktopFirst {
 				sb.WriteString("min-width:")
 			} else {
 				sb.WriteString("max-width:")
 			}
+
 			sb.WriteString(key.Breakpoint)
 			sb.WriteString(") {\n")
 
@@ -197,6 +205,7 @@ func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSC
 				sb.WriteString(raw)
 				sb.WriteString("\n")
 				sb.WriteString("}\n")
+
 				continue
 			}
 
@@ -227,11 +236,8 @@ func (a *accumulator) EmitProcedural() string {
 	)
 }
 
-func (a *accumulator) BuildCSS() (styles string, css string) {
+func (a *accumulator) BuildCSS() (string, string) {
 	order, groups := a.groupCSS()
 
-	styles = a.emitStyles(order, groups)
-	css = a.emitProcedural(order, groups)
-
-	return styles, css
+	return a.emitStyles(order, groups), a.emitProcedural(order, groups)
 }

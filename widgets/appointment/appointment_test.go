@@ -1,4 +1,4 @@
-package wappointment
+package appointment
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/widgets/base"
-	winputdate "github.com/TudorHulban/hxgo/widgets/input-date"
+	inputdate "github.com/TudorHulban/hxgo/widgets/input-date"
 	winputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
 	"github.com/stretchr/testify/require"
 )
@@ -50,7 +50,7 @@ func TestAppointment(t *testing.T) {
 					},
 				},
 			},
-			ParamsWidgetInputDate: winputdate.ParamsWidgetInputDate{
+			ParamsWidgetInputDate: inputdate.ParamsWidgetInputDate{
 				CSSID: "schedule",
 
 				DateValue:   time.Now(),

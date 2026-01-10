@@ -1,4 +1,4 @@
-package whero
+package hero
 
 import (
 	"testing"
