@@ -1,70 +1,15 @@
 package dsl
 
-import (
-	"fmt"
-	"unsafe"
+// pseudo classes
 
-	"github.com/TudorHulban/hxgo/helpers"
-)
-
-type CSSContributionKey struct {
-	Selector     string
-	Breakpoint   string
-	DesktopFirst bool
-}
-
-type CSS func() string
-
-type CSSContribution struct {
-	CSSContributionKey
-
-	DeclarativeStyle [][2]string
-	ProceduralCSS    []CSS
-}
-
-func NewGeneralCSS() *CSSContribution {
-	return &CSSContribution{}
-}
-
-func NewCSSFor(selector string) *CSSContribution {
-	return &CSSContribution{
-		CSSContributionKey: CSSContributionKey{
-			Selector: selector,
-		},
-	}
-}
-
-func NewCSSForClass(class string) *CSSContribution {
-	return &CSSContribution{
-		CSSContributionKey: CSSContributionKey{
-			Selector: "." + helpers.RemoveBeforeFirstLetter(class),
-		},
-	}
-}
-
-func NewCSSForID(id string) *CSSContribution {
-	return &CSSContribution{
-		CSSContributionKey: CSSContributionKey{
-			Selector: "#" + helpers.RemoveBeforeFirstLetter(id),
-		},
-	}
-}
-
-func (co *CSSContribution) AddStyles(styles ...[2]string) *CSSContribution {
-	co.DeclarativeStyle = append(co.DeclarativeStyle, styles...)
+func (co *CSSContribution) Hover() *CSSContribution {
+	co.Selector = co.Selector + ":hover"
 
 	return co
 }
 
-func (co *CSSContribution) AddCSS(css ...CSS) *CSSContribution {
-	co.ProceduralCSS = append(co.ProceduralCSS, css...)
-
-	return co
-}
-
-func (co *CSSContribution) AtMin(px int) *CSSContribution {
-	co.Breakpoint = fmt.Sprintf("%dpx", px)
-	co.DesktopFirst = true
+func (co *CSSContribution) Active() *CSSContribution {
+	co.Selector = co.Selector + ":active"
 
 	return co
 }
@@ -161,53 +106,6 @@ func (co *CSSContribution) Radius(value string) *CSSContribution {
 			value,
 		},
 	)
-
-	return co
-}
-
-func (co *CSSContribution) WithBreakpoint(point string) *CSSContribution {
-	co.Breakpoint = point
-
-	return co
-}
-
-func (co *CSSContribution) WithStyles(styles ...[2]string) Node {
-	co.DeclarativeStyle = append(co.DeclarativeStyle, styles...)
-
-	return co.AsNode()
-}
-
-func renderCSSContribution(a *accumulator, data unsafe.Pointer) {
-	co := (*CSSContribution)(data)
-
-	a.css = append(a.css, *co)
-}
-
-func (co *CSSContribution) AsNode() Node {
-	return Node{
-		fn:    renderCSSContribution,
-		data:  unsafe.Pointer(co),
-		isCSS: true,
-	}
-}
-
-// media
-
-func (co *CSSContribution) Mobile() *CSSContribution  { return co.AtMin(0) }
-func (co *CSSContribution) Tablet() *CSSContribution  { return co.AtMin(768) }
-func (co *CSSContribution) Desktop() *CSSContribution { return co.AtMin(1024) }
-func (co *CSSContribution) Large() *CSSContribution   { return co.AtMin(1280) }
-
-// pseudo classes
-
-func (co *CSSContribution) Hover() *CSSContribution {
-	co.Selector = co.Selector + ":hover"
-
-	return co
-}
-
-func (co *CSSContribution) Active() *CSSContribution {
-	co.Selector = co.Selector + ":active"
 
 	return co
 }

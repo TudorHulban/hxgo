@@ -1,4 +1,4 @@
-package winputslots
+package inputslots
 
 import (
 	"testing"

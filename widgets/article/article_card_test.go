@@ -1,4 +1,4 @@
-package warticle
+package article
 
 import (
 	"testing"
@@ -16,7 +16,7 @@ func TestWidgetArticleCard(t *testing.T) {
 		&ParamsWidgetArticleCard{
 			Category:       "category-g1",
 			Title:          "Article-title",
-			ArticleExcerpt: "lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+			ArticleExcerpt: "lorem ipsum dolor sit amet, consectetur adipiscing elit. sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.", //nolint:revive
 
 			ArticleMeta: ArticleMeta{
 				LastUpdate:     time.Now(),

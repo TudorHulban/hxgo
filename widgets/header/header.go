@@ -1,4 +1,4 @@
-package wheader
+package header
 
 import (
 	"github.com/TudorHulban/hxgo/components"

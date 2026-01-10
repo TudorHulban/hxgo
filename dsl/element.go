@@ -46,6 +46,12 @@ func renderEl(a *accumulator, p unsafe.Pointer) {
 		d.attrs[i].fn(a, d.attrs[i].data)
 	}
 
+	if isTagless(d.tag) {
+		a.Write1(">")
+
+		return
+	}
+
 	a.Write1(">")
 
 	// Render children - single iteration

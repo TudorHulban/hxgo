@@ -15,7 +15,7 @@ func TestProcBucket(t *testing.T) {
 	b.Add(f1)
 	b.Add(f2)
 
-	var result []string
+	result := make([]string, 0, 2)
 
 	for _, fn := range b.order {
 		result = append(result, fn())

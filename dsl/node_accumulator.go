@@ -69,9 +69,9 @@ func stripTrailingBraces(text string) string {
 	return text
 }
 
-func (a *accumulator) groupCSS() (order []CSSContributionKey, groups map[CSSContributionKey]*group) {
-	groups = make(map[CSSContributionKey]*group)
-	order = make([]CSSContributionKey, 0, len(a.css))
+func (a *accumulator) groupCSS() ([]CSSContributionKey, map[CSSContributionKey]*group) {
+	groups := make(map[CSSContributionKey]*group)
+	order := make([]CSSContributionKey, 0, len(a.css))
 
 	for _, contribution := range a.css {
 		key := contribution.CSSContributionKey
@@ -98,7 +98,7 @@ func (a *accumulator) groupCSS() (order []CSSContributionKey, groups map[CSSCont
 	return order, groups
 }
 
-func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+func (*accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
 	var sb strings.Builder
 
 	for _, key := range order {
@@ -150,7 +150,7 @@ func (a *accumulator) emitStyles(order []CSSContributionKey, groups map[CSSContr
 	return sb.String()
 }
 
-func (a *accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
+func (*accumulator) emitProcedural(order []CSSContributionKey, groups map[CSSContributionKey]*group) string {
 	var sb strings.Builder
 
 	for _, key := range order {

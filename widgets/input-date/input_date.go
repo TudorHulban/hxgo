@@ -1,4 +1,4 @@
-package winputdate
+package inputdate
 
 import (
 	"time"
@@ -9,9 +9,9 @@ import (
 )
 
 type ParamsWidgetInputDate struct {
-	CSSID string `valid:"required"`
+	DateValue time.Time
+	CSSID     string `valid:"required"`
 
-	DateValue   time.Time
 	HowManyDays uint8
 }
 

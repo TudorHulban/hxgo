@@ -1,4 +1,4 @@
-package wcard
+package card
 
 import (
 	"fmt"
@@ -21,12 +21,12 @@ type WidgetCardHorizontalInfo struct {
 }
 
 type ParamsWidgetCardHorizontal struct {
-	WidgetCardHorizontalInfo
-
 	CurrencySimbol string
 	PriceCaption   string
 
 	CSSFlexGap string
+
+	WidgetCardHorizontalInfo
 }
 
 func WidgetCardHorizontal(params *ParamsWidgetCardHorizontal) dsl.Node {

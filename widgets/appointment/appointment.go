@@ -1,16 +1,16 @@
-package wappointment
+package appointment
 
 import (
 	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/dsl"
-	winputdate "github.com/TudorHulban/hxgo/widgets/input-date"
-	winputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
+	inputdate "github.com/TudorHulban/hxgo/widgets/input-date"
+	inputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
 )
 
 type ParamsWidgetAppointment struct {
-	winputslots.ParamsWidgetSlots
-	winputdate.ParamsWidgetInputDate
+	inputslots.ParamsWidgetSlots
+	inputdate.ParamsWidgetInputDate
 
 	SelectLabel  string
 	SelectValues []string
@@ -19,14 +19,14 @@ type ParamsWidgetAppointment struct {
 }
 
 type ResponseWidgetAppointment struct {
+	CSS []func() *pagecss.CSSElement
+
 	HTML           dsl.Node
 	LinkJavascript dsl.Node
-
-	CSS []func() *pagecss.CSSElement
 }
 
 func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointment {
-	nodesInputDate := winputdate.WidgetInputDate(
+	nodesInputDate := inputdate.WidgetInputDate(
 		&params.ParamsWidgetInputDate,
 	)
 
@@ -42,8 +42,8 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 	return &ResponseWidgetAppointment{
 		LinkJavascript: nodesInputDate.LinkJavascript,
 		CSS: []func() *pagecss.CSSElement{
-			winputdate.CSSInputDate,
-			winputslots.CSSWidgetSlots,
+			inputdate.CSSInputDate,
+			inputslots.CSSWidgetSlots,
 			CSSAppointment,
 		},
 
@@ -66,7 +66,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 
 					inputSimple.Raw(),
 
-					winputslots.WidgetSlots(
+					inputslots.WidgetSlots(
 						&params.ParamsWidgetSlots,
 					),
 				),

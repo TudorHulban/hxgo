@@ -1,4 +1,4 @@
-package wcard
+package card
 
 import (
 	"github.com/TudorHulban/hxgo/components"

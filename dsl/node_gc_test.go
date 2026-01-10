@@ -35,7 +35,7 @@ func TestGCActual(t *testing.T) {
 	}()
 
 	// 2. Force GC strongly
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		runtime.GC()
 		runtime.Gosched()
 

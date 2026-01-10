@@ -1,4 +1,4 @@
-package wheader
+package header
 
 import (
 	"testing"
