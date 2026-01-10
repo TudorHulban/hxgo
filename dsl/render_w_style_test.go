@@ -13,12 +13,12 @@ func TestStyledDiv(t *testing.T) {
 			WithBreakpoint("768px").
 			Padding("20px").
 			Radius("8px").
-			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+			BoxShadow("0 4px 12px rgba(0,0,0,0.1)").
 			AsNode(),
 
 		NewCSSForClass("card").
 			WithBreakpoint("1024px").
-			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+			BoxShadow("0 4px 12px rgba(0,0,0,0.1)").
 			AsNode(),
 
 		Div(AttrClass("card")),

@@ -37,19 +37,19 @@ func TestButton(t *testing.T) {
 			Padding("10px 18px").
 			Radius("6px").
 			Transition("background 0.2s ease, box-shadow 0.2s ease").
-			ShadowBox("0 4px 14px rgba(0,0,0,0.15)").
+			BoxShadow("0 4px 14px rgba(0,0,0,0.15)").
 			AsNode(),
 
 		dsl.NewCSSFor("#"+t.Name()+":hover").
 			WithBreakpoint("768px").
 			Background("#3d5be0").
-			ShadowBox("0 4px 14px rgba(0,0,0,0.15)").
+			BoxShadow("0 4px 14px rgba(0,0,0,0.15)").
 			AsNode(),
 
 		dsl.NewCSSFor("#"+t.Name()+":active").
 			WithBreakpoint("768px").
 			Background("#344fcc").
-			ShadowBox("0 2px 8px rgba(0,0,0,0.2)").
+			BoxShadow("0 2px 8px rgba(0,0,0,0.2)").
 			AsNode(),
 	)
 
@@ -81,7 +81,7 @@ func TestButton(t *testing.T) {
 	http.ListenAndServe(":8080", nil)
 }
 
-// BenchmarkButtonSubmit-12    	 2860005	       420.4 ns/op	     432 B/op	       3 allocs/op
+// BenchmarkButtonSubmit-16    	 4754221	       244.8 ns/op	     432 B/op	       3 allocs/op
 func BenchmarkButtonSubmit(b *testing.B) {
 	b.ReportAllocs()
 

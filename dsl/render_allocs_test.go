@@ -53,7 +53,7 @@ func TestAllocGuard_CSSOnly(t *testing.T) {
 		WithBreakpoint("768px").
 		Padding("20px").
 		Radius("8px").
-		ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+		BoxShadow("0 4px 12px rgba(0,0,0,0.1)").
 		AsNode()
 
 	allocs := testing.AllocsPerRun(
@@ -80,7 +80,7 @@ func TestAllocGuard_HTMLAndCSS(t *testing.T) {
 			WithBreakpoint("768px").
 			Padding("20px").
 			Radius("8px").
-			ShadowBox("0 4px 12px rgba(0,0,0,0.1)").
+			BoxShadow("0 4px 12px rgba(0,0,0,0.1)").
 			AsNode(),
 	)
 

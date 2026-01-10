@@ -15,7 +15,7 @@ func TestNewForm3Containers(t *testing.T) {
 		dsl.NewCSSForClass("card:hover").
 			WithBreakpoint("768px").
 			Padding("10px 18px").
-			ShadowBox("0 8px 24px rgba(0,0,0,0.2)").
+			BoxShadow("0 8px 24px rgba(0,0,0,0.2)").
 			AsNode(),
 	)
 
