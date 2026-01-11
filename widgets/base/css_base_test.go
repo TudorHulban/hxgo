@@ -27,7 +27,5 @@ func TestBase(t *testing.T) {
 
 	defer writerCSS.Close()
 
-	writerCSS.Write(
-		[]byte(css),
-	)
+	writerCSS.WriteString(css)
 }

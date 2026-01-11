@@ -120,9 +120,7 @@ func TestAppointment(t *testing.T) {
 		html,
 	)
 
-	writerCSS.Write(
-		[]byte(css),
-	)
+	writerCSS.WriteString(css)
 
 	http.HandleFunc(
 		"/",

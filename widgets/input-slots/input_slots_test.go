@@ -95,7 +95,5 @@ func TestSlots(t *testing.T) {
 		html,
 	)
 
-	writerCSS.Write(
-		[]byte(css),
-	)
+	writerCSS.WriteString(css)
 }
