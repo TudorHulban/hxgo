@@ -1,10 +1,8 @@
 package footer
 
 import (
-	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/dsl"
-	"github.com/TudorHulban/hxgo/widgets/base"
 )
 
 func WidgetFooter() dsl.Node {
@@ -75,11 +73,9 @@ func WidgetFooter() dsl.Node {
 	)
 }
 
-func CSSWidgetFooter() *pagecss.CSSElement {
-	return &pagecss.CSSElement{
-		DesktopFirst: true,
-
-		CSSAllMedias: `
+// DesktopFirst: true.
+func CSSWidgetFooter() string {
+	return `
 		.page-footer {
             background-color: #333;
             color: #fff;
@@ -138,13 +134,12 @@ func CSSWidgetFooter() *pagecss.CSSElement {
     		margin-inline-start: 0;
     		margin-inline-end: 0;
 		}
-`,
+`
+}
 
-		CSSResponsive: []pagecss.CSSMedia{
-			{
-				InflexionPointPX: base.Tablet,
-				CSS: `
-			.page-footer {
+func CSSResponsive() string {
+	return `
+	.page-footer {
                 padding: 1rem;
             }
 
@@ -158,8 +153,5 @@ func CSSWidgetFooter() *pagecss.CSSElement {
             #form-footer-info > div {
                 min-width: 100%;
             }
-				`,
-			},
-		},
-	}
+	`
 }

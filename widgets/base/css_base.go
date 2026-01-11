@@ -1,10 +1,7 @@
 package base
 
-import pagecss "github.com/TudorHulban/hx-core/page-css"
-
-func CSSBase() *pagecss.CSSElement {
-	return &pagecss.CSSElement{
-		CSSAllMedias: `
+func CSSBase() string {
+	return `
 		html {
 	line-height: 1.15;
 	-webkit-text-size-adjust: 100%;
@@ -200,6 +197,5 @@ template {
 html {
 	box-sizing: border-box;
 }
-		`,
-	}
+		`
 }

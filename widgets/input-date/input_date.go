@@ -3,7 +3,6 @@ package inputdate
 import (
 	"time"
 
-	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 )
@@ -62,8 +61,4 @@ func WidgetInputDate(params *ParamsWidgetInputDate) *ResponseWidgetInputDate {
 			`<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>`,
 		),
 	}
-}
-
-func CSSInputDate() *pagecss.CSSElement {
-	return &pagecss.CSSElement{}
 }

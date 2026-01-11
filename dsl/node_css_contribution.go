@@ -21,6 +21,20 @@ type CSSContribution struct {
 	ProceduralCSS    []CSS
 }
 
+func renderCSSContribution(a *accumulator, data unsafe.Pointer) {
+	co := (*CSSContribution)(data)
+
+	a.css = append(a.css, *co)
+}
+
+func (co *CSSContribution) AsNode() Node {
+	return Node{
+		fn:    renderCSSContribution,
+		data:  unsafe.Pointer(co),
+		isCSS: true,
+	}
+}
+
 func NewGeneralCSS() *CSSContribution {
 	return &CSSContribution{}
 }
@@ -65,18 +79,4 @@ func (co *CSSContribution) WithStyles(styles ...[2]string) Node {
 	co.DeclarativeStyle = append(co.DeclarativeStyle, styles...)
 
 	return co.AsNode()
-}
-
-func renderCSSContribution(a *accumulator, data unsafe.Pointer) {
-	co := (*CSSContribution)(data)
-
-	a.css = append(a.css, *co)
-}
-
-func (co *CSSContribution) AsNode() Node {
-	return Node{
-		fn:    renderCSSContribution,
-		data:  unsafe.Pointer(co),
-		isCSS: true,
-	}
 }

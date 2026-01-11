@@ -1,21 +1,22 @@
 package appointment
 
 import (
+	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
-	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/widgets/base"
 	inputdate "github.com/TudorHulban/hxgo/widgets/input-date"
-	winputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
+	inputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
 	"github.com/stretchr/testify/require"
 )
 
 func TestAppointment(t *testing.T) {
-	fragment := WidgetAppointment(
+	w := WidgetAppointment(
 		&ParamsWidgetAppointment{
 			SelectLabel: "Doctor",
 			SelectValues: []string{
@@ -23,11 +24,11 @@ func TestAppointment(t *testing.T) {
 				"Martha Doe",
 			},
 
-			ParamsWidgetSlots: winputslots.ParamsWidgetSlots{
+			ParamsWidgetSlots: inputslots.ParamsWidgetSlots{
 				SubmitEndpoint: "xxx",
 				NumberColumns:  1,
 
-				SlotsInfo: []*winputslots.InfoSlot{
+				SlotsInfo: []*inputslots.InfoSlot{
 					{
 						ResourceID: 1,
 						SlotID:     1000,
@@ -59,7 +60,7 @@ func TestAppointment(t *testing.T) {
 			ParamsButtonSubmit: components.ParamsButtonSubmit{
 				Label:    "Submit",
 				CSSClass: "btn-submit",
-				CSSID:    winputslots.ButtonSubmitCSSID,
+				CSSID:    inputslots.ButtonSubmitCSSID,
 			},
 		},
 	)
@@ -83,42 +84,64 @@ func TestAppointment(t *testing.T) {
 		},
 
 		Body: []dsl.Node{
-			fragment.LinkJavascript,
-			fragment.HTML,
+			w.LinkJavascript,
+			w.HTML,
 		},
 	}
 
-	writer, errWriterCSS := helpers.GetFileWriter("generated.css")
+	cssContribution := dsl.CSSContribution{
+		ProceduralCSS: []dsl.CSS{
+			base.CSSBase,
+			base.CSSSite,
+		},
+	}
+
+	el := page.Build()
+	el.Add(
+		cssContribution.AsNode(),
+	)
+
+	writerCSS, errWriterCSS := helpers.GetFileWriter("generated.css")
 	require.NoError(t, errWriterCSS)
 
-	defer writer.Close()
-
-	cssPage := pagecss.NewCSSPage(
-		append(
-			[]func() *pagecss.CSSElement{
-				base.CSSBase,
-				base.CSSSite,
-			},
-			fragment.CSS...,
-		)...,
-	)
-
-	cssPage.GetCSSAccurateBeautifiedTo(
-		writer,
-		&pagecss.ParamsSpaces{
-			NumberSpaces:              5,
-			IncrementWithNumberSpaces: 2,
-		},
-	)
+	defer writerCSS.Close()
 
 	writerHTML, errWriterHTML := helpers.GetFileWriter(t.Name() + ".html")
 	require.NoError(t, errWriterHTML)
 
 	defer writerHTML.Close()
 
-	writer.Write(
-		dsl.Render(
-			page.Build(),
-		),
+	html, styles, css := dsl.RenderFull(el)
+	require.Zero(t, styles)
+	require.NotZero(t, html)
+	require.NotZero(t, css)
+
+	writerHTML.Write(
+		html,
 	)
+
+	writerCSS.Write(
+		[]byte(css),
+	)
+
+	http.HandleFunc(
+		"/",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write(
+				[]byte(
+					dsl.HTMLwithDataCSS(
+						html,
+						"",
+					),
+				),
+			)
+		},
+	)
+
+	fmt.Println(
+		"Open http://localhost:8080 and press Ctrl-C when done",
+	)
+
+	http.ListenAndServe(":8080", nil)
 }
