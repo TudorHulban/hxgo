@@ -78,7 +78,7 @@ func TestButton(t *testing.T) {
 		"Open http://localhost:8080 and press Ctrl-C when done",
 	)
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 }
 
 // BenchmarkButtonSubmit-16    	 4754221	       244.8 ns/op	     432 B/op	       3 allocs/op

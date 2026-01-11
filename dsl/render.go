@@ -18,6 +18,22 @@ func walk(a *accumulator, n Node) {
 	}
 }
 
+func walkHTML(a *accumulator, n Node) {
+	if n.fn == nil {
+		return
+	}
+
+	n.fn(a, n.data)
+
+	for i := range n.children {
+		if n.children[i].isCSS {
+			continue
+		}
+
+		walkHTML(a, n.children[i])
+	}
+}
+
 // Render renders nodes to HTML bytes in single-pass traversal.
 // For better performance with large outputs, use RenderHTMLWithCapacity.
 func Render(nodes ...Node) []byte {
@@ -28,7 +44,7 @@ func Render(nodes ...Node) []byte {
 	var a accumulator
 
 	for i := range nodes {
-		walk(&a, nodes[i])
+		walkHTML(&a, nodes[i])
 	}
 
 	// HTML is already fully assembled
@@ -45,7 +61,8 @@ func RenderHX(nodes ...Node) []byte {
 	var a accumulator
 
 	for i := range nodes {
-		walk(&a, nodes[i])
+		walkHTML(&a, nodes[i])
+
 		a.Write1("|\n")
 	}
 
@@ -64,7 +81,7 @@ func RenderHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
-		walk(a, nodes[i])
+		walkHTML(a, nodes[i])
 	}
 
 	return a.html
@@ -80,7 +97,8 @@ func RenderHXHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
-		walk(a, nodes[i])
+		walkHTML(a, nodes[i])
+
 		a.Write1("|\n")
 	}
 
@@ -119,12 +137,6 @@ func RenderFull(nodes ...Node) ([]byte, string, string) {
 	if len(a.css) == 0 {
 		return a.html, "", "" // HTML is already fully assembled
 	}
-
-	// // Build styles
-	// styles := newStylesCollector()
-	// for _, s := range a.cssComponents {
-	// 	styles.Add(s)
-	// }
 
 	styles, css := a.BuildCSS()
 

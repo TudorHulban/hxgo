@@ -56,7 +56,7 @@ func renderEl(a *accumulator, p unsafe.Pointer) {
 
 	// Render children - single iteration
 	for i := range d.children {
-		walk(a, d.children[i])
+		walkHTML(a, d.children[i])
 	}
 
 	a.Write3("</", d.tag, ">")
@@ -116,7 +116,7 @@ func renderElWId(a *accumulator, p unsafe.Pointer) {
 
 	// Render children - single iteration
 	for i := range d.children {
-		walk(a, d.children[i])
+		walkHTML(a, d.children[i])
 	}
 
 	a.Write1("</")
