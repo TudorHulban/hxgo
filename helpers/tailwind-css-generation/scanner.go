@@ -3,6 +3,7 @@ package tailwindcssgeneration
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -44,8 +45,8 @@ func ScanUsedMethods(cfg ScanConfig, allMethods []MethodInfo) (map[string]bool, 
 
 			// Detect method usage by simple substring matching.
 			for _, name := range methodNames {
-				needle := "." + name + "("
-				if strings.Contains(src, needle) {
+				pattern := regexp.MustCompile(`\.` + regexp.QuoteMeta(name) + `\s*\(`)
+				if pattern.MatchString(src) {
 					used[name] = true
 				}
 			}

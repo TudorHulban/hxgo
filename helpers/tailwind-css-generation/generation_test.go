@@ -13,9 +13,7 @@ func Test_GenerateReducedTailwindCSS(t *testing.T) {
 	zero := dsl.TW() // zero-value DSL instance
 
 	scanFolders := []string{
-		"./cmd",
-		"./internal",
-		"./ui",
+		"../../dsl",
 	}
 
 	// Versioned CDN URL for Tailwind CSS.

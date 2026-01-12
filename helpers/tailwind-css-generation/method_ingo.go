@@ -1,6 +1,7 @@
 package tailwindcssgeneration
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -47,6 +48,8 @@ func ExtractAllMethods(tailwindZero any) ([]MethodInfo, error) {
 	numMethods := v.NumMethod()
 	for i := 0; i < numMethods; i++ {
 		m := v.Type().Method(i)
+
+		fmt.Println("REFLECT METHOD:", m.Name)
 
 		// Only exported methods.
 		if m.PkgPath != "" {
