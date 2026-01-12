@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -24,11 +25,19 @@ func MethodNamesOf(v any) string {
 	}
 
 	pt := reflect.PointerTo(t)
-	for i := 0; i < pt.NumMethod(); i++ {
-		names = append(names, pt.Method(i).Name)
+	for ix := 0; ix < pt.NumMethod(); ix++ {
+		names = append(names, pt.Method(ix).Name)
 	}
 
 	sort.Strings(names)
 
-	return strings.Join(names, "\n")
+	result := []string{
+		fmt.Sprintf("object: %s", t.Name()),
+	}
+
+	result = append(result, names...)
+
+	result = append(result, fmt.Sprintf("methods: %d", len(names)))
+
+	return strings.Join(result, "\n")
 }
