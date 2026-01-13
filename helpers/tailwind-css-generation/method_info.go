@@ -1,15 +1,14 @@
 package tailwindcssgeneration
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 )
 
 // MethodInfo represents a single DSL method and its mapped Tailwind class.
 type MethodInfo struct {
-	Name  string // Go method name, e.g. "TextSm"
-	Class string // Tailwind class, e.g. "text-sm"
+	Name  string
+	Class string
 }
 
 // ExtractAllMethods builds a dictionary of all exported, parameterless DSL
@@ -48,8 +47,6 @@ func ExtractAllMethods(tailwindZero any) ([]MethodInfo, error) {
 	numMethods := v.NumMethod()
 	for i := 0; i < numMethods; i++ {
 		m := v.Type().Method(i)
-
-		fmt.Println("REFLECT METHOD:", m.Name)
 
 		// Only exported methods.
 		if m.PkgPath != "" {

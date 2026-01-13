@@ -39,8 +39,13 @@ func GenerateReducedTailwindCSS(
 	)
 	require.NoError(t, err)
 
+	usedSet := make(map[string]bool, len(usedNames))
+	for _, name := range usedNames {
+		usedSet[name] = true
+	}
+
 	// Step 3: Resolve used classes.
-	usedMethods := ResolveUsedMethods(allMethods, usedNames)
+	usedMethods := ResolveUsedMethods(allMethods, usedSet)
 	usedClasses := ClassesFromMethods(usedMethods)
 	require.NotEmpty(t, usedClasses)
 

@@ -1,36 +1,47 @@
-package tailwindcssgeneration_test
+package tailwindcssgeneration
 
 import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
-	tailwindcssgeneration "github.com/TudorHulban/hxgo/helpers/tailwind-css-generation"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_GenerateReducedTailwindCSS(t *testing.T) {
-	// Configuration for the test-driven Tailwind CSS reduction pipeline.
-	zero := dsl.TW() // zero-value DSL instance
+// This file itself contains the usage.
 
-	scanFolders := []string{
-		"../../dsl",
-	}
+func TestOneLineScanDetectsAbsolute(t *testing.T) {
+	_ = dsl.TW().Absolute().
+		AsNode()
 
-	// Versioned CDN URL for Tailwind CSS.
-	cssURL := "https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css"
+	all, errScan := ExtractAllMethods(dsl.TW())
+	require.NoError(t, errScan)
+	require.NotEmpty(t, all)
 
-	// Output location for the reduced CSS file.
-	outputPath := "./tailwind.reduced.css"
-
-	// Execute the full pipeline.
-	tailwindcssgeneration.GenerateReducedTailwindCSS(
-		t,
-		zero,
-		scanFolders,
-		cssURL,
-		outputPath,
+	usedMethods, errScan := ScanUsedMethods(
+		ScanConfig{
+			Files: []string{"./generation_test.go"},
+		},
+		all,
 	)
+	require.NoError(t, errScan)
+	require.Contains(t, usedMethods, "Absolute")
+}
 
-	// Sanity check: the file must exist after generation.
-	require.FileExists(t, outputPath)
+func TestMultiLineScanDetectsAbsolute(t *testing.T) {
+	_ = dsl.TW().
+		LeadingNormal().
+		AsNode()
+
+	all, errScan := ExtractAllMethods(dsl.TW())
+	require.NoError(t, errScan)
+	require.NotEmpty(t, all)
+
+	usedMethods, errScan := ScanUsedMethods(
+		ScanConfig{
+			Files: []string{"./generation_test.go"},
+		},
+		all,
+	)
+	require.NoError(t, errScan)
+	require.Contains(t, usedMethods, "LeadingNormal")
 }

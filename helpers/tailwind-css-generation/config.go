@@ -71,8 +71,13 @@ func Run(cfg OrchestratorConfig) error {
 		return err
 	}
 
+	usedSet := make(map[string]bool, len(usedNames))
+	for _, name := range usedNames {
+		usedSet[name] = true
+	}
+
 	// Step 3: Resolve used classes.
-	usedMethods := ResolveUsedMethods(allMethods, usedNames)
+	usedMethods := ResolveUsedMethods(allMethods, usedSet)
 	usedClasses := ClassesFromMethods(usedMethods)
 	if len(usedClasses) == 0 {
 		return fmt.Errorf("no used classes detected")
