@@ -2,29 +2,49 @@ package tailwindcssgeneration
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
+	"io"
+	"sort"
+	"strings"
 )
 
-// CSSWriter persists the reduced CSS content to the configured output path.
-// The writer creates parent directories when necessary and overwrites any
-// existing file. No additional transformations are applied to the content.
-func CSSWriter(outputPath string, css string) error {
-	if outputPath == "" {
-		return fmt.Errorf("output path is empty")
-	}
+func Writer(w io.Writer, dictionary map[string]string, usedMethods []string) error {
+	methodsSeen := make(map[string]struct{}, len(usedMethods))
+	var methodsInDictionary []string
 
-	dir := filepath.Dir(outputPath)
-	if dir != "." {
-		err := os.MkdirAll(dir, 0o755)
-		if err != nil {
-			return fmt.Errorf("failed to create output directory: %w", err)
+	var methodsMissing []string
+	missingSet := make(map[string]struct{}, len(usedMethods))
+
+	for _, method := range usedMethods {
+		if _, exists := dictionary[method]; exists {
+			if _, s := methodsSeen[method]; !s {
+				methodsSeen[method] = struct{}{}
+
+				methodsInDictionary = append(methodsInDictionary, method)
+			}
+		} else {
+			if _, exists := missingSet[method]; !exists {
+				missingSet[method] = struct{}{}
+
+				methodsMissing = append(methodsMissing, method)
+			}
 		}
 	}
 
-	err := os.WriteFile(outputPath, []byte(css), 0o644)
-	if err != nil {
-		return fmt.Errorf("failed to write css file: %w", err)
+	if len(methodsMissing) > 0 {
+		sort.Strings(methodsMissing)
+
+		return fmt.Errorf(
+			"missing methods: %s",
+			strings.Join(methodsMissing, ", "),
+		)
+	}
+
+	sort.Strings(methodsInDictionary)
+
+	for _, method := range methodsInDictionary {
+		if _, err := io.WriteString(w, dictionary[method]+"\n"); err != nil {
+			return err
+		}
 	}
 
 	return nil

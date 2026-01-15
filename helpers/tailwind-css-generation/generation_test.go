@@ -1,6 +1,7 @@
 package tailwindcssgeneration
 
 import (
+	"os"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
@@ -44,4 +45,12 @@ func TestMultiLineScanDetectsAbsolute(t *testing.T) {
 	)
 	require.NoError(t, errScan)
 	require.Contains(t, usedMethods, "LeadingNormal")
+
+	require.NoError(t,
+		Writer(
+			os.Stdout,
+			Dictionary,
+			usedMethods,
+		),
+	)
 }
