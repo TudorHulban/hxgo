@@ -13,15 +13,15 @@ func TestOneLineScanDetectsAbsolute(t *testing.T) {
 	_ = dsl.TW().Absolute().
 		AsNode()
 
-	all, errScan := ExtractAllMethods(dsl.TW())
+	allMethods, errScan := ExtractAllMethods(dsl.TW())
 	require.NoError(t, errScan)
-	require.NotEmpty(t, all)
+	require.NotEmpty(t, allMethods)
 
 	usedMethods, errScan := ScanUsedMethods(
 		ScanConfig{
 			Files: []string{"./generation_test.go"},
 		},
-		all,
+		allMethods,
 	)
 	require.NoError(t, errScan)
 	require.Contains(t, usedMethods, "Absolute")
@@ -32,15 +32,15 @@ func TestMultiLineScanDetectsAbsolute(t *testing.T) {
 		LeadingNormal().
 		AsNode()
 
-	all, errScan := ExtractAllMethods(dsl.TW())
+	allMethods, errScan := ExtractAllMethods(dsl.TW())
 	require.NoError(t, errScan)
-	require.NotEmpty(t, all)
+	require.NotEmpty(t, allMethods)
 
 	usedMethods, errScan := ScanUsedMethods(
 		ScanConfig{
 			Files: []string{"./generation_test.go"},
 		},
-		all,
+		allMethods,
 	)
 	require.NoError(t, errScan)
 	require.Contains(t, usedMethods, "LeadingNormal")

@@ -81,10 +81,16 @@ func ExtractAllMethods(tailwindZero any) ([]MethodInfo, error) {
 			continue
 		}
 
-		methods = append(methods, MethodInfo{
-			Name:  m.Name,
-			Class: class,
-		})
+		// fmt.Println(
+		// 	m.Name,
+		// )
+
+		methods = append(
+			methods, MethodInfo{
+				Name:  m.Name,
+				Class: class,
+			},
+		)
 	}
 
 	return methods, nil
