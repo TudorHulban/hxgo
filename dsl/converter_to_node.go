@@ -123,24 +123,70 @@ func renderElement(a *accumulator, data unsafe.Pointer) {
 
 func ConvertHTML(n *html.Node) Node {
 	switch n.Type {
+	case html.DocumentNode:
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			if c.Type == html.ElementNode {
+				return ConvertHTML(c)
+			}
+		}
+		return Node{}
+
 	case html.ElementNode:
+		// unwrap <html>
+		if n.Data == "html" {
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				if c.Type == html.ElementNode && c.Data == "body" {
+					return ConvertHTML(c)
+				}
+			}
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				if c.Type == html.ElementNode {
+					return ConvertHTML(c)
+				}
+			}
+			return Node{}
+		}
+
+		// unwrap <body>
+		if n.Data == "body" {
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				if c.Type == html.ElementNode {
+					return ConvertHTML(c)
+				}
+			}
+			return Node{}
+		}
+
 		return convertElement(n)
 
 	case html.TextNode:
 		return convertText(n)
 
-	case html.DocumentNode:
-		// descend to first non-nil child with a renderer
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			child := ConvertHTML(c)
-			if child.fn != nil {
-				return child
-			}
-		}
-
-		return Node{} // nothing useful found
-
 	default:
 		return Node{}
 	}
 }
+
+// func ConvertHTML(n *html.Node) Node {
+// 	switch n.Type {
+// 	case html.ElementNode:
+// 		return convertElement(n)
+
+// 	case html.TextNode:
+// 		return convertText(n)
+
+// 	case html.DocumentNode:
+// 		// descend to first non-nil child with a renderer
+// 		for c := n.FirstChild; c != nil; c = c.NextSibling {
+// 			child := ConvertHTML(c)
+// 			if child.fn != nil {
+// 				return child
+// 			}
+// 		}
+
+// 		return Node{} // nothing useful found
+
+// 	default:
+// 		return Node{}
+// 	}
+// }
