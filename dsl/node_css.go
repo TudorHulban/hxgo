@@ -42,6 +42,7 @@ func (co *CSSContribution) BackgroundColor(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"background-color", v},
 	)
+
 	return co
 }
 
@@ -49,6 +50,7 @@ func (co *CSSContribution) BackgroundImage(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"background-image", v},
 	)
+
 	return co
 }
 
@@ -56,6 +58,7 @@ func (co *CSSContribution) BackgroundSize(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"background-size", v},
 	)
+
 	return co
 }
 
@@ -63,6 +66,7 @@ func (co *CSSContribution) BackgroundRepeat(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"background-repeat", v},
 	)
+
 	return co
 }
 
@@ -70,6 +74,7 @@ func (co *CSSContribution) BackgroundPosition(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"background-position", v},
 	)
+
 	return co
 }
 
@@ -77,6 +82,7 @@ func (co *CSSContribution) BorderTop(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-top", v},
 	)
+
 	return co
 }
 
@@ -84,6 +90,7 @@ func (co *CSSContribution) BorderRight(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-right", v},
 	)
+
 	return co
 }
 
@@ -91,6 +98,7 @@ func (co *CSSContribution) BorderBottom(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-bottom", v},
 	)
+
 	return co
 }
 
@@ -98,6 +106,7 @@ func (co *CSSContribution) BorderLeft(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-left", v},
 	)
+
 	return co
 }
 
@@ -105,6 +114,7 @@ func (co *CSSContribution) BorderColor(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-color", v},
 	)
+
 	return co
 }
 
@@ -112,6 +122,7 @@ func (co *CSSContribution) BorderStyle(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-style", v},
 	)
+
 	return co
 }
 
@@ -119,6 +130,7 @@ func (co *CSSContribution) BorderWidth(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"border-width", v},
 	)
+
 	return co
 }
 
@@ -1666,6 +1678,7 @@ func (co *CSSContribution) Margin(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"margin", v},
 	)
+
 	return co
 }
 
@@ -1673,6 +1686,7 @@ func (co *CSSContribution) MarginTop(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"margin-top", v},
 	)
+
 	return co
 }
 
@@ -1680,6 +1694,7 @@ func (co *CSSContribution) MarginRight(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"margin-right", v},
 	)
+
 	return co
 }
 
@@ -1687,6 +1702,7 @@ func (co *CSSContribution) MarginBottom(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"margin-bottom", v},
 	)
+
 	return co
 }
 
@@ -1694,6 +1710,7 @@ func (co *CSSContribution) MarginLeft(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"margin-left", v},
 	)
+
 	return co
 }
 
@@ -1701,6 +1718,7 @@ func (co *CSSContribution) Width(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"width", v},
 	)
+
 	return co
 }
 
@@ -1708,6 +1726,7 @@ func (co *CSSContribution) Height(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"height", v},
 	)
+
 	return co
 }
 
@@ -1715,6 +1734,7 @@ func (co *CSSContribution) MaxWidth(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"max-width", v},
 	)
+
 	return co
 }
 
@@ -1722,6 +1742,7 @@ func (co *CSSContribution) MinWidth(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"min-width", v},
 	)
+
 	return co
 }
 
@@ -1729,6 +1750,7 @@ func (co *CSSContribution) MaxHeight(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"max-height", v},
 	)
+
 	return co
 }
 
@@ -1736,6 +1758,7 @@ func (co *CSSContribution) MinHeight(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"min-height", v},
 	)
+
 	return co
 }
 
@@ -1743,6 +1766,7 @@ func (co *CSSContribution) Gap(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"gap", v},
 	)
+
 	return co
 }
 
@@ -1750,6 +1774,7 @@ func (co *CSSContribution) RowGap(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"row-gap", v},
 	)
+
 	return co
 }
 
@@ -1757,6 +1782,7 @@ func (co *CSSContribution) AlignItems(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"align-items", v},
 	)
+
 	return co
 }
 
@@ -1764,6 +1790,7 @@ func (co *CSSContribution) JustifyContent(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"justify-content", v},
 	)
+
 	return co
 }
 
@@ -1771,6 +1798,7 @@ func (co *CSSContribution) FlexDirection(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"flex-direction", v},
 	)
+
 	return co
 }
 
@@ -1778,6 +1806,7 @@ func (co *CSSContribution) FlexWrap(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"flex-wrap", v},
 	)
+
 	return co
 }
 
@@ -1785,6 +1814,7 @@ func (co *CSSContribution) Position(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"position", v},
 	)
+
 	return co
 }
 
@@ -1792,6 +1822,7 @@ func (co *CSSContribution) ZIndex(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"z-index", v},
 	)
+
 	return co
 }
 
@@ -1799,6 +1830,7 @@ func (co *CSSContribution) Top(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"top", v},
 	)
+
 	return co
 }
 
@@ -1806,6 +1838,7 @@ func (co *CSSContribution) Right(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"right", v},
 	)
+
 	return co
 }
 
@@ -1813,6 +1846,7 @@ func (co *CSSContribution) Bottom(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"bottom", v},
 	)
+
 	return co
 }
 
@@ -1820,6 +1854,7 @@ func (co *CSSContribution) Left(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"left", v},
 	)
+
 	return co
 }
 
@@ -1827,6 +1862,7 @@ func (co *CSSContribution) Overflow(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"overflow", v},
 	)
+
 	return co
 }
 
@@ -1834,6 +1870,7 @@ func (co *CSSContribution) OverflowX(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"overflow-x", v},
 	)
+
 	return co
 }
 
@@ -1841,6 +1878,7 @@ func (co *CSSContribution) OverflowY(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"overflow-y", v},
 	)
+
 	return co
 }
 
@@ -1848,6 +1886,7 @@ func (co *CSSContribution) Opacity(v string) *CSSContribution {
 	co.DeclarativeStyle = append(co.DeclarativeStyle,
 		[2]string{"opacity", v},
 	)
+
 	return co
 }
 

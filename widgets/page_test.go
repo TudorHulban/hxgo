@@ -6,9 +6,9 @@ import (
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
-	wcard "github.com/TudorHulban/hxgo/widgets/card"
-	wheader "github.com/TudorHulban/hxgo/widgets/header"
-	whero "github.com/TudorHulban/hxgo/widgets/hero"
+	"github.com/TudorHulban/hxgo/widgets/card"
+	"github.com/TudorHulban/hxgo/widgets/header"
+	"github.com/TudorHulban/hxgo/widgets/hero"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,8 +24,8 @@ func Page() dsl.Node {
 	action4 := "https://themes.getmotopress.com/bro-barbershop/service/mens-haircut/"
 
 	return dsl.Div(
-		wheader.WidgetHeader(
-			&wheader.ParamsWidgetHeader{
+		header.WidgetHeader(
+			&header.ParamsWidgetHeader{
 				Title: "Barber Shop",
 
 				ParamsImage: components.ParamsImage{
@@ -36,8 +36,8 @@ func Page() dsl.Node {
 			},
 		),
 
-		whero.WidgetHero(
-			&whero.ParamsWidgetHero{
+		hero.WidgetHero(
+			&hero.ParamsWidgetHero{
 				Title:   "Expert cuts and classic styles",
 				Message: "Experience the finest grooming services in town. from traditional haircuts to modern styling, we've got you covered.",
 
@@ -58,8 +58,8 @@ func Page() dsl.Node {
 			},
 		),
 
-		wcard.WidgetCards(
-			&wcard.ParamsWidgetCards{
+		card.WidgetCards(
+			&card.ParamsWidgetCards{
 				Title: "Popular Services",
 
 				CurrencySimbol: "RON",
@@ -67,7 +67,7 @@ func Page() dsl.Node {
 
 				CSSFlexGap: "20px",
 
-				Cards: []*wcard.WidgetCardVerticalInfo{
+				Cards: []*card.WidgetCardVerticalInfo{
 					{
 						Title: "Washing Head",
 						Price: "49",

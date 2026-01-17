@@ -1,11 +1,8 @@
 package base
 
-import pagecss "github.com/TudorHulban/hx-core/page-css"
-
-func CSSSite() *pagecss.CSSElement {
-	return &pagecss.CSSElement{
-		CSSAllMedias: `
-		.content,
+func CSSSite() string {
+	return `
+.content,
 body,
 button,
 input,
@@ -332,13 +329,12 @@ label {
 textarea {
 	width: 100%;
 }
-		`,
+`
+}
 
-		CSSResponsive: []pagecss.CSSMedia{
-			{
-				InflexionPointPX: Tablet,
-				CSS: `
-				h1 {
+func CSSResponsive() string {
+	return `
+	h1 {
 		font-size: 75px;
 		line-height: 1.15;
 	}
@@ -355,9 +351,6 @@ textarea {
 	table th,
 	table td {
 		padding: 18px 20px;
-	}
-				`,
-			},
-		},
-	}
+	}	
+`
 }

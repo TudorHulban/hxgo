@@ -3,7 +3,6 @@ package inputslots
 import (
 	"fmt"
 
-	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 )
@@ -136,9 +135,8 @@ func WidgetSlots(params *ParamsWidgetSlots) dsl.Node {
 	)
 }
 
-func CSSWidgetSlots() *pagecss.CSSElement {
-	return &pagecss.CSSElement{
-		CSSAllMedias: `
+func CSSWidgetSlots() string {
+	return `
 		.hours-grid {
     		width: 40%;
 		}
@@ -156,6 +154,5 @@ func CSSWidgetSlots() *pagecss.CSSElement {
   			border: 1px solid blue;
   			font-weight: bold;
 		}
-		`,
-	}
+`
 }

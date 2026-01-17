@@ -1,7 +1,6 @@
 package appointment
 
 import (
-	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/dsl"
 	inputdate "github.com/TudorHulban/hxgo/widgets/input-date"
@@ -19,7 +18,7 @@ type ParamsWidgetAppointment struct {
 }
 
 type ResponseWidgetAppointment struct {
-	CSS []func() *pagecss.CSSElement
+	CSS []dsl.CSS
 
 	HTML           dsl.Node
 	LinkJavascript dsl.Node
@@ -41,11 +40,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 
 	return &ResponseWidgetAppointment{
 		LinkJavascript: nodesInputDate.LinkJavascript,
-		CSS: []func() *pagecss.CSSElement{
-			inputdate.CSSInputDate,
-			inputslots.CSSWidgetSlots,
-			CSSAppointment,
-		},
+		CSS:            []dsl.CSS{CSSAppointment},
 
 		HTML: dsl.Div(
 			dsl.AttrClass(
@@ -79,9 +74,8 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 	}
 }
 
-func CSSAppointment() *pagecss.CSSElement {
-	return &pagecss.CSSElement{
-		CSSAllMedias: `
+func CSSAppointment() string {
+	return `
 		.appointment-container {
 			padding: 0.3em;
 			text-align: right;
@@ -96,6 +90,5 @@ func CSSAppointment() *pagecss.CSSElement {
 				width: 100%;
 			}
 		}
-		`,
-	}
+		`
 }

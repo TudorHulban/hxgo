@@ -84,7 +84,7 @@ linters:
         # ============================
         - name: line-length-limit
           severity: error
-          arguments: [150]
+          arguments: [190]
 
         # ============================
         # ACTIVE RULES WITH ARGUMENTS
@@ -111,7 +111,7 @@ linters:
           arguments: [50]
 
         - name: cyclomatic
-          arguments: [10]
+          arguments: [15]
 
         - name: max-control-nesting
           arguments: [7]

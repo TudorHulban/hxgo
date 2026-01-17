@@ -3,7 +3,6 @@ package inputslots
 import (
 	"testing"
 
-	pagecss "github.com/TudorHulban/hx-core/page-css"
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
@@ -64,23 +63,22 @@ func TestSlots(t *testing.T) {
 		},
 	}
 
-	writer, errWriterCSS := helpers.GetFileWriter("generated.css")
+	writerCSS, errWriterCSS := helpers.GetFileWriter("generated.css")
 	require.NoError(t, errWriterCSS)
 
-	defer writer.Close()
+	defer writerCSS.Close()
 
-	cssPage := pagecss.NewCSSPage(
-		base.CSSBase,
-		base.CSSSite,
-		CSSWidgetSlots,
-	)
-
-	cssPage.GetCSSAccurateBeautifiedTo(
-		writer,
-		&pagecss.ParamsSpaces{
-			NumberSpaces:              5,
-			IncrementWithNumberSpaces: 2,
+	cssContribution := dsl.CSSContribution{
+		ProceduralCSS: []dsl.CSS{
+			base.CSSBase,
+			base.CSSSite,
+			CSSWidgetSlots,
 		},
+	}
+
+	el := page.Build()
+	el.Add(
+		cssContribution.AsNode(),
 	)
 
 	writerHTML, errWriterHTML := helpers.GetFileWriter(t.Name() + ".html")
@@ -88,9 +86,14 @@ func TestSlots(t *testing.T) {
 
 	defer writerHTML.Close()
 
-	writer.Write(
-		dsl.Render(
-			page.Build(),
-		),
+	html, styles, css := dsl.RenderFull(el)
+	require.Zero(t, styles)
+	require.NotZero(t, html)
+	require.NotZero(t, css)
+
+	writerHTML.Write(
+		html,
 	)
+
+	writerCSS.WriteString(css)
 }
