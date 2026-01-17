@@ -31,9 +31,11 @@ func MethodNamesOf(v any) string {
 
 	sort.Strings(names)
 
-	result := []string{
-		fmt.Sprintf("object: %s", t.Name()),
-	}
+	result := make([]string, 0, 1+len(names)+1)
+
+	result = append(result,
+		Sprintf("object: %s", t.Name()),
+	)
 
 	result = append(result, names...)
 

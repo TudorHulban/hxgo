@@ -10,12 +10,12 @@ import (
 )
 
 type ScanConfig struct {
-	Folders []string
-	Files   []string
-
 	BuilderFunc      string // start token
 	BuilderQualifier string // token builder package
 	EndMethod        string // end token
+
+	Folders []string
+	Files   []string
 }
 
 func scanSourceForChains(src string, cfg ScanConfig, methodNames map[string]struct{}, used map[string]struct{}) {
@@ -29,18 +29,20 @@ func scanSourceForChains(src string, cfg ScanConfig, methodNames map[string]stru
 
 	for _, start := range startPatterns {
 		searchIdx := 0
+
 		for {
-			i := strings.Index(src[searchIdx:], start)
-			if i == -1 {
+			ixStart := strings.Index(src[searchIdx:], start)
+			if ixStart == -1 {
 				break
 			}
 
-			chainStart := searchIdx + i + len(start)
+			chainStart := searchIdx + ixStart + len(start)
 
 			// Find end pattern from chainStart onwards
 			loc := endPattern.FindStringIndex(src[chainStart:])
 			if loc == nil {
 				searchIdx = chainStart
+
 				continue
 			}
 
@@ -48,23 +50,32 @@ func scanSourceForChains(src string, cfg ScanConfig, methodNames map[string]stru
 
 			region := src[chainStart:chainEnd]
 
-			// Split by '.' to get method calls
-			parts := strings.Split(region, ".")
-			for _, part := range parts {
-				part = strings.TrimSpace(part)
-				if part == "" {
-					continue
-				}
+			iterationMethodCalls := strings.SplitSeq(region, ".")
 
-				if idx := strings.Index(part, "("); idx != -1 {
-					methodName := strings.TrimSpace(part[:idx])
-					if methodName != "" {
-						if _, ok := methodNames[methodName]; ok {
-							used[methodName] = struct{}{}
-						}
+			iterationMethodCalls(
+				func(part string) bool {
+					part = strings.TrimSpace(part)
+					if len(part) == 0 {
+						return true
 					}
-				}
-			}
+
+					methodName, _, found := strings.Cut(part, "(")
+					if !found {
+						return true
+					}
+
+					methodName = strings.TrimSpace(methodName)
+					if len(methodName) == 0 {
+						return true
+					}
+
+					if _, exists := methodNames[methodName]; exists {
+						used[methodName] = struct{}{}
+					}
+
+					return true
+				},
+			)
 
 			searchIdx = chainStart + loc[1] // loc[1] is the end of the match, move past it
 		}
@@ -75,14 +86,17 @@ func ScanUsedMethods(cfg ScanConfig, methods []MethodInfo) ([]string, error) {
 	if cfg.BuilderFunc == "" {
 		cfg.BuilderFunc = "TW"
 	}
+
 	if cfg.EndMethod == "" {
 		cfg.EndMethod = "AsNode"
 	}
+
 	if cfg.BuilderQualifier == "" {
 		cfg.BuilderQualifier = "dsl"
 	}
 
 	methodNames := make(map[string]struct{}, len(methods))
+
 	for _, m := range methods {
 		methodNames[m.Name] = struct{}{}
 	}
@@ -91,27 +105,33 @@ func ScanUsedMethods(cfg ScanConfig, methods []MethodInfo) ([]string, error) {
 
 	// 1. Scan folders
 	for _, folder := range cfg.Folders {
-		err := filepath.WalkDir(folder, func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() {
-				return nil
-			}
-			if !strings.HasSuffix(path, ".go") {
-				return nil
-			}
+		errWalk := filepath.WalkDir(
+			folder,
+			func(path string, d fs.DirEntry, errInput error) error {
+				if errInput != nil {
+					return errInput
+				}
 
-			src, err := os.ReadFile(path)
-			if err != nil {
-				return err
-			}
+				if d.IsDir() {
+					return nil
+				}
 
-			scanSourceForChains(string(src), cfg, methodNames, used)
-			return nil
-		})
-		if err != nil {
-			return nil, err
+				if !strings.HasSuffix(path, ".go") {
+					return nil
+				}
+
+				src, errRead := os.ReadFile(path)
+				if errRead != nil {
+					return errRead
+				}
+
+				scanSourceForChains(string(src), cfg, methodNames, used)
+
+				return nil
+			},
+		)
+		if errWalk != nil {
+			return nil, errWalk
 		}
 	}
 
@@ -120,17 +140,26 @@ func ScanUsedMethods(cfg ScanConfig, methods []MethodInfo) ([]string, error) {
 		if !strings.HasSuffix(file, ".go") {
 			continue
 		}
-		src, err := os.ReadFile(file)
-		if err != nil {
-			return nil, err
+
+		src, errRead := os.ReadFile(file)
+		if errRead != nil {
+			return nil, errRead
 		}
-		scanSourceForChains(string(src), cfg, methodNames, used)
+
+		scanSourceForChains(
+			string(src),
+			cfg,
+			methodNames,
+			used,
+		)
 	}
 
 	out := make([]string, 0, len(used))
 	for name := range used {
 		out = append(out, name)
 	}
+
 	sort.Strings(out)
+
 	return out, nil
 }

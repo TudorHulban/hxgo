@@ -45,15 +45,15 @@ func ExtractAllMethods(tailwindZero any) ([]MethodInfo, error) {
 	var methods []MethodInfo
 
 	numMethods := v.NumMethod()
-	for i := 0; i < numMethods; i++ {
-		m := v.Type().Method(i)
+	for ix := range numMethods {
+		m := v.Type().Method(ix)
 
 		// Only exported methods.
 		if m.PkgPath != "" {
 			continue
 		}
 
-		mv := v.Method(i)
+		mv := v.Method(ix)
 		mt := mv.Type()
 
 		// Only methods with no parameters and a single return value.

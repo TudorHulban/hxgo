@@ -9,9 +9,10 @@ import (
 
 func Writer(w io.Writer, dictionary map[string]string, usedMethods []string) error {
 	methodsSeen := make(map[string]struct{}, len(usedMethods))
-	var methodsInDictionary []string
 
-	var methodsMissing []string
+	methodsInDictionary := make([]string, 0)
+	methodsMissing := make([]string, 0)
+
 	missingSet := make(map[string]struct{}, len(usedMethods))
 
 	for _, method := range usedMethods {
