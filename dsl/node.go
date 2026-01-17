@@ -14,9 +14,11 @@ type Node struct {
 	fn   renderer
 	data unsafe.Pointer
 
-	children    []Node
+	children []Node
+
 	isAttribute bool
 	isCSS       bool
+	isText      bool
 }
 
 func (n *Node) Add(children ...Node) {

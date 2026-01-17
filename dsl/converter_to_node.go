@@ -7,6 +7,22 @@ import (
 	"golang.org/x/net/html"
 )
 
+// ConvertHTML calls convertElement for element nodes
+// convertElement uses dataForTag to build the data structure with openTag/closeTag
+// convertElement uses rendererForTag which returns renderElement for all tags
+// walkHTML calls renderElement to write opening tag, then renderElementClose to write closing tag
+
+func renderElementClose(a *accumulator, data unsafe.Pointer) {
+	type tagData struct {
+		openTag  []byte
+		closeTag []byte
+	}
+
+	d := (*tagData)(data)
+
+	a.html = append(a.html, d.closeTag...)
+}
+
 func renderText(a *accumulator, data unsafe.Pointer) {
 	s := *(*string)(data)
 	if len(s) == 0 {
@@ -22,9 +38,12 @@ func convertText(n *html.Node) Node {
 		return Node{}
 	}
 
+	text := &trimmed
+
 	return Node{
-		fn:   renderText,
-		data: unsafe.Pointer(&trimmed),
+		fn:     renderText,
+		data:   unsafe.Pointer(text),
+		isText: true, // NEW
 	}
 }
 
@@ -58,56 +77,22 @@ func convertAttribute(a html.Attribute) Node {
 	}
 }
 
-func rendererForTag(tag string) renderer {
-	switch tag {
-	case "div":
-		return renderDiv
-	case "span":
-		return renderSpan
-	case "a":
-		return renderA
-	case "p":
-		return renderP
-	case "img":
-		return renderImg
-	case "ul":
-		return renderUl
-	case "ol":
-		return renderOl
-	case "li":
-		return renderLi
-	case "nav":
-		return renderNav
-	case "h1":
-		return renderH1
-	case "h2":
-		return renderH2
-	case "h3":
-		return renderH3
-	case "h4":
-		return renderH4
-	case "h5":
-		return renderH5
-	case "h6":
-		return renderH6
+func buildDataForTag(tag string) unsafe.Pointer {
+	d := &struct {
+		openTag  []byte
+		closeTag []byte
+	}{
+		openTag:  append([]byte{'<'}, tag...),
+		closeTag: append(append([]byte{'<', '/'}, tag...), '>'),
 	}
 
-	// fallback for unknown tags
-	return renderGenericElement
-}
-
-func buildDataForTag(tag string) unsafe.Pointer {
-	s := tag // allocate a copy so the pointer remains stable
-
-	return unsafe.Pointer(&s)
+	return unsafe.Pointer(d)
 }
 
 func convertElement(n *html.Node) Node {
-	tag := n.Data
-
 	node := Node{
-		fn:   rendererForTag(tag),
-		data: buildDataForTag(tag),
+		fn:   renderElement,
+		data: dataForTag(n.Data),
 	}
 
 	// attributes first
@@ -126,6 +111,16 @@ func convertElement(n *html.Node) Node {
 	return node
 }
 
+func renderElement(a *accumulator, data unsafe.Pointer) {
+	type tagData struct {
+		openTag  []byte
+		closeTag []byte
+	}
+
+	d := (*tagData)(data)
+	a.html = append(a.html, d.openTag...)
+}
+
 func ConvertHTML(n *html.Node) Node {
 	switch n.Type {
 	case html.ElementNode:
@@ -142,6 +137,7 @@ func ConvertHTML(n *html.Node) Node {
 				return child
 			}
 		}
+
 		return Node{} // nothing useful found
 
 	default:

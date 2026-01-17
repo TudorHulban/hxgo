@@ -36,7 +36,7 @@ func mapNodeAttribute(nodeKey, nodeValue string) string {
 }
 
 func mapNodesAttributes(data map[string]string) string {
-	result := make([]string, 0)
+	result := make([]string, 0, len(data))
 
 	for node, value := range data {
 		result = append(
