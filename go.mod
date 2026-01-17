@@ -6,6 +6,7 @@ require (
 	github.com/TudorHulban/epochid v0.0.0-20250522145321-43740b377e0d
 	github.com/TudorHulban/go-errors v0.0.0-20250526111805-0875506117af
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/net v0.49.0
 )
 
 require (
