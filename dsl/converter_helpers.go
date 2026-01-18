@@ -26,7 +26,7 @@ func hasClass(n *html.Node, class string) bool {
 	return false
 }
 
-func hasId(n *html.Node, id string) bool {
+func hasID(n *html.Node, id string) bool {
 	if n.Type != html.ElementNode {
 		return false
 	}
@@ -51,6 +51,7 @@ func isTriviallyEmpty(n *html.Node) bool {
 			if strings.TrimSpace(c.Data) != "" {
 				return false
 			}
+
 		case html.ElementNode:
 			return false
 		}

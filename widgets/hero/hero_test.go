@@ -61,7 +61,7 @@ func TestHero(t *testing.T) {
 	}
 
 	writer.Write(
-		dsl.Render(
+		dsl.RenderConvertedHTML(
 			page.Build(),
 		),
 	)

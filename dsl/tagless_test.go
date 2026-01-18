@@ -11,8 +11,8 @@ func TestImg(t *testing.T) {
 
 	require.Equal(t,
 		`<img>`,
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 	)
 }

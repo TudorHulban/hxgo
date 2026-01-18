@@ -6,9 +6,9 @@ import (
 	"github.com/TudorHulban/hxgo/helpers"
 )
 
-// Render renders nodes to HTML bytes in single-pass traversal.
+// RenderFast renders nodes to HTML bytes in single-pass traversal.
 // For better performance with large outputs, use RenderHTMLWithCapacity.
-func Render(nodes ...Node) []byte {
+func RenderFast(nodes ...Node) []byte {
 	if len(nodes) == 0 {
 		return []byte{}
 	}
@@ -16,7 +16,22 @@ func Render(nodes ...Node) []byte {
 	var a accumulator
 
 	for i := range nodes {
-		// walkHTML(&a, nodes[i])
+		walkHTML(&a, nodes[i])
+	}
+
+	// HTML is already fully assembled
+	return a.html
+}
+
+// RenderConvertedHTML should be used when testing the HTML converter.
+func RenderConvertedHTML(nodes ...Node) []byte {
+	if len(nodes) == 0 {
+		return []byte{}
+	}
+
+	var a accumulator
+
+	for i := range nodes {
 		converterWalk(&a, nodes[i])
 	}
 

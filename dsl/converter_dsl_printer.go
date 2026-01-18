@@ -47,7 +47,7 @@ func PrintDSL(w io.Writer, n Node, indentUnit ...string) {
 
 func (p *DSLPrinter) writeIndent() {
 	for i := 0; i < p.indent; i++ {
-		p.w.Write(
+		_, _ = p.w.Write(
 			[]byte(p.indentUnit),
 		)
 	}
@@ -68,30 +68,30 @@ func (p *DSLPrinter) printElement(n Node) {
 	tag := extractTagName(n.data)
 
 	p.writeIndent()
-	p.w.Write([]byte(_DSL))
-	p.w.Write([]byte("."))
-	p.w.Write([]byte(capitalize(tag)))
-	p.w.Write([]byte("("))
+	_, _ = p.w.Write([]byte(_DSL))
+	_, _ = p.w.Write([]byte("."))
+	_, _ = p.w.Write([]byte(capitalize(tag)))
+	_, _ = p.w.Write([]byte("("))
 
 	if p.isMultiLine {
-		p.w.Write([]byte("\n"))
+		_, _ = p.w.Write([]byte("\n"))
 	}
 
 	p.indent++
 
 	for i := range n.children {
 		p.printNode(n.children[i])
-		p.w.Write([]byte(","))
+		_, _ = p.w.Write([]byte(","))
 
 		if p.isMultiLine {
-			p.w.Write([]byte("\n"))
+			_, _ = p.w.Write([]byte("\n"))
 		}
 	}
 
 	p.indent--
 
 	p.writeIndent()
-	p.w.Write([]byte(")"))
+	_, _ = p.w.Write([]byte(")"))
 }
 
 func (p *DSLPrinter) printAttribute(n Node) {
@@ -101,20 +101,20 @@ func (p *DSLPrinter) printAttribute(n Node) {
 	})(n.data)
 
 	p.writeIndent()
-	p.w.Write([]byte(_DSL))
-	p.w.Write([]byte("."))
-	p.w.Write([]byte(capitalize(d.key)))
-	p.w.Write([]byte("("))
-	p.w.Write([]byte(strconv.Quote(d.val)))
-	p.w.Write([]byte(")"))
+	_, _ = p.w.Write([]byte(_DSL))
+	_, _ = p.w.Write([]byte("."))
+	_, _ = p.w.Write([]byte(capitalize(d.key)))
+	_, _ = p.w.Write([]byte("("))
+	_, _ = p.w.Write([]byte(strconv.Quote(d.val)))
+	_, _ = p.w.Write([]byte(")"))
 }
 
 func (p *DSLPrinter) printText(n Node) {
 	s := *(*string)(n.data)
 
 	p.writeIndent()
-	p.w.Write([]byte(_DSL))
-	p.w.Write([]byte(".Text("))
-	p.w.Write([]byte(strconv.Quote(s)))
-	p.w.Write([]byte(")"))
+	_, _ = p.w.Write([]byte(_DSL))
+	_, _ = p.w.Write([]byte(".Text("))
+	_, _ = p.w.Write([]byte(strconv.Quote(s)))
+	_, _ = p.w.Write([]byte(")"))
 }

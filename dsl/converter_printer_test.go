@@ -183,7 +183,7 @@ func TestPrintDSL(t *testing.T) {
 	}
 }
 
-func TestWithURL(t *testing.T) {
+func TestFullPageWithURL(t *testing.T) {
 	const testURL = "https://templates.iqonic.design/product/lite/logik/html/dist/dashboard/"
 
 	req, errRequest := http.NewRequestWithContext(
@@ -209,4 +209,37 @@ func TestWithURL(t *testing.T) {
 	root := ConvertHTML(doc)
 
 	PrintDSL(os.Stdout, root)
+}
+
+func TestElementsWithURL(t *testing.T) {
+	const testURL = "https://templates.iqonic.design/product/lite/logik/html/dist/dashboard/"
+
+	req, errRequest := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		testURL,
+		nil,
+	)
+	require.NoError(t, errRequest)
+
+	resp, errCall := http.DefaultClient.Do(req)
+	require.NoError(t, errCall)
+
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	doc, errParse := html.Parse(resp.Body)
+	require.NoError(t, errParse)
+	require.NotNil(t, doc)
+	require.NotEmpty(t, doc)
+
+	elements := ConvertDOMElements(
+		doc,
+		DOMNode{
+			CSSClass: "card-body",
+		},
+	)
+
+	elements.PrintWithDescription(os.Stdout)
 }

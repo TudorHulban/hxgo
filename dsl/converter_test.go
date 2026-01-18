@@ -30,7 +30,7 @@ func TestHowToUse(t *testing.T) {
 	require.NotNil(t, root.fn)
 
 	// NEW: render hxgo.Node → HTML
-	out := Render(root)
+	out := RenderConvertedHTML(root)
 	require.NotEmpty(t, out)
 
 	fmt.Println(string(out))

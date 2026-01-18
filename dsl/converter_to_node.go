@@ -129,6 +129,7 @@ func ConvertHTML(n *html.Node) Node {
 				return ConvertHTML(c)
 			}
 		}
+
 		return Node{}
 
 	case html.ElementNode:
@@ -139,6 +140,7 @@ func ConvertHTML(n *html.Node) Node {
 					return ConvertHTML(c)
 				}
 			}
+
 			return Node{}
 		}
 
@@ -150,9 +152,10 @@ func ConvertHTML(n *html.Node) Node {
 				}
 
 				// skip known boilerplate
-				if hasId(c, "loading") {
+				if hasID(c, "loading") {
 					continue
 				}
+
 				if hasClass(c, "loader") || hasClass(c, "simple-loader") {
 					continue
 				}
