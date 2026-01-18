@@ -139,21 +139,32 @@ func ConvertHTML(n *html.Node) Node {
 					return ConvertHTML(c)
 				}
 			}
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				if c.Type == html.ElementNode {
-					return ConvertHTML(c)
-				}
-			}
 			return Node{}
 		}
 
-		// unwrap <body>
+		// unwrap <body> with semantic filtering
 		if n.Data == "body" {
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				if c.Type == html.ElementNode {
-					return ConvertHTML(c)
+				if c.Type != html.ElementNode {
+					continue
 				}
+
+				// skip known boilerplate
+				if hasId(c, "loading") {
+					continue
+				}
+				if hasClass(c, "loader") || hasClass(c, "simple-loader") {
+					continue
+				}
+
+				// skip empty wrappers
+				if isTriviallyEmpty(c) {
+					continue
+				}
+
+				return ConvertHTML(c)
 			}
+
 			return Node{}
 		}
 
@@ -166,27 +177,3 @@ func ConvertHTML(n *html.Node) Node {
 		return Node{}
 	}
 }
-
-// func ConvertHTML(n *html.Node) Node {
-// 	switch n.Type {
-// 	case html.ElementNode:
-// 		return convertElement(n)
-
-// 	case html.TextNode:
-// 		return convertText(n)
-
-// 	case html.DocumentNode:
-// 		// descend to first non-nil child with a renderer
-// 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-// 			child := ConvertHTML(c)
-// 			if child.fn != nil {
-// 				return child
-// 			}
-// 		}
-
-// 		return Node{} // nothing useful found
-
-// 	default:
-// 		return Node{}
-// 	}
-// }

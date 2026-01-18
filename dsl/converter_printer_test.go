@@ -1,6 +1,9 @@
 package dsl
 
 import (
+	"context"
+	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"unsafe"
@@ -36,9 +39,15 @@ func TestHTMLToDSL(t *testing.T) {
 				require.NoError(t, err)
 
 				root := ConvertHTML(doc)
-				out := PrintDSL(root)
 
-				require.Equal(t, tt.expectedDSL, out)
+				var out strings.Builder
+
+				printDSL(&out, root)
+
+				require.Equal(t,
+					tt.expectedDSL,
+					out.String(),
+				)
 			},
 		)
 	}
@@ -47,8 +56,9 @@ func TestHTMLToDSL(t *testing.T) {
 func TestPrintDSL(t *testing.T) {
 	tests := []struct {
 		description string
-		node        Node
 		expectedDSL string
+
+		node Node
 	}{
 		{
 			description: "1. empty node returns empty string",
@@ -160,9 +170,43 @@ func TestPrintDSL(t *testing.T) {
 		t.Run(
 			tt.description,
 			func(t *testing.T) {
-				out := PrintDSL(tt.node)
-				require.Equal(t, tt.expectedDSL, out)
+				var out strings.Builder
+
+				printDSL(&out, tt.node)
+
+				require.Equal(t,
+					tt.expectedDSL,
+					out.String(),
+				)
 			},
 		)
 	}
+}
+
+func TestWithURL(t *testing.T) {
+	const testURL = "https://templates.iqonic.design/product/lite/logik/html/dist/dashboard/"
+
+	req, errRequest := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		testURL,
+		nil,
+	)
+	require.NoError(t, errRequest)
+
+	resp, errCall := http.DefaultClient.Do(req)
+	require.NoError(t, errCall)
+
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	doc, errParse := html.Parse(resp.Body)
+	require.NoError(t, errParse)
+	require.NotNil(t, doc)
+	require.NotEmpty(t, doc)
+
+	root := ConvertHTML(doc)
+
+	PrintDSL(os.Stdout, root)
 }
