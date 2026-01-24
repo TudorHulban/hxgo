@@ -14,7 +14,7 @@ import (
 )
 
 func TestHTMLToDSL(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		description string
 		htmlInput   string
 		expectedDSL string
@@ -31,12 +31,12 @@ func TestHTMLToDSL(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tc := range testCases {
 		t.Run(
-			tt.description,
+			tc.description,
 			func(t *testing.T) {
-				doc, err := html.Parse(strings.NewReader(tt.htmlInput))
-				require.NoError(t, err)
+				doc, errParse := html.Parse(strings.NewReader(tc.htmlInput))
+				require.NoError(t, errParse)
 
 				root := ConvertHTML(doc)
 
@@ -45,7 +45,7 @@ func TestHTMLToDSL(t *testing.T) {
 				printDSL(&out, root)
 
 				require.Equal(t,
-					tt.expectedDSL,
+					tc.expectedDSL,
 					out.String(),
 				)
 			},
@@ -158,6 +158,7 @@ func TestPrintDSL(t *testing.T) {
 			},
 			expectedDSL: helpers.Sprintf(
 				`%s.Li(%s.Class("breadcrumb-item"),%s.Span(%s.Text("Text"),),)`,
+
 				_DSL,
 				_DSL,
 				_DSL,

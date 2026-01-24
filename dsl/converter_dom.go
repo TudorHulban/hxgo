@@ -19,6 +19,17 @@ func (r ResultDOMConversion) PrintWithDescription(w io.Writer) {
 	PrintDSL(w, r.Node)
 }
 
+func (result ResultDOMConversion) PrintWithTransformers(writer io.Writer, transformers ...Transformer) {
+	_, _ = writer.Write([]byte(result.Description))
+	_, _ = writer.Write([]byte(":\n"))
+
+	for _, transformer := range transformers {
+		result.Node = transformer(result.Node)
+	}
+
+	PrintDSL(writer, result.Node)
+}
+
 type ResultsDOMConversion []ResultDOMConversion
 
 func (r ResultsDOMConversion) PrintWithDescription(w io.Writer) {
