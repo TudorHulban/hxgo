@@ -24,12 +24,14 @@ func Image(params *ParamsImage) dsl.Node {
 			),
 		),
 		dsl.AttrCSS("object-fit:cover;"),
+		dsl.AttrClass("attachment-post-thumbnail"),
 		dsl.AttrWithValue("decoding", "async"),
 		dsl.AttrWithValue("height", params.ImageSquareSize),
 		dsl.AttrWithValue("width", params.ImageSquareSize),
-		dsl.AttrWithValue("alt", params.ImageAlt),
+
+		dsl.AttrImgAlternativeText(params.ImageAlt),
+		dsl.AttrImgSource(params.ImageSource),
+
 		dsl.AttrWithValue("loading", "lazy"),
-		dsl.AttrWithValue("src", params.ImageSource),
-		dsl.AttrClass("attachment-post-thumbnail"),
 	)
 }

@@ -227,7 +227,10 @@ func TestElementsWithURL(t *testing.T) {
 
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t,
+		http.StatusOK,
+		resp.StatusCode,
+	)
 
 	doc, errParse := html.Parse(resp.Body)
 	require.NoError(t, errParse)

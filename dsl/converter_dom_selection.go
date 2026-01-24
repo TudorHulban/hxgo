@@ -60,19 +60,19 @@ func getAttr(n *html.Node, key string) string {
 	return ""
 }
 
-func matchesSelector(n *html.Node, sel DOMNode) bool {
-	if sel.CSSID != "" {
-		if id := getAttr(n, "id"); id == sel.CSSID {
+func matchesSelector(node *html.Node, selector DOMNode) bool {
+	if selector.CSSID != "" {
+		elementID := getAttr(node, "id")
+		if elementID == selector.CSSID {
 			return true
 		}
 	}
 
-	if sel.CSSClass != "" {
-		class := getAttr(n, "class")
-		if class != "" {
-			classes := strings.Fields(class)
-			for _, c := range classes {
-				if c == sel.CSSClass {
+	if selector.CSSClass != "" {
+		classAttr := getAttr(node, "class")
+		if classAttr != "" {
+			for classToken := range strings.FieldsSeq(classAttr) {
+				if classToken == selector.CSSClass {
 					return true
 				}
 			}

@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"slices"
 	"strings"
 	"unsafe"
 
@@ -14,11 +15,11 @@ func hasClass(n *html.Node, class string) bool {
 
 	for _, a := range n.Attr {
 		if a.Key == "class" {
-			parts := strings.Fields(a.Val)
-			for i := range parts {
-				if parts[i] == class {
-					return true
-				}
+			if slices.Contains(
+				strings.Fields(a.Val), // parts
+				class,
+			) {
+				return true
 			}
 		}
 	}

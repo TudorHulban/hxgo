@@ -134,10 +134,13 @@ linters:
         - name: max-public-structs
           disabled: true
 
+        - name: confusing-naming
+          disabled: true
+
         - name: deep-exit
           disabled: true
 
-        - name: confusing-naming
+        - name: enforce-switch-style
           disabled: true
 
         - name: flag-parameter
