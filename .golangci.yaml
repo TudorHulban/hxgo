@@ -12,36 +12,36 @@ linters:
     - cyclop
     - depguard
     - dupword
-    - errname
-    - godox
-    - ireturn
-    - intrange
+    - embeddedstructfieldcheck
     - err113
     - errcheck
-    - embeddedstructfieldcheck
+    - errname
     - exhaustruct
     - exhaustive
     - forbidigo
-    - funcorder
     - funlen
-    - lll
-    - gocognit
+    - funcorder
     - gochecknoglobals
+    - gocognit
     - godoclint
     - godot
+    - godox
     - inamedparam
-    - unparam
-    - tagalign
-    - varnamelen
-    - paralleltest
-    - recvcheck
+    - intrange
+    - ireturn
+    - lll
     - mnd
     - nestif
-    - nolintlint
     - noinlineerr
+    - nolintlint
+    - paralleltest
+    - recvcheck
+    - tagalign
     - tagliatelle
-    - testifylint
     - testpackage
+    - testifylint
+    - unparam
+    - varnamelen
     - wrapcheck
     - zerologlint
 
