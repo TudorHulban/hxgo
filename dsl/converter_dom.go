@@ -19,15 +19,21 @@ func (r ResultDOMConversion) PrintWithDescription(w io.Writer) {
 	PrintDSL(w, r.Node)
 }
 
-func (result ResultDOMConversion) PrintWithTransformers(writer io.Writer, transformers ...Transformer) {
-	_, _ = writer.Write([]byte(result.Description))
+func (r ResultDOMConversion) PrintWithTransformers(writer io.Writer, useTailwind bool, transformers ...func(Node) Node) {
+	_, _ = writer.Write([]byte(r.Description))
 	_, _ = writer.Write([]byte(":\n"))
 
-	for _, transformer := range transformers {
-		result.Node = transformer(result.Node)
+	for _, t := range transformers {
+		r.Node = t(r.Node)
 	}
 
-	PrintDSL(writer, result.Node)
+	if useTailwind {
+		PrintDSLWithTailwind(writer, r.Node)
+
+		return
+	}
+
+	PrintDSL(writer, r.Node)
 }
 
 type ResultsDOMConversion []ResultDOMConversion

@@ -34,6 +34,7 @@ linters:
     - tagalign
     - varnamelen
     - paralleltest
+    - recvcheck
     - mnd
     - nestif
     - nolintlint
@@ -134,6 +135,12 @@ linters:
         - name: max-public-structs
           disabled: true
 
+        - name: call-to-gc
+          disabled: true
+
+        - name: comment-spacings 
+          disabled: true
+
         - name: confusing-naming
           disabled: true
 
@@ -152,10 +159,7 @@ linters:
         - name: unused-parameter
           disabled: true
 
-        - name: call-to-gc
-          disabled: true
-
-        - name: comment-spacings 
+        - name: modifies-value-receiver 
           disabled: true
 
   exclusions:

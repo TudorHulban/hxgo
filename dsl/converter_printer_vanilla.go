@@ -53,6 +53,14 @@ func (p *DSLPrinter) writeIndent() {
 	}
 }
 
+func (p *DSLPrinter) writeIndentN(extra int) {
+	totalIndent := p.indent + extra
+
+	for range totalIndent {
+		_, _ = p.w.Write([]byte(p.indentUnit))
+	}
+}
+
 func (p *DSLPrinter) printNode(n Node) {
 	switch {
 	case n.isText:
@@ -99,6 +107,15 @@ func (p *DSLPrinter) printAttribute(n Node) {
 		key string
 		val string
 	})(n.data)
+
+	// SPECIAL CASE: empty value → raw DSL call
+	if d.val == "" {
+		p.writeIndent()
+		_, _ = p.w.Write([]byte(capitalize(d.key)))
+		_, _ = p.w.Write([]byte("()"))
+
+		return
+	}
 
 	p.writeIndent()
 	_, _ = p.w.Write([]byte(_DSL))

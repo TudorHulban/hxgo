@@ -1,6 +1,9 @@
 package dsl
 
-import "unsafe"
+import (
+	"strings"
+	"unsafe"
+)
 
 type renderer func(*accumulator, unsafe.Pointer)
 
@@ -32,6 +35,16 @@ func (n Node) IsZero() bool {
 
 func (n *Node) Add(children ...Node) {
 	n.children = append(n.children, children...)
+}
+
+func (n Node) GetTagName() string {
+	if n.isAttribute || n.isText || n.isCSS {
+		return ""
+	}
+
+	name := (*struct{ name string })(n.data).name
+
+	return strings.TrimPrefix(name, "<")
 }
 
 func (n Node) GetAttributeNameValue() (string, string) {

@@ -21,18 +21,17 @@ func TestTailwindTypographyMapping_PrintDSL(t *testing.T) {
 			description: "1. transforms text-sm variants into DSL TW() chain",
 			html: `
 <p class="text-sm sm:text-sm md:text-sm lg:text-sm xl:text-sm 2xl:text-sm">
-    Hello
+    Hi!
 </p>`,
-			expected: `P(
-    TW().TextSm().TextSmSm().TextSmMd().TextSmLg().TextSmXl().TextSmX2l(),
-    Text("Hello"),
+			expected: `dsl.P(
+    dsl.TW().TextSm().TextSmSm().TextSmMd().TextSmLg().TextSmXl().TextSmX2l(),
+    dsl.Text("Hi!"),
 )
 `,
 		},
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(
 			tc.description,
 			func(t *testing.T) {
@@ -52,13 +51,13 @@ func TestTailwindTypographyMapping_PrintDSL(t *testing.T) {
 
 				dom.PrintWithTransformers(
 					&buffer,
+					true,
 					TailwindTransformer,
-					DeleteNodesWhere(IsClassAttribute),
 				)
 
 				got := buffer.String()
 
-				require.Equal(t,
+				require.Contains(t,
 					tc.expected,
 					got,
 

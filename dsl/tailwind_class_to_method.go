@@ -2,7 +2,7 @@ package dsl
 
 import "strings"
 
-func (t Tailwind) mapping() map[string]string {
+func (Tailwind) mapping() map[string]string {
 	return map[string]string{
 		"text-sm":     "TextSm",
 		"sm:text-sm":  "TextSmSm",
@@ -25,23 +25,4 @@ func parseTailwindClasses(classValue string) []string {
 	}
 
 	return result
-}
-
-func applyTailwindClassesToNode(node Node, classValue string) Node {
-	classes := parseTailwindClasses(classValue)
-	mapping := TW().mapping()
-
-	var methods []string
-
-	for _, className := range classes {
-		if methodName, ok := mapping[className]; ok {
-			methods = append(methods, methodName)
-		}
-	}
-
-	if len(methods) > 0 {
-		node.Add(AttrWithValue("tw", strings.Join(methods, ",")))
-	}
-
-	return node
 }

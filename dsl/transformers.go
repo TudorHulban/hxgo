@@ -1,9 +1,10 @@
 package dsl
 
 import (
-	"strings"
 	"unsafe"
 )
+
+const _Class = "class"
 
 type Transformer func(Node) Node
 
@@ -34,7 +35,7 @@ func IsClassAttribute(n Node) bool {
 
 	name, _ := n.GetAttributeNameValue()
 
-	return name == "class"
+	return name == _Class
 }
 
 func DeleteNodesWhere(pred func(Node) bool) Transformer {
@@ -81,33 +82,19 @@ func DeleteAttributesNamed(name string) Transformer {
 	}
 }
 
-func buildTailwindDSLText(methods []string) string {
-	var b strings.Builder
-
-	b.WriteString("TW()")
-
-	for _, m := range methods {
-		b.WriteString(".")
-		b.WriteString(m)
-		b.WriteString("()")
-	}
-
-	return b.String()
-}
-
 func TailwindTransformer(n Node) Node {
-	// Do not transform attributes, text, or CSS nodes
 	if n.isAttribute || n.isText || n.isCSS {
 		return n
 	}
 
-	// Extract class attribute
 	var classValue string
+
 	for _, child := range n.children {
 		if child.isAttribute {
 			name, value := child.GetAttributeNameValue()
 			if name == "class" {
 				classValue = value
+
 				break
 			}
 		}
@@ -117,11 +104,11 @@ func TailwindTransformer(n Node) Node {
 		return n
 	}
 
-	// Parse Tailwind classes
 	classes := parseTailwindClasses(classValue)
 	mapping := TW().mapping()
 
 	methods := make([]string, 0, len(classes))
+
 	for _, className := range classes {
 		if methodName, ok := mapping[className]; ok {
 			methods = append(methods, methodName)
@@ -132,22 +119,22 @@ func TailwindTransformer(n Node) Node {
 		return n
 	}
 
-	dslValue := buildTailwindDSLText(methods)
-
-	// Build new children:
-	// 1. DSL text node
-	// 2. All original non-attribute children
 	out := n
-	// out.children = []Node{dslText}
 	out.children = nil
 
+	// Emit each Tailwind method as a CSS node
+	for _, m := range methods {
+		cssNode := AttrWithValue(m, "")
+		cssNode.isCSS = true // Mark as CSS so it's collected properly
+
+		out.children = append(out.children, cssNode)
+	}
+
+	// Keep all non-class children
 	for _, child := range n.children {
 		if child.isAttribute {
 			name, _ := child.GetAttributeNameValue()
-			if name == "class" {
-				// Replace class attribute with Tailwind DSL
-				out.children = append(out.children, AttrWithValue("class", dslValue))
-
+			if name == _Class {
 				continue
 			}
 		}
