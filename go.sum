@@ -1,9 +1,5 @@
 github.com/TudorHulban/epochid v0.0.0-20250522145321-43740b377e0d h1:bYwk6Y5bbwJiW1iomLUfAy4itpbC/PPuWN2WVIqXTDk=
 github.com/TudorHulban/epochid v0.0.0-20250522145321-43740b377e0d/go.mod h1:hcxbLvVE/6UN9hTgI00EpMwg5LYKz9m7xF3jS3ZIVz4=
-github.com/TudorHulban/func-usage v0.0.0-20260205131413-10f66d031b5c h1:y/dHhdshxpcvnccEgw3m05V9kl8PbmemyLIKZmEZrd0=
-github.com/TudorHulban/func-usage v0.0.0-20260205131413-10f66d031b5c/go.mod h1:fBwXS9eWf2fh9h5TEOy4htf+CRAsE62VcvpvTVJtB6k=
-github.com/TudorHulban/func-usage v0.0.1 h1:RpJOGmKdjeaghI8nfzs/b95Keq/kqREgn1ma78bHZz4=
-github.com/TudorHulban/func-usage v0.0.1/go.mod h1:fBwXS9eWf2fh9h5TEOy4htf+CRAsE62VcvpvTVJtB6k=
 github.com/TudorHulban/go-errors v0.0.0-20250526111805-0875506117af h1:gFDZ0aHlCNtIUND0xokxzqaQ/apFHGGLt4YOu1DJp94=
 github.com/TudorHulban/go-errors v0.0.0-20250526111805-0875506117af/go.mod h1:qvQZ/acYbqlKiEFR3hzHFWlAIGXi9mcelK6ofHDspm8=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -14,6 +10,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+github.com/tudorhulban/func-usage v0.0.2 h1:b/pR/u3G0ZZccYOH4d5Ab0+j9jm5QR6SWWx1RvSHPWQ=
+github.com/tudorhulban/func-usage v0.0.2/go.mod h1:JLvLjWma3IpJNymPM+21IlElJJ6jz7wsj0LaN3hRWDE=
 golang.org/x/mod v0.32.0 h1:9F4d3PHLljb6x//jOyokMv3eX+YDeepZSEo3mFJy93c=
 golang.org/x/mod v0.32.0/go.mod h1:SgipZ/3h2Ci89DlEtEXWUk/HteuRin+HHhN+WbNhguU=
 golang.org/x/net v0.49.0 h1:eeHFmOGUTtaaPSGNmjBKpbng9MulQsJURQUAfUwY++o=

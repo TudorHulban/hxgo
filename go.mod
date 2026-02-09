@@ -4,11 +4,12 @@ go 1.24.4
 
 require (
 	github.com/TudorHulban/epochid v0.0.0-20250522145321-43740b377e0d
-	github.com/TudorHulban/func-usage v0.0.1
 	github.com/TudorHulban/go-errors v0.0.0-20250526111805-0875506117af
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.49.0
 )
+
+require github.com/tudorhulban/func-usage v0.0.2
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

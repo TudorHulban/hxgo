@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	funcusage "github.com/TudorHulban/func-usage"
 	"github.com/stretchr/testify/require"
+	funcusage "github.com/tudorhulban/func-usage"
 )
 
 func TestFuncUsageAnalyzer(t *testing.T) {
