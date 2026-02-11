@@ -20,6 +20,8 @@ func TestFuncUsageAnalyzer(t *testing.T) {
 	require.NoError(t, errAnalyze)
 	require.NotZero(t, usage)
 
+	usage.WherePackageIs("dsl")
+
 	fmt.Println(
 		usage.
 			MostUsed(10).
