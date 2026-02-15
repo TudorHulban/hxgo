@@ -1,7 +1,6 @@
 package hxgo
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,18 +12,22 @@ func TestFuncUsageAnalyzer(t *testing.T) {
 	require.NoError(t, errCr)
 	require.NotNil(t, a)
 
-	usage, errAnalyze := a.Analyze(
+	analysis, errAnalyze := a.Analyze(
 		funcusage.ModeIncludeTestsForCoverage,
 		true,
 	)
 	require.NoError(t, errAnalyze)
-	require.NotZero(t, usage)
+	require.NotZero(t, analysis)
 
-	usage.WherePackageIs("dsl")
+	printer := funcusage.NewPrinter().WithName()
 
-	fmt.Println(
-		usage.
-			MostUsed(10).
-			String(),
-	)
+	analysis.
+		LevelFunction.
+		WherePackageIs("dsl").
+		IsFunction().
+		AcceptingCaseInsensitiveLike("node").
+		ReturningCaseInsensitiveLike("node").
+		OrderByNameAsc().
+		// MostUsed(10).
+		PrintWith(printer)
 }
