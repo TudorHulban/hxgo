@@ -2,6 +2,7 @@ package dsl
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -21,9 +22,9 @@ func TestHTMLToDSL(t *testing.T) {
 	}{
 		{
 			description: "1. div with text",
-			htmlInput:   `<div>Hello</div>`,
+			htmlInput:   `<div>Hi!</div>`,
 			expectedDSL: helpers.Sprintf(
-				`%s.Div(%s.Text("Hello"),)`,
+				`%s.Div(%s.Text("Hi!"),)`,
 
 				_DSL,
 				_DSL,
@@ -212,7 +213,7 @@ func TestFullPageWithURL(t *testing.T) {
 	PrintDSL(os.Stdout, root)
 }
 
-func TestElementsWithURL(t *testing.T) {
+func TestElementFromURL(t *testing.T) {
 	const testURL = "https://templates.iqonic.design/product/lite/logik/html/dist/dashboard/"
 
 	req, errRequest := http.NewRequestWithContext(
@@ -238,7 +239,11 @@ func TestElementsWithURL(t *testing.T) {
 	require.NotNil(t, doc)
 	require.NotEmpty(t, doc)
 
-	elements := ConvertDOMElements(
+	fmt.Println(
+		GetHTMLPrimitives(doc),
+	)
+
+	elements := ConvertFirstDOMElement(
 		doc,
 		DOMNode{
 			CSSClass: "card-body",

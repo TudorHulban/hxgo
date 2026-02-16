@@ -1,6 +1,8 @@
 package dsl
 
 import (
+	"slices"
+	"strconv"
 	"strings"
 	"unsafe"
 
@@ -179,4 +181,38 @@ func ConvertHTML(n *html.Node) Node {
 	default:
 		return Node{}
 	}
+}
+
+func GetHTMLPrimitives(n *html.Node) string {
+	seen := make(map[string]struct{})
+	var elements []string
+	var traverse func(*html.Node)
+
+	traverse = func(node *html.Node) {
+		if node.Type == html.ElementNode {
+			if _, exists := seen[node.Data]; !exists {
+				seen[node.Data] = struct{}{}
+				elements = append(elements, node.Data)
+			}
+		}
+
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			traverse(c)
+		}
+	}
+
+	traverse(n)
+
+	slices.Sort(elements)
+
+	var result strings.Builder
+
+	for i, elem := range elements {
+		result.WriteString(strconv.Itoa(i + 1))
+		result.WriteString(". ")
+		result.WriteString(strings.ToUpper(elem))
+		result.WriteByte('\n')
+	}
+
+	return result.String()
 }

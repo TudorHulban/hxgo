@@ -119,7 +119,7 @@ func findMatches(root *html.Node, sel DOMNode) []*html.Node {
 	return out
 }
 
-func ConvertDOMElements(doc *html.Node, selectors ...DOMNode) ResultsDOMConversion {
+func ConvertFirstDOMElement(doc *html.Node, selectors ...DOMNode) ResultsDOMConversion {
 	var results []ResultDOMConversion
 
 	for _, sel := range selectors {
