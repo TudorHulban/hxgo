@@ -2,7 +2,7 @@ hxgo_info_color := \033[0;32m
 hxgo_no_color := \033[0m
 
 hxgo_linting := .linting
-hxgo_golangci_lint_ver := 2.8.0
+hxgo_golangci_lint_ver := 2.9.0
 
 .DEFAULT_GOAL := lint
 

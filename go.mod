@@ -1,6 +1,6 @@
 module github.com/TudorHulban/hxgo
 
-go 1.24.4
+go 1.26
 
 require (
 	github.com/TudorHulban/epochid v0.0.0-20250522145321-43740b377e0d

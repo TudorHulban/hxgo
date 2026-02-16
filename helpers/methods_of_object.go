@@ -20,13 +20,13 @@ func MethodNamesOf(v any) string {
 	names := make([]string, 0)
 
 	vt := reflect.TypeOf(reflect.New(t).Elem().Interface())
-	for i := 0; i < vt.NumMethod(); i++ {
-		names = append(names, vt.Method(i).Name)
+	for method := range vt.Methods() {
+		names = append(names, method.Name)
 	}
 
 	pt := reflect.PointerTo(t)
-	for ix := 0; ix < pt.NumMethod(); ix++ {
-		names = append(names, pt.Method(ix).Name)
+	for method := range pt.Methods() {
+		names = append(names, method.Name)
 	}
 
 	sort.Strings(names)

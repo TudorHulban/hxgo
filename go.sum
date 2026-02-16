@@ -10,12 +10,6 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
-github.com/tudorhulban/func-usage v0.0.2 h1:b/pR/u3G0ZZccYOH4d5Ab0+j9jm5QR6SWWx1RvSHPWQ=
-github.com/tudorhulban/func-usage v0.0.2/go.mod h1:JLvLjWma3IpJNymPM+21IlElJJ6jz7wsj0LaN3hRWDE=
-github.com/tudorhulban/func-usage v0.0.5-0.20260211111535-c41b83d647a2 h1:AXAceq5uUot4BS4iwd63gy+maP5rBqun+VIKo1rYCFI=
-github.com/tudorhulban/func-usage v0.0.5-0.20260211111535-c41b83d647a2/go.mod h1:JLvLjWma3IpJNymPM+21IlElJJ6jz7wsj0LaN3hRWDE=
-github.com/tudorhulban/func-usage v0.0.7-0.20260214154537-0d87020bdf1a h1:kZZv+xiUoolAIr0wJlPsNjhRrFBA/ztkm7dtosFZ9EU=
-github.com/tudorhulban/func-usage v0.0.7-0.20260214154537-0d87020bdf1a/go.mod h1:JLvLjWma3IpJNymPM+21IlElJJ6jz7wsj0LaN3hRWDE=
 github.com/tudorhulban/func-usage v0.0.8-0.20260215145502-4e5c84759bfa h1:QgFteI3tNoLDKsIMsOnUcSLPMoiINvNbuUS6Wx4OgpI=
 github.com/tudorhulban/func-usage v0.0.8-0.20260215145502-4e5c84759bfa/go.mod h1:JLvLjWma3IpJNymPM+21IlElJJ6jz7wsj0LaN3hRWDE=
 golang.org/x/mod v0.33.0 h1:tHFzIWbBifEmbwtGz65eaWyGiGZatSrT9prnU8DbVL8=
