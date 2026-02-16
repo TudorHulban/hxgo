@@ -1,9 +1,9 @@
 package converter
 
 import (
+	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"testing"
 
@@ -40,12 +40,16 @@ func TestHowToUse(t *testing.T) {
 func TestWithURL(t *testing.T) {
 	testURL := "https://tailwind-nextjs-starter-blog.vercel.app/"
 
-	parsedURL, err := url.ParseRequestURI(testURL)
-	require.NoError(t, err)
-	require.NotEmpty(t, parsedURL)
+	req, errRequest := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		testURL,
+		nil,
+	)
+	require.NoError(t, errRequest)
 
-	resp, err := http.Get(parsedURL.String())
-	require.NoError(t, err)
+	resp, errCall := http.DefaultClient.Do(req)
+	require.NoError(t, errCall)
 
 	defer resp.Body.Close()
 

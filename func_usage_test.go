@@ -19,15 +19,18 @@ func TestFuncUsageAnalyzer(t *testing.T) {
 	require.NoError(t, errAnalyze)
 	require.NotZero(t, analysis)
 
-	printer := funcusage.NewPrinter().WithName()
+	printer := funcusage.NewPrinter().
+		WithName().
+		WithPosition()
 
 	analysis.
 		LevelFunction.
 		WherePackageIs("dsl").
 		IsFunction().
+		HasVariadic().
 		AcceptingCaseInsensitiveLike("node").
 		ReturningCaseInsensitiveLike("node").
 		OrderByNameAsc().
-		// MostUsed(10).
+		MostUsed(10).
 		PrintWith(printer)
 }

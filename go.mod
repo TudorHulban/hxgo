@@ -9,7 +9,7 @@ require (
 	golang.org/x/net v0.50.0
 )
 
-require github.com/tudorhulban/func-usage v0.0.7-0.20260214154537-0d87020bdf1a
+require github.com/tudorhulban/func-usage v0.0.8-0.20260215145502-4e5c84759bfa
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
