@@ -185,8 +185,11 @@ func ConvertHTML(n *html.Node) Node {
 
 func GetHTMLPrimitives(n *html.Node) string {
 	seen := make(map[string]struct{})
-	var elements []string
-	var traverse func(*html.Node)
+
+	var (
+		elements []string
+		traverse func(*html.Node)
+	)
 
 	traverse = func(node *html.Node) {
 		if node.Type == html.ElementNode {
