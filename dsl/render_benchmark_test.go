@@ -148,7 +148,7 @@ func BenchmarkRenderHTML(b *testing.B) {
 				b.ResetTimer()
 
 				for i := 0; i < b.N; i++ {
-					_ = Render(tt.nodes...)
+					_ = RenderFast(tt.nodes...)
 				}
 			},
 		)

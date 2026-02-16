@@ -12,9 +12,9 @@ func Test01Div(t *testing.T) {
 
 	require.Equal(t,
 		"<div>hi!</div>",
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 	)
 }
 
@@ -26,9 +26,9 @@ func Test02Div(t *testing.T) {
 
 	require.Equal(t,
 		`<div class="css-class">hi!</div>`,
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 	)
 }
 
@@ -46,9 +46,9 @@ func Test03Div(t *testing.T) {
 
 	require.Equal(t,
 		`<div class="css-class">hi<div><span>!</span></div></div>`,
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 	)
 }
 

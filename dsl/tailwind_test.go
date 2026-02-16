@@ -26,6 +26,6 @@ func TestTailwind(t *testing.T) {
 	)
 
 	fmt.Println(
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 	)
 }

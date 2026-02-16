@@ -10,6 +10,6 @@ func BenchmarkClassCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = Render(el)
+		_ = RenderConvertedHTML(el)
 	}
 }

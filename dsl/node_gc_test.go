@@ -17,9 +17,9 @@ func TestGCRun(t *testing.T) {
 
 	require.Equal(t,
 		"<div>hi!</div>",
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 
-		string(Render(el)),
+		string(RenderConvertedHTML(el)),
 	)
 }
 
@@ -44,7 +44,7 @@ func TestGCActual(t *testing.T) {
 	}
 
 	// 3. Try to render through dangling pointer
-	result := Render(*nodePtr) // UAF risk!
+	result := RenderConvertedHTML(*nodePtr) // UAF risk!
 
 	fmt.Println(
 		string(result),
@@ -71,6 +71,6 @@ func TestStackFrameIssue(t *testing.T) {
 
 	require.Equal(t,
 		"<div><p>Hi</p><p>World</p></div>",
-		string(Render(ui)),
+		string(RenderConvertedHTML(ui)),
 	)
 }

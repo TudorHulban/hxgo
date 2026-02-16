@@ -5,6 +5,9 @@ version: "2"
 linters:
   default: all
 
+  enable:
+    - wsl_v5
+
   disable:
     - canonicalheader
     - containedctx
@@ -12,36 +15,38 @@ linters:
     - cyclop
     - depguard
     - dupword
-    - errname
-    - godox
-    - ireturn
-    - intrange
+    - embeddedstructfieldcheck
     - err113
     - errcheck
-    - embeddedstructfieldcheck
+    - errname
     - exhaustruct
     - exhaustive
     - forbidigo
-    - funcorder
     - funlen
-    - lll
-    - gocognit
+    - funcorder
     - gochecknoglobals
+    - gocognit
     - godoclint
     - godot
+    - godox
     - inamedparam
-    - unparam
-    - tagalign
-    - varnamelen
-    - paralleltest
+    - intrange
+    - ireturn
+    - lll
     - mnd
     - nestif
-    - nolintlint
     - noinlineerr
+    - nolintlint
+    - paralleltest
+    - recvcheck
+    - tagalign
     - tagliatelle
-    - testifylint
     - testpackage
+    - testifylint
+    - unparam
+    - varnamelen
     - wrapcheck
+    - wsl
     - zerologlint
 
   settings:
@@ -111,7 +116,7 @@ linters:
           arguments: [50]
 
         - name: cyclomatic
-          arguments: [15]
+          arguments: [18]
 
         - name: max-control-nesting
           arguments: [7]
@@ -134,10 +139,19 @@ linters:
         - name: max-public-structs
           disabled: true
 
-        - name: deep-exit
+        - name: call-to-gc
+          disabled: true
+
+        - name: comment-spacings 
           disabled: true
 
         - name: confusing-naming
+          disabled: true
+
+        - name: deep-exit
+          disabled: true
+
+        - name: enforce-switch-style
           disabled: true
 
         - name: flag-parameter
@@ -149,11 +163,13 @@ linters:
         - name: unused-parameter
           disabled: true
 
-        - name: call-to-gc
+        - name: modifies-value-receiver 
           disabled: true
 
-        - name: comment-spacings 
-          disabled: true
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
 
   exclusions:
     generated: lax

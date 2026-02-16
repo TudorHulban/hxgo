@@ -85,13 +85,6 @@ func H6(children ...Node) Node {
 	)
 }
 
-func Img(children ...Node) Node {
-	return el(
-		"img",
-		children...,
-	)
-}
-
 func Input(children ...Node) Node {
 	return el(
 		"input",
@@ -186,6 +179,92 @@ func Ol(children ...Node) Node {
 func Span(children ...Node) Node {
 	return el(
 		"span",
+		children...,
+	)
+}
+
+// inline‑element set
+
+func Small(children ...Node) Node {
+	return el(
+		"small",
+		children...,
+	)
+}
+
+func Em(children ...Node) Node {
+	return el(
+		"em",
+		children...,
+	)
+}
+
+func Strong(children ...Node) Node {
+	return el(
+		"strong",
+		children...,
+	)
+}
+
+func Mark(children ...Node) Node {
+	return el(
+		"mark",
+		children...,
+	)
+}
+
+func Sub(children ...Node) Node {
+	return el(
+		"sub",
+		children...,
+	)
+}
+
+func Sup(children ...Node) Node {
+	return el(
+		"sup",
+		children...,
+	)
+}
+
+func Code(children ...Node) Node {
+	return el(
+		"code",
+		children...,
+	)
+}
+
+func I(children ...Node) Node {
+	return el(
+		"i",
+		children...,
+	)
+}
+
+func B(children ...Node) Node {
+	return el(
+		"b",
+		children...,
+	)
+}
+
+func U(children ...Node) Node {
+	return el(
+		"u",
+		children...,
+	)
+}
+
+func S(children ...Node) Node {
+	return el(
+		"s",
+		children...,
+	)
+}
+
+func Q(children ...Node) Node {
+	return el(
+		"q",
 		children...,
 	)
 }

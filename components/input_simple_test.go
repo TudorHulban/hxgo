@@ -35,6 +35,6 @@ func TestNoIDElementSimpleInput(t *testing.T) {
 
 	require.Equal(t,
 		expectedOutput,
-		string(dsl.Render(output)),
+		string(dsl.RenderConvertedHTML(output)),
 	)
 }
