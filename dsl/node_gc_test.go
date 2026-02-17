@@ -17,9 +17,9 @@ func TestGCRun(t *testing.T) {
 
 	require.Equal(t,
 		"<div>hi!</div>",
-		string(RenderConvertedHTML(el)),
+		string(RenderFast(el)),
 
-		string(RenderConvertedHTML(el)),
+		string(RenderFast(el)),
 	)
 }
 

@@ -20,7 +20,7 @@ func BenchmarkElCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = RenderConvertedHTML(el)
+		_ = RenderFast(el)
 	}
 }
 
@@ -32,7 +32,7 @@ func BenchmarkElWIdCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = RenderConvertedHTML(el)
+		_ = RenderFast(el)
 	}
 }
 
@@ -44,7 +44,7 @@ func BenchmarkDiv(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = RenderConvertedHTML(el)
+		_ = RenderFast(el)
 	}
 }
 
