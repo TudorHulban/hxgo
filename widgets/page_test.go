@@ -1,6 +1,8 @@
 package widgets
 
 import (
+	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/components"
@@ -149,9 +151,24 @@ func TestPage(t *testing.T) {
 		},
 	}
 
-	writer.Write(
-		dsl.RenderConvertedHTML(
-			page.Build(),
-		),
+	body := dsl.RenderConvertedHTML(
+		page.Build(),
 	)
+	require.NotNil(t, body)
+
+	http.HandleFunc(
+		"/",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write(
+				body,
+			)
+		},
+	)
+
+	fmt.Println(
+		"Open http://localhost:8080 and press Ctrl-C when done",
+	)
+
+	http.ListenAndServe(":8080", nil)
 }
