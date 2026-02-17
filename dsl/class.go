@@ -1,11 +1,16 @@
 package dsl
 
-import "unsafe"
+import (
+	"unsafe"
+)
 
 func Class(name string) Node {
+	namePtr := new(string)
+	*namePtr = name
+
 	return Node{
 		fn:   renderClass,
-		data: unsafe.Pointer(&name),
+		data: unsafe.Pointer(namePtr),
 
 		isAttribute: true,
 	}

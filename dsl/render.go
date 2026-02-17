@@ -23,7 +23,8 @@ func RenderFast(nodes ...Node) []byte {
 	return a.html
 }
 
-// RenderConvertedHTML should be used when testing the HTML converter.
+// RenderConvertedHTML should be used
+// when testing the html obtained with the HTML converter.
 func RenderConvertedHTML(nodes ...Node) []byte {
 	if len(nodes) == 0 {
 		return []byte{}

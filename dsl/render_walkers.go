@@ -28,6 +28,10 @@ func converterWalk(a *accumulator, n Node) {
 		}
 	}
 
+	if n.data == nil {
+		return
+	}
+
 	// Check if void element
 	type tagData struct {
 		openTag  []byte

@@ -15,12 +15,19 @@ import (
 // walkHTML calls renderElement to write opening tag, then renderElementClose to write closing tag
 
 func renderElementClose(a *accumulator, data unsafe.Pointer) {
+	if data == nil {
+		return
+	}
+
 	type tagData struct {
 		openTag  []byte
 		closeTag []byte
 	}
 
 	d := (*tagData)(data)
+	if d.closeTag == nil {
+		return
+	}
 
 	a.html = append(a.html, d.closeTag...)
 }
