@@ -23,22 +23,6 @@ func RenderFast(nodes ...Node) []byte {
 	return a.html
 }
 
-// RenderConvertedHTML should be used when testing the HTML converter.
-func RenderConvertedHTML(nodes ...Node) []byte {
-	if len(nodes) == 0 {
-		return []byte{}
-	}
-
-	var a accumulator
-
-	for i := range nodes {
-		converterWalk(&a, nodes[i])
-	}
-
-	// HTML is already fully assembled
-	return a.html
-}
-
 // RenderHX introduces
 // the separator needed by HX client for parsing the response.
 func RenderHX(nodes ...Node) []byte {

@@ -1,8 +1,9 @@
 package components
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestARef(t *testing.T) {
@@ -13,7 +14,8 @@ func TestARef(t *testing.T) {
 		},
 	)
 
-	fmt.Println(
+	require.Equal(t,
+		`<a href="/home">Home</a>`,
 		el,
 	)
 }

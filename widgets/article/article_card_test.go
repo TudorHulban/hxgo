@@ -65,7 +65,7 @@ func TestWidgetArticleCard(t *testing.T) {
 	}
 
 	writer.Write(
-		dsl.RenderConvertedHTML(
+		dsl.RenderFast(
 			page.Build(),
 		),
 	)
