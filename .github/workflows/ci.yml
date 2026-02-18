@@ -12,7 +12,7 @@ concurrency:
 jobs:
   j1_of_3-lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -23,7 +23,7 @@ jobs:
   j2_of_3-test:
     runs-on: ubuntu-latest
     needs: j1_of_3-lint
-    timeout-minutes: 2
+    timeout-minutes: 0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -32,41 +32,44 @@ jobs:
       - run: make test
 
   j3_of_3-cleanup:
-    runs-on: ubuntu-latest
-    if: always()
-    permissions:
-      actions: write
-      contents: read
-    env:
-      GH_TOKEN: ${{ github.token }}   # <-- REQUIRED for gh to work
-    steps:
-      - name: Install GitHub CLI
-        run: sudo apt-get update && sudo apt-get install -y gh jq
+  runs-on: ubuntu-latest
+  if: always()
+  permissions:
+    actions: write
+    contents: read
+  env:
+    GH_TOKEN: ${{ github.token }}
+  steps:
+    - name: Install GitHub CLI
+      run: sudo apt-get update && sudo apt-get install -y gh jq
 
-      - name: Delete old workflow runs
-        env:
-          KEEP_DAYS: 1
-        run: |
-          CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
+    - name: Delete old workflow runs
+      env:
+        KEEP_DAYS: 1
+      run: |
+        CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
 
-          gh workflow list --json id --jq '.[].id' | while read WF; do
-            echo "Workflow $WF"
+        gh workflow list --repo "$GITHUB_REPOSITORY" --json id --jq '.[].id' |
+        while read WF; do
+          echo "Workflow $WF"
 
-            gh run list --workflow "$WF" \
-              --json databaseId,createdAt,headBranch \
-              --limit 200 \
-              --jq '.[] | @base64' |
-            while read RUN; do
-              j() { echo "$RUN" | base64 --decode | jq -r "$1"; }
+          gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow "$WF" \
+            --json databaseId,createdAt,headBranch \
+            --limit 200 \
+            --jq '.[] | @base64' |
+          while read RUN; do
+            j() { echo "$RUN" | base64 --decode | jq -r "$1"; }
 
-              ID=$(j '.databaseId')
-              CREATED=$(j '.createdAt')
-              BRANCH=$(j '.headBranch')
-              TS=$(date -d "$CREATED" +%s)
+            ID=$(j '.databaseId')
+            CREATED=$(j '.createdAt')
+            BRANCH=$(j '.headBranch')
+            TS=$(date -d "$CREATED" +%s)
 
-              if [ "$TS" -lt "$CUTOFF" ] && [ -n "$BRANCH" ]; then
-                echo "  Deleting run $ID (branch: $BRANCH, date: $CREATED)"
-                gh run delete "$ID" --confirm
-              fi
-            done
+            if [ "$TS" -lt "$CUTOFF" ] && [ -n "$BRANCH" ]; then
+              echo "  Deleting run $ID (branch: $BRANCH, date: $CREATED)"
+              gh run delete "$ID" --repo "$GITHUB_REPOSITORY" --confirm
+            fi
           done
+        done
