@@ -11,6 +11,8 @@ func TestMethodsCSSContribution(t *testing.T) {
 	c := CSSContribution{}
 
 	fmt.Println(
-		helpers.MethodNamesOf(c),
+		len(
+			helpers.MethodNamesOf(c),
+		),
 	)
 }

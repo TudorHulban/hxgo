@@ -250,5 +250,7 @@ func TestElementFromURL(t *testing.T) {
 		},
 	)
 
-	elements.PrintWithDescription(os.Stdout)
+	// elements.PrintWithDescription(os.Stdout)
+
+	require.Len(t, elements, 1)
 }

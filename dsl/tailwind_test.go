@@ -11,7 +11,9 @@ func TestMethodsTailwind(t *testing.T) {
 	c := TW()
 
 	fmt.Println(
-		helpers.MethodNamesOf(c),
+		len(
+			helpers.MethodNamesOf(c),
+		),
 	)
 }
 

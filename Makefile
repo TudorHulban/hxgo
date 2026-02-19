@@ -33,4 +33,3 @@ lint: deps
 test:
 	@echo -e "$(hxgo_info_color)==> $@ $(hxgo_no_color)"
 	@go test ./... -race -count=1 -v
-

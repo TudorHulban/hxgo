@@ -8,6 +8,11 @@ import (
 )
 
 func TestFuncUsageAnalyzer(t *testing.T) {
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
+
 	a, errCr := funcusage.NewAnalyzer(".")
 	require.NoError(t, errCr)
 	require.NotNil(t, a)

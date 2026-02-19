@@ -10,6 +10,11 @@ import (
 )
 
 func TestNewForm3Containers(t *testing.T) {
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
+
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
 

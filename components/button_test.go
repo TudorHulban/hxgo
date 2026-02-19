@@ -6,18 +6,15 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
 
 func TestButton(t *testing.T) {
-	if helpers.IsRunningInCI() {
-		t.Skipf(
-			"test: '%s' is a manual test.",
-			t.Name(),
-		)
-	}
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
 
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{

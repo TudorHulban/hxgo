@@ -80,9 +80,9 @@ func Test04DivStyles(t *testing.T) {
 	)
 
 	html, styles, css := RenderFull(compound)
+	require.Zero(t, css)
 	require.NotZero(t, html)
 	require.NotZero(t, styles, "should have style")
-	require.Zero(t, css)
 
 	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
 	//   .css-class {
