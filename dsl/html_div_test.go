@@ -52,12 +52,75 @@ func Test03Div(t *testing.T) {
 	)
 }
 
-func Test04DivStyles(t *testing.T) {
-	cssClass := "css-class"
-
+func Test04DivStyle(t *testing.T) {
 	el := Div(
-		Class(cssClass),
-		Text("hi!"),
+		Class("css-class"),
+		Text(
+			fmt.Sprintf(
+				"hi %s!",
+				t.Name(),
+			),
+		),
+	)
+
+	type TData struct {
+		tag      string
+		attrs    []Node
+		children []Node
+	}
+
+	require.Len(t,
+		(*TData)(el.data).attrs,
+		1,
+	)
+	require.Len(t,
+		(*TData)(el.data).children,
+		1,
+	)
+
+	el.Add(
+		NewCSSForClass("card").
+			WithBreakpoint("768px").
+			Padding("10px 10px").
+			AsNode(),
+
+		NewCSSForClass("card").
+			WithBreakpoint("1028px").
+			Padding("18px 18px").
+			AsNode(),
+	)
+
+	require.Len(t,
+		(*TData)(el.data).children,
+		1,
+	)
+	require.Len(t,
+		el.children,
+		2,
+	)
+
+	html, styles, css := RenderFull(el)
+	require.Zero(t, css)
+	require.NotZero(t, html)
+	require.NotZero(t, styles, "should have style")
+
+	fmt.Println(
+		string(html),
+	)
+	fmt.Println(
+		styles,
+	)
+}
+
+func Test05DivStyles(t *testing.T) {
+	el := Div(
+		Class("css-class"),
+		Text(
+			fmt.Sprintf(
+				"hi %s!",
+				t.Name(),
+			),
+		),
 	)
 
 	el.Add(
@@ -97,7 +160,7 @@ func Test04DivStyles(t *testing.T) {
 	)
 }
 
-func Test04aTailwind(t *testing.T) {
+func Test06Tailwind(t *testing.T) {
 	el := Div(
 		Class("bg-blue-500 p-4 rounded shadow"),
 		Text("hi!"),
@@ -125,7 +188,7 @@ func Test04aTailwind(t *testing.T) {
 	)
 }
 
-func Test05DivFull(t *testing.T) {
+func Test07DivFull(t *testing.T) {
 	cssClassComponent := "css-class"
 	cssClassWidget := "css-widget"
 
@@ -190,7 +253,7 @@ func Test05DivFull(t *testing.T) {
 	)
 }
 
-func Test06DivCSS(t *testing.T) {
+func Test08DivCSS(t *testing.T) {
 	el := Div(
 		Text("hi!"),
 	)
@@ -225,7 +288,7 @@ func Test06DivCSS(t *testing.T) {
 	)
 }
 
-func Test07DivCSS(t *testing.T) {
+func Test09DivCSS(t *testing.T) {
 	el := Div(
 		Text("hi!"),
 	)

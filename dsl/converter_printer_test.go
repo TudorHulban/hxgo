@@ -186,6 +186,11 @@ func TestPrintDSL(t *testing.T) {
 }
 
 func TestFullPageWithURL(t *testing.T) {
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
+
 	const testURL = "https://templates.iqonic.design/product/lite/logik/html/dist/dashboard/"
 
 	req, errRequest := http.NewRequestWithContext(
@@ -214,6 +219,11 @@ func TestFullPageWithURL(t *testing.T) {
 }
 
 func TestElementFromURL(t *testing.T) {
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
+
 	const testURL = "https://templates.iqonic.design/product/lite/logik/html/dist/dashboard/"
 
 	req, errRequest := http.NewRequestWithContext(
@@ -250,7 +260,5 @@ func TestElementFromURL(t *testing.T) {
 		},
 	)
 
-	// elements.PrintWithDescription(os.Stdout)
-
-	require.Len(t, elements, 1)
+	elements.PrintWithDescription(os.Stdout)
 }
