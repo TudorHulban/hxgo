@@ -16,7 +16,7 @@ func RenderFast(nodes ...Node) []byte {
 	var a accumulator
 
 	for i := range nodes {
-		walkHTML(&a, nodes[i])
+		walk(&a, nodes[i])
 	}
 
 	// HTML is already fully assembled
@@ -33,7 +33,7 @@ func RenderHX(nodes ...Node) []byte {
 	var a accumulator
 
 	for i := range nodes {
-		walkHTML(&a, nodes[i])
+		walk(&a, nodes[i])
 
 		a.Write1("|\n")
 	}
@@ -53,7 +53,7 @@ func RenderHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
-		walkHTML(a, nodes[i])
+		walk(a, nodes[i])
 	}
 
 	return a.html
@@ -69,7 +69,7 @@ func RenderHXHTMLWithCapacity(estimatedSize int, nodes ...Node) []byte {
 	a := newAccumulator(estimatedSize, 0)
 
 	for i := range nodes {
-		walkHTML(a, nodes[i])
+		walk(a, nodes[i])
 
 		a.Write1("|\n")
 	}

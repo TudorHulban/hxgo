@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -99,64 +100,59 @@ func Test04DivStyle(t *testing.T) {
 		2,
 	)
 
-	html, styles, css := RenderFull(el)
-	require.Zero(t, css)
-	require.NotZero(t, html)
-	require.NotZero(t, styles, "should have style")
+	t.Run(
+		"1. Div direct",
+		func(t *testing.T) {
+			html, styles, css := RenderFull(el)
+			require.Zero(t, css)
+			require.NotZero(t, html)
+			require.NotZero(t, styles, "should have style")
 
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(
-		styles,
-	)
-}
-
-func Test05DivStyles(t *testing.T) {
-	el := Div(
-		Class("css-class"),
-		Text(
-			fmt.Sprintf(
-				"hi %s!",
-				t.Name(),
-			),
-		),
+			if !helpers.IsRunningInCI() {
+				fmt.Println(
+					string(html),
+				)
+				fmt.Println(
+					styles,
+				)
+			}
+		},
 	)
 
-	el.Add(
-		NewCSSForClass("card").
-			WithBreakpoint("768px").
-			Padding("10px 18px").
-			AsNode(),
+	t.Run(
+		"2. Div soup",
+		func(t *testing.T) {
+			compound := Div(el)
 
-		NewCSSForClass("card").
-			WithBreakpoint("1028px").
-			Padding("15px 18px").
-			AsNode(),
+			html, styles, css := RenderFull(compound)
+			require.Zero(t, css)
+			require.NotZero(t, html)
+			require.NotZero(t, styles, "should have style")
+		},
 	)
 
-	// elWithStyles x2 but only one style emitted.
-	compound := Div(
-		el,
-		Text("-------"),
-		el,
-	)
+	t.Run(
+		"3. Unique CSS emitted",
+		func(t *testing.T) {
+			compound := Div(
+				el,
+				el,
+			)
 
-	html, styles, css := RenderFull(compound)
-	require.Zero(t, css)
-	require.NotZero(t, html)
-	require.NotZero(t, styles, "should have style")
+			html, styles, css := RenderFull(compound)
+			require.Zero(t, css)
+			require.NotZero(t, html)
+			require.NotZero(t, styles, "should have style")
 
-	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
-	//   .css-class {
-	//     padding: 10px 18px;
-	//   }
-
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(
-		styles,
+			if !helpers.IsRunningInCI() {
+				fmt.Println(
+					string(html),
+				)
+				fmt.Println(
+					styles,
+				)
+			}
+		},
 	)
 }
 
