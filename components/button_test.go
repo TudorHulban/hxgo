@@ -13,7 +13,10 @@ import (
 
 func TestButton(t *testing.T) {
 	if helpers.IsRunningInCI() {
-		t.Skip()
+		t.Skipf(
+			"test: '%s' is a manual test.",
+			t.Name(),
+		)
 	}
 
 	el := ButtonSubmitWCSS(
