@@ -171,17 +171,14 @@ func Test06Tailwind(t *testing.T) {
 	require.Zero(t, styles)
 	require.Zero(t, css)
 
-	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
-	//   .css-class {
-	//     padding: 10px 18px;
-	//   }
-
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(
-		styles,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(
+			styles,
+		)
+	}
 }
 
 func Test07DivFull(t *testing.T) {
@@ -230,23 +227,20 @@ func Test07DivFull(t *testing.T) {
 	require.NotZero(t, styles, "should have style")
 	require.NotZero(t, css, "should have css")
 
-	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
-	//   .css-class {
-	//     padding: 10px 18px;
-	//   }
-
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(
-		styles,
-	)
-	fmt.Println(
-		"-----------------",
-	)
-	fmt.Println(
-		css,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(
+			styles,
+		)
+		fmt.Println(
+			"-----------------",
+		)
+		fmt.Println(
+			css,
+		)
+	}
 }
 
 func Test08DivCSS(t *testing.T) {
@@ -273,15 +267,17 @@ func Test08DivCSS(t *testing.T) {
 	require.Zero(t, styles, "no styles")
 	require.NotZero(t, css, "should have css")
 
-	fmt.Println(
-		string(html), // <div>hi!</div>
-	)
-	fmt.Println(
-		"-----------------",
-	)
-	fmt.Println(
-		css,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html), // <div>hi!</div>
+		)
+		fmt.Println(
+			"-----------------",
+		)
+		fmt.Println(
+			css,
+		)
+	}
 }
 
 func Test09DivCSS(t *testing.T) {
@@ -309,13 +305,15 @@ func Test09DivCSS(t *testing.T) {
 	require.Zero(t, styles, "no styles")
 	require.NotZero(t, css, "should have css")
 
-	fmt.Println(
-		string(html), // <div>hi!</div>
-	)
-	fmt.Println(
-		"-----------------",
-	)
-	fmt.Println(
-		css,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html), // <div>hi!</div>
+		)
+		fmt.Println(
+			"-----------------",
+		)
+		fmt.Println(
+			css,
+		)
+	}
 }

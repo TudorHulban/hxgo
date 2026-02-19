@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,9 +47,11 @@ func TestGCActual(t *testing.T) {
 	// 3. Try to render through dangling pointer
 	result := RenderFast(*nodePtr) // UAF risk!
 
-	fmt.Println(
-		string(result),
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(result),
+		)
+	}
 }
 
 // This mimics real usage pattern:

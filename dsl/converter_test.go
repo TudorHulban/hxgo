@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
@@ -33,5 +34,7 @@ func TestHowToUse(t *testing.T) {
 	out := RenderConvertedHTML(root)
 	require.NotEmpty(t, out)
 
-	fmt.Println(string(out))
+	if !helpers.IsRunningInCI() {
+		fmt.Println(string(out))
+	}
 }
