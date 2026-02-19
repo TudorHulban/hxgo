@@ -22,7 +22,7 @@ jobs:
 
   j2_of_2-test:
     runs-on: ubuntu-latest
-    needs: j1_of_3-lint
+    needs: j1_of_2-lint
     timeout-minutes: 2
     steps:
       - uses: actions/checkout@v4
