@@ -47,7 +47,7 @@ jobs:
         env:
           KEEP_DAYS: 0
         run: |
-          CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
+          CUTOFF=$(date -u -d "$KEEP_DAYS days ago" +%s)
 
           gh workflow list --repo "$GITHUB_REPOSITORY" --json id --jq '.[].id' |
           while read WF; do

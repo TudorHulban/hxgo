@@ -7,8 +7,6 @@ import (
 )
 
 func TestCanonical(t *testing.T) {
-	require := require.New(t)
-
 	tests := []struct {
 		description string
 		input       string
@@ -79,7 +77,10 @@ func TestCanonical(t *testing.T) {
 			test.description,
 			func(t *testing.T) {
 				result := ApplyPredicates(test.input, CanonicalDSL...)
-				require.Equal(test.expected, result)
+				require.Equal(t,
+					test.expected,
+					result,
+				)
 			},
 		)
 	}

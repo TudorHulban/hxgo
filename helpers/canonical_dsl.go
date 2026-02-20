@@ -41,6 +41,7 @@ func StripWhitespaceOutsideQuotes[T ~string](value T) T {
 
 		if ch == '"' {
 			inQuotes = !inQuotes
+
 			b.WriteByte(ch)
 
 			continue
@@ -86,7 +87,9 @@ func RemoveTrailingCommas[T ~string](value T) T {
 
 		if ch == ',' {
 			lastWasComma = true
+
 			builder.WriteByte(ch)
+
 			continue
 		}
 
@@ -101,12 +104,14 @@ func RemoveTrailingCommas[T ~string](value T) T {
 			}
 
 			builder.WriteByte(')')
+
 			lastWasComma = false
 
 			continue
 		}
 
 		lastWasComma = false
+
 		builder.WriteByte(ch)
 	}
 
@@ -129,12 +134,14 @@ func NormalizeParens[T ~string](value T) T {
 				temp := builder.String()
 				builder.Reset()
 				builder.Grow(len(temp))
+
 				for i := 0; i < len(temp)-1; i++ {
 					builder.WriteByte(temp[i])
 				}
 			}
 
 			builder.WriteByte('(')
+
 			previous = '('
 
 			continue
@@ -197,8 +204,10 @@ func StripComments[T ~string](value T) T {
 		if inLineComment {
 			if ch == '\n' {
 				inLineComment = false
+
 				builder.WriteByte(ch)
 			}
+
 			index++
 
 			continue
@@ -211,6 +220,7 @@ func StripComments[T ~string](value T) T {
 
 				continue
 			}
+
 			index++
 
 			continue
@@ -235,6 +245,7 @@ func StripComments[T ~string](value T) T {
 		}
 
 		builder.WriteByte(ch)
+
 		index++
 	}
 
@@ -293,5 +304,5 @@ func TrimOuterSpaces[T ~string](value T) T {
 		end--
 	}
 
-	return T(value[start:end])
+	return (value[start:end])
 }
