@@ -4,18 +4,11 @@ import "strings"
 
 type Predicate[T any] func(T) T
 
-func ApplyPredicates[T any](value T, predicates ...Predicate[T]) T {
-	result := value
+var CanonicalDSL = []Predicate[string]{
+	func(value string) string {
+		return strings.ReplaceAll(value, "dsl.", "")
+	},
 
-	for _, predicate := range predicates {
-		result = predicate(result)
-	}
-
-	return result
-}
-
-var Canonical = []Predicate[string]{
-	func(v string) string { return strings.ReplaceAll(v, "dsl.", "") },
 	StripWhitespaceOutsideQuotes[string],
 	RemoveNewlines[string],
 	RemoveTrailingCommas[string],
@@ -25,6 +18,16 @@ var Canonical = []Predicate[string]{
 	NormalizeCommaSpacing[string],
 	RemoveDoubleSpaces[string],
 	TrimOuterSpaces[string],
+}
+
+func ApplyPredicates[T any](value T, predicates ...Predicate[T]) T {
+	result := value
+
+	for _, predicate := range predicates {
+		result = predicate(result)
+	}
+
+	return result
 }
 
 func StripWhitespaceOutsideQuotes[T ~string](value T) T {

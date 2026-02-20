@@ -78,7 +78,7 @@ func TestCanonical(t *testing.T) {
 		t.Run(
 			test.description,
 			func(t *testing.T) {
-				result := ApplyPredicates(test.input, Canonical...)
+				result := ApplyPredicates(test.input, CanonicalDSL...)
 				require.Equal(test.expected, result)
 			},
 		)
