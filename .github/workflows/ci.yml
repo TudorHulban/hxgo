@@ -45,7 +45,7 @@ jobs:
 
       - name: Delete old workflow runs
         env:
-          KEEP_DAYS: 1
+          KEEP_DAYS: 0
         run: |
           CUTOFF=$(date -d "$KEEP_DAYS days ago" +%s)
 

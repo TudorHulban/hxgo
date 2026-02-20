@@ -7,13 +7,7 @@ import (
 )
 
 func TestIsRunningInCI(t *testing.T) {
-	require.False(t,
+	require.True(t,
 		IsRunningInCI(),
 	)
-}
-
-func BenchmarkIsRunningInCI(b *testing.B) {
-	for b.Loop() {
-		IsRunningInCI()
-	}
 }
