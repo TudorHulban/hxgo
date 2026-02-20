@@ -10,11 +10,13 @@ import (
 func TestMethodsTailwind(t *testing.T) {
 	c := TW()
 
-	fmt.Println(
-		len(
-			helpers.MethodNamesOf(c),
-		),
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			len(
+				helpers.MethodNamesOf(c),
+			),
+		)
+	}
 }
 
 func TestTailwind(t *testing.T) {
@@ -27,7 +29,9 @@ func TestTailwind(t *testing.T) {
 			AsNode(),
 	)
 
-	fmt.Println(
-		string(RenderFast(el)),
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(RenderFast(el)),
+		)
+	}
 }
