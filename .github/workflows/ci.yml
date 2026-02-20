@@ -43,33 +43,29 @@ jobs:
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh jq
 
-      - name: Delete old workflow runs
+      - name: Keep only last N workflow runs
         env:
-          KEEP_DAYS: 0
+          KEEP_LAST: 1
         run: |
-          CUTOFF=$(date -u -d "$KEEP_DAYS days ago" +%s)
-
           gh workflow list --repo "$GITHUB_REPOSITORY" --json id --jq '.[].id' |
           while read WF; do
             echo "Workflow $WF"
-
+            
+            # Get all runs, sort by date (oldest first), skip the last KEEP_LAST
             gh run list \
               --repo "$GITHUB_REPOSITORY" \
               --workflow "$WF" \
               --json databaseId,createdAt,headBranch \
               --limit 200 \
-              --jq '.[] | @base64' |
+              --jq 'sort_by(.createdAt) | reverse | .[env.KEEP_LAST | tonumber:] | .[] | @base64' |
             while read RUN; do
               j() { echo "$RUN" | base64 --decode | jq -r "$1"; }
-
+              
               ID=$(j '.databaseId')
               CREATED=$(j '.createdAt')
               BRANCH=$(j '.headBranch')
-              TS=$(date -d "$CREATED" +%s)
-
-              if [ "$TS" -lt "$CUTOFF" ] && [ -n "$BRANCH" ]; then
-                echo "  Deleting run $ID (branch: $BRANCH, date: $CREATED)"
-                gh run delete "$ID" --repo "$GITHUB_REPOSITORY"
-              fi
+              
+              echo "  Deleting run $ID (branch: $BRANCH, date: $CREATED)"
+              gh run delete "$ID" --repo "$GITHUB_REPOSITORY" || echo "  Failed to delete $ID (might already be gone)"
             done
           done
