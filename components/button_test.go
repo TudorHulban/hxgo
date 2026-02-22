@@ -6,14 +6,15 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
 
 func TestButton(t *testing.T) {
-	fmt.Println("manual test … skipping")
-	t.Skip(
-		"manual testing",
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
 	)
 
 	el := ButtonSubmitWCSS(
@@ -57,10 +58,12 @@ func TestButton(t *testing.T) {
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(css)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(css)
+	}
 
 	http.HandleFunc(
 		"/",
@@ -81,7 +84,11 @@ func TestButton(t *testing.T) {
 	http.ListenAndServe(":8080", nil)
 }
 
-// BenchmarkButtonSubmit-16    	 4754221	       244.8 ns/op	     432 B/op	       3 allocs/op
+// GOEXPERIMENT=nogreenteagc go test -bench=BenchmarkButtonSubmit -benchmem -benchtime=10s
+// BenchmarkButtonSubmit-16        46242216               256.3 ns/op           432 B/op          3 allocs/op
+
+// go test -bench=BenchmarkButtonSubmit -benchmem -benchtime=10s
+// BenchmarkButtonSubmit-16        48235134               247.9 ns/op           432 B/op          3 allocs/op
 func BenchmarkButtonSubmit(b *testing.B) {
 	b.ReportAllocs()
 

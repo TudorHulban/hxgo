@@ -5,11 +5,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
 
-func TestTailwindTypographyMapping_PrintDSL(t *testing.T) {
+func TestTailwindPrintDSL(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -45,8 +46,7 @@ func TestTailwindTypographyMapping_PrintDSL(t *testing.T) {
 				var buffer bytes.Buffer
 
 				dom := ResultDOMConversion{
-					Description: tc.description,
-					Node:        root,
+					Node: root,
 				}
 
 				dom.PrintWithTransformers(
@@ -57,11 +57,15 @@ func TestTailwindTypographyMapping_PrintDSL(t *testing.T) {
 
 				got := buffer.String()
 
-				require.Contains(t,
-					tc.expected,
-					got,
-
-					got,
+				require.Equal(t,
+					helpers.ApplyPredicates(
+						tc.expected,
+						helpers.CanonicalDSL...,
+					),
+					helpers.ApplyPredicates(
+						got,
+						helpers.CanonicalDSL...,
+					),
 				)
 			},
 		)

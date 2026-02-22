@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,9 +13,9 @@ func Test01Div(t *testing.T) {
 
 	require.Equal(t,
 		"<div>hi!</div>",
-		string(RenderConvertedHTML(el)),
+		string(RenderFast(el)),
 
-		string(RenderConvertedHTML(el)),
+		string(RenderFast(el)),
 	)
 }
 
@@ -25,10 +26,15 @@ func Test02Div(t *testing.T) {
 	)
 
 	require.Equal(t,
-		`<div class="css-class">hi!</div>`,
-		string(RenderConvertedHTML(el)),
+		`div[class="css-class"](text("hi!"))`,
+		el.Canonical(),
+	)
 
-		string(RenderConvertedHTML(el)),
+	require.Equal(t,
+		`<div class="css-class">hi!</div>`,
+		string(RenderFast(el)),
+
+		string(RenderFast(el)),
 	)
 }
 
@@ -45,59 +51,122 @@ func Test03Div(t *testing.T) {
 	)
 
 	require.Equal(t,
-		`<div class="css-class">hi<div><span>!</span></div></div>`,
-		string(RenderConvertedHTML(el)),
+		el.Canonical(),
+		`div[class="css-class"](text("hi"), div(span(text("!"))))`,
+	)
 
-		string(RenderConvertedHTML(el)),
+	require.Equal(t,
+		`<div class="css-class">hi<div><span>!</span></div></div>`,
+		string(RenderFast(el)),
+
+		string(RenderFast(el)),
 	)
 }
 
-func Test04DivStyles(t *testing.T) {
-	cssClass := "css-class"
-
+func Test04DivStyle(t *testing.T) {
 	el := Div(
-		Class(cssClass),
-		Text("hi!"),
+		Class("css-class"),
+		Text(
+			fmt.Sprintf(
+				"hi %s!",
+				t.Name(),
+			),
+		),
+	)
+
+	type TData struct {
+		tag      string
+		attrs    []Node
+		children []Node
+	}
+
+	require.Len(t,
+		(*TData)(el.data).attrs,
+		1,
+	)
+	require.Len(t,
+		(*TData)(el.data).children,
+		1,
 	)
 
 	el.Add(
 		NewCSSForClass("card").
 			WithBreakpoint("768px").
-			Padding("10px 18px").
+			Padding("10px 10px").
 			AsNode(),
 
 		NewCSSForClass("card").
 			WithBreakpoint("1028px").
-			Padding("15px 18px").
+			Padding("18px 18px").
 			AsNode(),
 	)
 
-	// elWithStyles x2 but only one style emitted.
-	compound := Div(
-		el,
-		Text("-------"),
-		el,
+	require.Len(t,
+		(*TData)(el.data).children,
+		1,
+	)
+	require.Len(t,
+		el.children,
+		2,
 	)
 
-	html, styles, css := RenderFull(compound)
-	require.NotZero(t, html)
-	require.NotZero(t, styles, "should have style")
-	require.Zero(t, css)
+	t.Run(
+		"1. Div direct",
+		func(t *testing.T) {
+			html, styles, css := RenderFull(el)
+			require.Zero(t, css)
+			require.NotZero(t, html)
+			require.NotZero(t, styles, "should have style")
 
-	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
-	//   .css-class {
-	//     padding: 10px 18px;
-	//   }
-
-	fmt.Println(
-		string(html),
+			if !helpers.IsRunningInCI() {
+				fmt.Println(
+					string(html),
+				)
+				fmt.Println(
+					styles,
+				)
+			}
+		},
 	)
-	fmt.Println(
-		styles,
+
+	t.Run(
+		"2. Div soup",
+		func(t *testing.T) {
+			compound := Div(el)
+
+			html, styles, css := RenderFull(compound)
+			require.Zero(t, css)
+			require.NotZero(t, html)
+			require.NotZero(t, styles, "should have style")
+		},
+	)
+
+	t.Run(
+		"3. Unique CSS emitted",
+		func(t *testing.T) {
+			compound := Div(
+				el,
+				el,
+			)
+
+			html, styles, css := RenderFull(compound)
+			require.Zero(t, css)
+			require.NotZero(t, html)
+			require.NotZero(t, styles, "should have style")
+
+			if !helpers.IsRunningInCI() {
+				fmt.Println(
+					string(html),
+				)
+				fmt.Println(
+					styles,
+				)
+			}
+		},
 	)
 }
 
-func Test04aTailwind(t *testing.T) {
+func Test06Tailwind(t *testing.T) {
 	el := Div(
 		Class("bg-blue-500 p-4 rounded shadow"),
 		Text("hi!"),
@@ -112,20 +181,17 @@ func Test04aTailwind(t *testing.T) {
 	require.Zero(t, styles)
 	require.Zero(t, css)
 
-	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
-	//   .css-class {
-	//     padding: 10px 18px;
-	//   }
-
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(
-		styles,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(
+			styles,
+		)
+	}
 }
 
-func Test05DivFull(t *testing.T) {
+func Test07DivFull(t *testing.T) {
 	cssClassComponent := "css-class"
 	cssClassWidget := "css-widget"
 
@@ -171,26 +237,23 @@ func Test05DivFull(t *testing.T) {
 	require.NotZero(t, styles, "should have style")
 	require.NotZero(t, css, "should have css")
 
-	// <div><div class="css-class">hi!</div>-------<div class="css-class">hi!</div></div>
-	//   .css-class {
-	//     padding: 10px 18px;
-	//   }
-
-	fmt.Println(
-		string(html),
-	)
-	fmt.Println(
-		styles,
-	)
-	fmt.Println(
-		"-----------------",
-	)
-	fmt.Println(
-		css,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(
+			styles,
+		)
+		fmt.Println(
+			"-----------------",
+		)
+		fmt.Println(
+			css,
+		)
+	}
 }
 
-func Test06DivCSS(t *testing.T) {
+func Test08DivCSS(t *testing.T) {
 	el := Div(
 		Text("hi!"),
 	)
@@ -214,18 +277,20 @@ func Test06DivCSS(t *testing.T) {
 	require.Zero(t, styles, "no styles")
 	require.NotZero(t, css, "should have css")
 
-	fmt.Println(
-		string(html), // <div>hi!</div>
-	)
-	fmt.Println(
-		"-----------------",
-	)
-	fmt.Println(
-		css,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html), // <div>hi!</div>
+		)
+		fmt.Println(
+			"-----------------",
+		)
+		fmt.Println(
+			css,
+		)
+	}
 }
 
-func Test07DivCSS(t *testing.T) {
+func Test09DivCSS(t *testing.T) {
 	el := Div(
 		Text("hi!"),
 	)
@@ -250,13 +315,15 @@ func Test07DivCSS(t *testing.T) {
 	require.Zero(t, styles, "no styles")
 	require.NotZero(t, css, "should have css")
 
-	fmt.Println(
-		string(html), // <div>hi!</div>
-	)
-	fmt.Println(
-		"-----------------",
-	)
-	fmt.Println(
-		css,
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html), // <div>hi!</div>
+		)
+		fmt.Println(
+			"-----------------",
+		)
+		fmt.Println(
+			css,
+		)
+	}
 }

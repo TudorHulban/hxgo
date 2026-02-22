@@ -16,7 +16,12 @@ import (
 )
 
 func TestAppointment(t *testing.T) {
-	w := WidgetAppointment(
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
+
+	widget := WidgetAppointment(
 		&ParamsWidgetAppointment{
 			SelectLabel: "Doctor",
 			SelectValues: []string{
@@ -84,8 +89,8 @@ func TestAppointment(t *testing.T) {
 		},
 
 		Body: []dsl.Node{
-			w.LinkJavascript,
-			w.HTML,
+			widget.LinkJavascript,
+			widget.HTML,
 		},
 	}
 

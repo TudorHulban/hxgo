@@ -22,7 +22,7 @@ func BenchmarkHTMLCall(b *testing.B) {
 	b.ResetTimer()
 
 	for b.Loop() {
-		_ = RenderConvertedHTML(el)
+		_ = RenderFast(el)
 	}
 }
 

@@ -25,6 +25,7 @@ func printDSL(w io.Writer, n Node) {
 	p.printNode(n)
 }
 
+// PrintDSL should be used with the HTML converter only.
 func PrintDSL(w io.Writer, n Node, indentUnit ...string) {
 	if n.fn == nil {
 		return

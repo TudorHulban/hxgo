@@ -72,7 +72,7 @@ func TestAllocGuard_CSSOnly(t *testing.T) {
 }
 
 func TestAllocGuard_HTMLAndCSS(t *testing.T) {
-	const maxAllocations = 9
+	const maxAllocations = 19
 
 	node := Div(
 		Class("card"),

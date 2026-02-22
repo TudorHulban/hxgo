@@ -10,7 +10,11 @@ import (
 func TestMethodsCSSContribution(t *testing.T) {
 	c := CSSContribution{}
 
-	fmt.Println(
-		helpers.MethodNamesOf(c),
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			len(
+				helpers.MethodNamesOf(c),
+			),
+		)
+	}
 }

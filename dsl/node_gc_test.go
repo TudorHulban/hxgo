@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,9 +18,9 @@ func TestGCRun(t *testing.T) {
 
 	require.Equal(t,
 		"<div>hi!</div>",
-		string(RenderConvertedHTML(el)),
+		string(RenderFast(el)),
 
-		string(RenderConvertedHTML(el)),
+		string(RenderFast(el)),
 	)
 }
 
@@ -44,11 +45,13 @@ func TestGCActual(t *testing.T) {
 	}
 
 	// 3. Try to render through dangling pointer
-	result := RenderConvertedHTML(*nodePtr) // UAF risk!
+	result := RenderFast(*nodePtr) // UAF risk!
 
-	fmt.Println(
-		string(result),
-	)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(result),
+		)
+	}
 }
 
 // This mimics real usage pattern:
@@ -71,6 +74,6 @@ func TestStackFrameIssue(t *testing.T) {
 
 	require.Equal(t,
 		"<div><p>Hi</p><p>World</p></div>",
-		string(RenderConvertedHTML(ui)),
+		string(RenderFast(ui)),
 	)
 }

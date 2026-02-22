@@ -2,13 +2,20 @@ package components
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewForm3Containers(t *testing.T) {
+	t.Skipf(
+		"test: '%s' is a manual test.",
+		t.Name(),
+	)
+
 	el := ButtonSubmitWCSS(
 		&ParamsButtonSubmit{},
 
@@ -67,8 +74,28 @@ func TestNewForm3Containers(t *testing.T) {
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
-	fmt.Println(
-		string(html),
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(css)
+	}
+
+	http.HandleFunc(
+		"/",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write(
+				[]byte(
+					dsl.HTMLwithDataCSS(html, css),
+				),
+			)
+		},
 	)
-	fmt.Println(css)
+
+	fmt.Println(
+		"Open http://localhost:8080 and press Ctrl-C when done",
+	)
+
+	http.ListenAndServe(":8080", nil)
 }

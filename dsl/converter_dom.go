@@ -21,7 +21,10 @@ func (r ResultDOMConversion) PrintWithDescription(w io.Writer) {
 
 func (r ResultDOMConversion) PrintWithTransformers(writer io.Writer, useTailwind bool, transformers ...func(Node) Node) {
 	_, _ = writer.Write([]byte(r.Description))
-	_, _ = writer.Write([]byte(":\n"))
+
+	if len(r.Description) > 0 {
+		_, _ = writer.Write([]byte(":\n"))
+	}
 
 	for _, t := range transformers {
 		r.Node = t(r.Node)

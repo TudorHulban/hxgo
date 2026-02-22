@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
-	"strings"
 )
 
-func MethodNamesOf(v any) string {
+func MethodNamesOf(v any) []string {
 	t := reflect.TypeOf(v)
+
 	if t == nil {
-		return ""
+		return nil
 	}
 
 	if t.Kind() == reflect.Pointer {
@@ -20,11 +20,13 @@ func MethodNamesOf(v any) string {
 	names := make([]string, 0)
 
 	vt := reflect.TypeOf(reflect.New(t).Elem().Interface())
+
 	for method := range vt.Methods() {
 		names = append(names, method.Name)
 	}
 
 	pt := reflect.PointerTo(t)
+
 	for method := range pt.Methods() {
 		names = append(names, method.Name)
 	}
@@ -39,7 +41,10 @@ func MethodNamesOf(v any) string {
 
 	result = append(result, names...)
 
-	result = append(result, fmt.Sprintf("methods: %d", len(names)))
+	result = append(
+		result,
+		fmt.Sprintf("methods: %d", len(names)),
+	)
 
-	return strings.Join(result, "\n")
+	return result
 }
