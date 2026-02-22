@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
@@ -57,10 +58,12 @@ func TestButton(t *testing.T) {
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
-	// fmt.Println(
-	// 	string(html),
-	// )
-	// fmt.Println(css)
+	if !helpers.IsRunningInCI() {
+		fmt.Println(
+			string(html),
+		)
+		fmt.Println(css)
+	}
 
 	http.HandleFunc(
 		"/",

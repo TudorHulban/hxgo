@@ -26,6 +26,11 @@ func Test02Div(t *testing.T) {
 	)
 
 	require.Equal(t,
+		`div[class="css-class"](text("hi!"))`,
+		el.Canonical(),
+	)
+
+	require.Equal(t,
 		`<div class="css-class">hi!</div>`,
 		string(RenderFast(el)),
 
@@ -43,6 +48,11 @@ func Test03Div(t *testing.T) {
 				Text("!"),
 			),
 		),
+	)
+
+	require.Equal(t,
+		el.Canonical(),
+		`div[class="css-class"](text("hi"), div(span(text("!"))))`,
 	)
 
 	require.Equal(t,
