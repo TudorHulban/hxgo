@@ -1,7 +1,7 @@
 package card
 
 import (
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 )
 
@@ -35,8 +35,8 @@ func WidgetCardVertical(params *ParamsWidgetCardVertical) dsl.Node {
 				dsl.A(
 					dsl.Href(params.ActionEndpoint),
 
-					components.Image(
-						&components.ParamsImage{
+					primitives.Image(
+						&primitives.ParamsImage{
 							ImageSquareSize: params.ImageSquareSize,
 							ImageSource:     params.ImageSource,
 							ImageAlt:        params.Title,

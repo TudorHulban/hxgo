@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
@@ -15,16 +16,16 @@ func TestHero(t *testing.T) {
 			Title:   "Expert cuts and classic styles",
 			Message: "experience the finest grooming services in town. from traditional haircuts to modern styling, we've got you covered.",
 
-			ButtonPrimaryInfo: components.ParamsARef{
+			ButtonPrimaryInfo: primitives.ParamsARef{
 				CSSClass: "button primary",
 				Caption:  "Book appointment",
 			},
-			ButtonSecondaryInfo: components.ParamsARef{
+			ButtonSecondaryInfo: primitives.ParamsARef{
 				CSSClass: "button secondary",
 				Caption:  "View services",
 			},
 
-			ParamsImage: components.ParamsImage{
+			ParamsImage: primitives.ParamsImage{
 				ImageSquareSize: "400",
 				ImageAlt:        "Barber Shop",
 				ImageSource:     "https://themes.getmotopress.com/bro-barbershop/wp-content/uploads/sites/64/2024/01/appointment-img.jpg",

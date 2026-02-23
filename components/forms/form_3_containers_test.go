@@ -1,10 +1,11 @@
-package components
+package forms
 
 import (
 	"fmt"
 	"net/http"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/components/buttons"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
@@ -16,8 +17,8 @@ func TestNewForm3Containers(t *testing.T) {
 		t.Name(),
 	)
 
-	el := ButtonSubmitWCSS(
-		&ParamsButtonSubmit{},
+	el := buttons.ButtonSubmitWCSS(
+		&buttons.ParamsButtonSubmit{},
 
 		dsl.NewCSSForClass("card:hover").
 			WithBreakpoint("768px").

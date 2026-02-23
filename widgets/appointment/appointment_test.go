@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/buttons"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/widgets/base"
@@ -62,7 +63,7 @@ func TestAppointment(t *testing.T) {
 				DateValue:   time.Now(),
 				HowManyDays: 3,
 			},
-			ParamsButtonSubmit: components.ParamsButtonSubmit{
+			ParamsButtonSubmit: buttons.ParamsButtonSubmit{
 				Label:    "Submit",
 				CSSClass: "btn-submit",
 				CSSID:    inputslots.ButtonSubmitCSSID,

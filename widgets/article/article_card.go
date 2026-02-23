@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/buttons"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 )
 
@@ -30,10 +31,10 @@ type ParamsWidgetArticleCard struct {
 	Title          string
 	ArticleExcerpt string
 
-	components.ParamsImage
+	primitives.ParamsImage
 	ArticleMeta
 
-	components.ParamsButtonSubmit
+	buttons.ParamsButtonSubmit
 }
 
 func WidgetArticleCard(params *ParamsWidgetArticleCard) dsl.Node {
@@ -43,7 +44,7 @@ func WidgetArticleCard(params *ParamsWidgetArticleCard) dsl.Node {
 		dsl.Div(
 			dsl.AttrClass("article-card-image-container"),
 
-			components.Image(
+			primitives.Image(
 				&params.ParamsImage,
 			),
 		),
@@ -85,7 +86,7 @@ func WidgetArticleCard(params *ParamsWidgetArticleCard) dsl.Node {
 			dsl.Div(
 				dsl.AttrClass("article-card-action"),
 
-				components.ButtonSubmit(
+				buttons.ButtonSubmit(
 					&params.ParamsButtonSubmit,
 				),
 			),

@@ -1,6 +1,9 @@
-package components
+package forms
 
-import "github.com/TudorHulban/hxgo/dsl"
+import (
+	"github.com/TudorHulban/hxgo/components/primitives"
+	"github.com/TudorHulban/hxgo/dsl"
+)
 
 type ParamsNewFormThreeContainers struct {
 	SymbolEntry   string // form logo symbol
@@ -47,8 +50,8 @@ func NewFormThreeContainers(params *ParamsNewFormThreeContainers) dsl.Node {
 				dsl.If(
 					len(params.TextForm) > 0,
 
-					H3(
-						&ParamsH{
+					primitives.H3(
+						&primitives.ParamsH{
 							Text:  params.TextForm,
 							CSSID: params.CSSIDTextForm,
 						},

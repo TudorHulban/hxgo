@@ -1,4 +1,4 @@
-package components
+package inputs
 
 const (
 	TypeInputText   = "text"

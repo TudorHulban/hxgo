@@ -1,7 +1,7 @@
 package header
 
 import (
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 )
 
@@ -9,7 +9,7 @@ type ParamsWidgetHeader struct {
 	Title             string
 	BreadcrumbCaption string
 
-	components.ParamsImage
+	primitives.ParamsImage
 }
 
 func WidgetHeader(params *ParamsWidgetHeader) dsl.Node {
