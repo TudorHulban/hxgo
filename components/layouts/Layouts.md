@@ -6,7 +6,8 @@ The folder provides a library of opinionated, named layouts. Each layout serves 
 
 ## Layout 1: Documentation
 
-Purpose: Content with navigation/supporting info (docs, tutorials, reference).
+Purpose: Content with navigation/supporting info (docs, tutorials, reference).  
+Documentation HTML file provides an example that includes debug info.
 
 ### 1.1. Documentation - Desktop (≥1024px)
 
@@ -94,7 +95,19 @@ Purpose: Data overview, analytics, management interfaces.
 
 ## Layout 3: Landing
 
-Purpose: Marketing pages, storytelling, product showcases.
+Purpose: Marketing pages, storytelling, product showcases.  
+Landing HTML file provides an example that includes debug info with the following structure:
+
+- Sticky Header - Logo + navigation
+- Hero Section - Split layout with CTA and image placeholder
+- Features Section - 3-column grid of feature cards (stacks on mobile)
+- Testimonials - 3-column with author avatars
+- Logo Cloud - 4-column company logos (2-column on tablet, 1 on mobile)
+- Pricing - 3-column cards with "popular" highlighted
+- CTA Section - Full-width colored section
+- Footer - 4-column links
+
+### Structure
 
 ```go
 ┌─────────────────────────────────┐
@@ -179,7 +192,8 @@ Purpose: Complex tools with multiple panels (email client, IDE, admin).
 
 ## Layout 5: Blog
 
-Purpose: Long-form reading, articles, posts.
+Purpose: Long-form reading, articles, posts.  
+Blog HTML file provides an example that includes debug info.
 
 ### 5.1 Blog - Desktop (≥1024px)
 
@@ -220,64 +234,17 @@ Purpose: Long-form reading, articles, posts.
 └─────────────────────────────────┘
 ```
 
-### Example Page Blog
-
-```html
-<body class="blog-layout debug-layout">
-    <header class="blog-layout__header">
-        <div style="width: 100%;">Logo | Navigation | Search</div>
-    </header>
-
-    <div class="blog-layout__featured-image">
-        <!-- Featured image placeholder -->
-    </div>
-
-    <div class="blog-layout__content">
-        <article class="blog-layout__article">
-            <h1>Understanding CSS Grid Layout</h1>
-            <p style="margin: 1rem 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-            <p style="margin: 1rem 0;">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-            <p style="margin: 1rem 0;">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-        </article>
-
-        <aside class="blog-layout__sidebar">
-            <div class="author-card">
-                <h3 style="margin-bottom: 0.5rem;">Jane Doe</h3>
-                <p>Senior Frontend Developer</p>
-            </div>
-            <div class="related-posts">
-                <h3 style="margin-bottom: 0.5rem;">Related Posts</h3>
-                <ul style="margin-left: 1.5rem;">
-                    <li>Flexbox vs Grid</li>
-                    <li>Responsive Design Patterns</li>
-                    <li>CSS Variables Guide</li>
-                </ul>
-            </div>
-        </aside>
-    </div>
-
-    <section class="blog-layout__comments">
-        <h2 style="margin-bottom: 1rem;">Comments (3)</h2>
-        <div style="background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
-            <strong>John:</strong> Great article! Really helped me understand grid.
-        </div>
-        <div style="background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
-            <strong>Sarah:</strong> When will you cover subgrid?
-        </div>
-        <div style="background: white; padding: 1rem; border-radius: 4px;">
-            <strong>Mike:</strong> The diagrams really made it click for me.
-        </div>
-    </section>
-
-    <footer class="blog-layout__footer">
-        © 2024 My Blog | About | Privacy | Terms
-    </footer>
-</body>
-```
-
 ## Layout 6: Product
 
-Purpose: E-commerce product pages.
+Purpose: E-commerce product pages.  
+Product HTML file provides an example that includes debug info with the following structure:
+
+- Header - Logo, search, navigation, cart
+- Product Grid - Gallery (left) + Info (right)
+- Product Details - Tabs with description and specs
+- Reviews Section - Rating summary and individual reviews
+- Related Products - 4-column grid of related items
+- Footer - 4-column links
 
 ### 6.1 Product - Desktop (≥1024px)
 
@@ -327,41 +294,19 @@ Purpose: E-commerce product pages.
 └─────────────────────────────────────┘
 ```
 
-### Example Page Product
-
-```html
-<body class="product-layout">
-  <header class="product-layout__header">...</header>
-  
-  <main class="product-layout__main">
-    <div class="product-layout__grid">
-      <div class="product-layout__gallery">...</div>
-      <div class="product-layout__info">...</div>
-    </div>
-    
-    <section class="product-layout__section">
-      <h2 class="product-layout__section-title">Details</h2>
-      ...
-    </section>
-    
-    <section class="product-layout__section">
-      <h2 class="product-layout__section-title">Related Products</h2>
-      <div class="product-layout__related">
-        <div class="product-card">...</div>
-        <div class="product-card">...</div>
-        <div class="product-card">...</div>
-        <div class="product-card">...</div>
-      </div>
-    </section>
-  </main>
-  
-  <footer class="product-layout__footer">...</footer>
-</body>
-```
-
 ## Layout 7: Search/Listing
 
-Purpose: Browse and filter content like products, articles, items.
+Purpose: Browse and filter content like products, articles, items.  
+Search products HTML file provides an example that includes debug info with the following features:
+
+- Sticky Filters on desktop/tablet
+- Mobile-friendly filter toggle
+- Product cards with image, category, rating, price, badges
+- Sort dropdown for results
+- Pagination at bottom
+- Clear filter option
+- Price range inputs
+- Checkbox filters for categories, brands, features
 
 ### 7.1 Search - Desktop (≥1024px)
 

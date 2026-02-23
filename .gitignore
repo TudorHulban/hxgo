@@ -1,8 +1,5 @@
 .linting
 
-*.html
-*.css
-
 *.pprof
 *.pdf
 *.test

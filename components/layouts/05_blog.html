@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Layout Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 250px;
+            --content-max-width: 700px;
+            --nav-height: 60px;
+
+            /* Colors (example) */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        /* layouts/blog.css */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-lg);
+            display: flex;
+            align-items: center;
+        }
+
+        .blog-layout__featured-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            background: #e2e8f0; /* Placeholder background */
+            min-height: 200px; /* Ensure visibility when no image */
+        }
+
+        .blog-layout__content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: var(--space-xl);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+            width: 100%;
+            flex: 1;
+        }
+
+        .blog-layout__article {
+            max-width: var(--content-max-width);
+            justify-self: end;
+            font-size: 1.125rem;
+            line-height: 1.7;
+            width: 100%;
+        }
+
+        .blog-layout__sidebar {
+            justify-self: start;
+            width: 100%;
+        }
+
+        .blog-layout__comments {
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+            width: 100%;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .blog-layout__footer {
+            padding: var(--space-lg);
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        /* Debug styles - add background colors and labels */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Distinct colors for each section type */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.3); }
+        .debug-layout .blog-layout__featured-image { background: rgba(54, 162, 235, 0.3); }
+        .debug-layout .blog-layout__content { background: rgba(255, 206, 86, 0.1); }
+        .debug-layout .blog-layout__article { background: rgba(75, 192, 192, 0.2); }
+        .debug-layout .blog-layout__sidebar { background: rgba(153, 102, 255, 0.2); }
+        .debug-layout .blog-layout__comments { background: rgba(255, 159, 64, 0.2); }
+        .debug-layout .blog-layout__footer { background: rgba(199, 199, 199, 0.3); }
+
+        /* Inner components also get colors */
+        .debug-layout .author-card { 
+            background: rgba(255, 99, 132, 0.2);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border: 1px dashed #ff6384;
+            position: relative;
+        }
+        
+        .debug-layout .related-posts { 
+            background: rgba(54, 162, 235, 0.2);
+            padding: var(--space-md);
+            border: 1px dashed #36a2eb;
+            position: relative;
+        }
+
+        .debug-layout .author-card::before {
+            content: "author-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            font-family: monospace;
+        }
+
+        .debug-layout .related-posts::before {
+            content: "related-posts";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            font-family: monospace;
+        }
+
+        /* Tablet */
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .blog-layout__content {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+
+            .blog-layout__article {
+                justify-self: center;
+            }
+
+            .blog-layout__sidebar {
+                justify-self: center;
+                max-width: var(--content-max-width);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 639px) {
+            .blog-layout__content {
+                grid-template-columns: 1fr;
+                padding: var(--space-lg) var(--space-md);
+            }
+
+            .blog-layout__article {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <header class="blog-layout__header">
+        <div style="width: 100%;">Logo | Navigation | Search</div>
+    </header>
+
+    <div class="blog-layout__featured-image">
+        <!-- Featured image placeholder -->
+    </div>
+
+    <div class="blog-layout__content">
+        <article class="blog-layout__article">
+            <h1>Understanding CSS Grid Layout</h1>
+            <p style="margin: 1rem 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+            <p style="margin: 1rem 0;">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p style="margin: 1rem 0;">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        </article>
+
+        <aside class="blog-layout__sidebar">
+            <div class="author-card">
+                <h3 style="margin-bottom: 0.5rem;">Jane Doe</h3>
+                <p>Senior Frontend Developer</p>
+            </div>
+            <div class="related-posts">
+                <h3 style="margin-bottom: 0.5rem;">Related Posts</h3>
+                <ul style="margin-left: 1.5rem;">
+                    <li>Flexbox vs Grid</li>
+                    <li>Responsive Design Patterns</li>
+                    <li>CSS Variables Guide</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <section class="blog-layout__comments">
+        <h2 style="margin-bottom: 1rem;">Comments (3)</h2>
+        <div style="background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+            <strong>John:</strong> Great article! Really helped me understand grid.
+        </div>
+        <div style="background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+            <strong>Sarah:</strong> When will you cover subgrid?
+        </div>
+        <div style="background: white; padding: 1rem; border-radius: 4px;">
+            <strong>Mike:</strong> The diagrams really made it click for me.
+        </div>
+    </section>
+
+    <footer class="blog-layout__footer">
+        © 2024 My Blog | About | Privacy | Terms
+    </footer>
+</body>
+
+</html>

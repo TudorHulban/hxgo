@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Layout - Blog Listing</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 250px;
+            --content-max-width: 700px;
+            --nav-height: 60px;
+
+            /* Colors (example) */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        /* layouts/dashboard.css */
+        .dashboard-layout {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-lg);
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .dashboard-layout__filters {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dashboard-layout__grid {
+            flex: 1;
+            padding: var(--space-lg);
+            display: grid;
+            gap: var(--space-md);
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .dashboard-layout__footer {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* Tablet */
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .dashboard-layout__grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 639px) {
+            .dashboard-layout__grid {
+                grid-template-columns: 1fr;
+                padding: var(--space-md);
+            }
+            
+            .dashboard-layout__filters {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: var(--space-sm) var(--space-md);
+            }
+            
+            .dashboard-layout__header {
+                padding: 0 var(--space-md);
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="dashboard-layout__"] {
+            position: relative;
+        }
+
+        .debug-layout [class*="dashboard-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Distinct colors */
+        .debug-layout .dashboard-layout__header { background: rgba(255, 99, 132, 0.3); }
+        .debug-layout .dashboard-layout__filters { background: rgba(54, 162, 235, 0.3); }
+        .debug-layout .dashboard-layout__grid { background: rgba(255, 206, 86, 0.1); }
+        .debug-layout .dashboard-layout__footer { background: rgba(199, 199, 199, 0.3); }
+
+        /* Card styling */
+        .blog-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .blog-card__image {
+            width: 100%;
+            height: 160px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+        }
+
+        .blog-card__content {
+            padding: var(--space-md);
+        }
+
+        .blog-card__title {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .blog-card__meta {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-bottom: var(--space-sm);
+        }
+
+        .blog-card__excerpt {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #4a5568;
+        }
+
+        .filter-chip {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+        }
+
+        /* Debug card colors */
+        .debug-layout .blog-card {
+            background: rgba(75, 192, 192, 0.1);
+            border: 2px dashed #4bc0c0;
+        }
+
+        .debug-layout .blog-card::before {
+            content: "blog-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            font-family: monospace;
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body class="dashboard-layout debug-layout">
+    <header class="dashboard-layout__header">
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; font-size: 1.25rem;">📝 Blog</span>
+            <nav style="display: flex; gap: 1.5rem;">
+                <a href="#" style="color: inherit; text-decoration: none;">Home</a>
+                <a href="#" style="color: inherit; text-decoration: none;">About</a>
+                <a href="#" style="color: inherit; text-decoration: none;">Contact</a>
+            </nav>
+            <span>👤</span>
+        </div>
+    </header>
+
+    <div class="dashboard-layout__filters">
+        <span class="filter-chip active">All Posts</span>
+        <span class="filter-chip">Tutorials</span>
+        <span class="filter-chip">News</span>
+        <span class="filter-chip">Opinion</span>
+        <span class="filter-chip">Case Studies</span>
+        <span class="filter-chip">Interviews</span>
+    </div>
+
+    <main class="dashboard-layout__grid">
+        <!-- Blog Post 1 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Getting Started with CSS Grid</h2>
+                <div class="blog-card__meta">By Sarah Chen • 5 min read • 2 days ago</div>
+                <p class="blog-card__excerpt">Learn how to create complex layouts with CSS Grid. Perfect for beginners looking to level up their CSS skills...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 2 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Building a Component System in Go</h2>
+                <div class="blog-card__meta">By Alex Rivera • 8 min read • 1 week ago</div>
+                <p class="blog-card__excerpt">Explore how to create reusable HTML components in Go. A practical guide to building maintainable web applications...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 3 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Responsive Design Patterns</h2>
+                <div class="blog-card__meta">By Emma Watson • 6 min read • 2 weeks ago</div>
+                <p class="blog-card__excerpt">Common patterns for building responsive websites that work on every device. From mobile-first to desktop-first...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 4 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">CSS Variables in Depth</h2>
+                <div class="blog-card__meta">By Mike Johnson • 4 min read • 3 weeks ago</div>
+                <p class="blog-card__excerpt">Master CSS custom properties and learn how they can simplify your stylesheets and enable theming...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 5 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Flexbox vs Grid</h2>
+                <div class="blog-card__meta">By Lisa Park • 7 min read • 1 month ago</div>
+                <p class="blog-card__excerpt">When to use Flexbox and when to use Grid. A comprehensive comparison with practical examples...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 6 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Performance Optimization Tips</h2>
+                <div class="blog-card__meta">By Tom Wilson • 10 min read • 1 month ago</div>
+                <p class="blog-card__excerpt">Make your websites faster with these practical performance optimization techniques...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 7 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Web Accessibility Guide</h2>
+                <div class="blog-card__meta">By Nina Patel • 9 min read • 2 months ago</div>
+                <p class="blog-card__excerpt">Ensure your websites are accessible to everyone. A practical guide to WCAG compliance...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 8 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">Modern JavaScript Features</h2>
+                <div class="blog-card__meta">By James Lee • 6 min read • 2 months ago</div>
+                <p class="blog-card__excerpt">Explore the latest JavaScript features and how they can improve your code...</p>
+            </div>
+        </article>
+
+        <!-- Blog Post 9 -->
+        <article class="blog-card">
+            <div class="blog-card__image">📸 Featured Image</div>
+            <div class="blog-card__content">
+                <h2 class="blog-card__title">API Design Best Practices</h2>
+                <div class="blog-card__meta">By Maria Garcia • 8 min read • 3 months ago</div>
+                <p class="blog-card__excerpt">Learn how to design clean, consistent, and developer-friendly APIs...</p>
+            </div>
+        </article>
+    </main>
+
+    <footer class="dashboard-layout__footer">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+            <span>© 2024 My Blog</span>
+            <span style="display: flex; gap: 2rem;">
+                <a href="#" style="color: inherit; text-decoration: none;">Privacy</a>
+                <a href="#" style="color: inherit; text-decoration: none;">Terms</a>
+                <a href="#" style="color: inherit; text-decoration: none;">RSS</a>
+            </span>
+        </div>
+    </footer>
+</body>
+
+</html>
