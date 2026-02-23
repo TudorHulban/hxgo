@@ -10,7 +10,7 @@ Purpose: Content with navigation/supporting info (docs, tutorials, reference).
 
 ### 1.1. Documentation - Desktop (≥1024px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │            header?              │
 ├───────────────┬─────────────────┤
@@ -25,7 +25,7 @@ Purpose: Content with navigation/supporting info (docs, tutorials, reference).
 
 ### 1.2 Documentation - Mobile (<640px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │            header?              │
 ├─────────────────────────────────┤
@@ -45,7 +45,7 @@ Purpose: Data overview, analytics, management interfaces.
 
 ### 2.1 Dashboard - Desktop (≥1024px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │             header              │
 ├─────────────────────────────────┤
@@ -64,7 +64,7 @@ Purpose: Data overview, analytics, management interfaces.
 
 ### 2.2. Dashboard - Tablet (640px - 1023px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │             header              │
 ├─────────────────────────────────┤
@@ -79,7 +79,7 @@ Purpose: Data overview, analytics, management interfaces.
 
 ### 2.3 Dashboard - Mobile (<640px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │             header              │
 ├─────────────────────────────────┤
@@ -96,7 +96,7 @@ Purpose: Data overview, analytics, management interfaces.
 
 Purpose: Marketing pages, storytelling, product showcases.
 
-```css
+```go
 ┌─────────────────────────────────┐
 │          header (nav)           │
 ├─────────────────────────────────┤
@@ -130,7 +130,7 @@ Purpose: Complex tools with multiple panels (email client, IDE, admin).
 
 ### 4.1 Application - Desktop (≥1024px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │              header                 │
 ├──────────┬──────────────┬───────────┤
@@ -146,7 +146,7 @@ Purpose: Complex tools with multiple panels (email client, IDE, admin).
 
 ### 4.2 Application - Tablet (640px - 1023px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │              header                 │
 ├─────────────────────────────────────┤
@@ -162,7 +162,7 @@ Purpose: Complex tools with multiple panels (email client, IDE, admin).
 
 ### 4.3 Application - Mobile  (<640px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │              header                 │
 ├─────────────────────────────────────┤
@@ -183,7 +183,7 @@ Purpose: Long-form reading, articles, posts.
 
 ### 5.1 Blog - Desktop (≥1024px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │            header               │
 ├─────────────────────────────────┤
@@ -203,7 +203,7 @@ Purpose: Long-form reading, articles, posts.
 
 ### 5.2 Blog - Mobile (<640px)
 
-```css
+```go
 ┌─────────────────────────────────┐
 │            header               │
 ├─────────────────────────────────┤
@@ -223,29 +223,55 @@ Purpose: Long-form reading, articles, posts.
 ### Example Page Blog
 
 ```html
-<body class="blog-layout">
-  <header class="blog-layout__header">...</header>
-  
-  <img class="blog-layout__featured-image" src="post.jpg">
-  
-  <div class="blog-layout__content">
-    <article class="blog-layout__article">
-      <h1>Post Title</h1>
-      <p>Content...</p>
-    </article>
-    
-    <aside class="blog-layout__sidebar">
-      <div class="author-card">...</div>
-      <div class="related-posts">...</div>
-    </aside>
-  </div>
-  
-  <section class="blog-layout__comments">
-    <h2>Comments</h2>
-    ...
-  </section>
-  
-  <footer class="blog-layout__footer">...</footer>
+<body class="blog-layout debug-layout">
+    <header class="blog-layout__header">
+        <div style="width: 100%;">Logo | Navigation | Search</div>
+    </header>
+
+    <div class="blog-layout__featured-image">
+        <!-- Featured image placeholder -->
+    </div>
+
+    <div class="blog-layout__content">
+        <article class="blog-layout__article">
+            <h1>Understanding CSS Grid Layout</h1>
+            <p style="margin: 1rem 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+            <p style="margin: 1rem 0;">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p style="margin: 1rem 0;">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        </article>
+
+        <aside class="blog-layout__sidebar">
+            <div class="author-card">
+                <h3 style="margin-bottom: 0.5rem;">Jane Doe</h3>
+                <p>Senior Frontend Developer</p>
+            </div>
+            <div class="related-posts">
+                <h3 style="margin-bottom: 0.5rem;">Related Posts</h3>
+                <ul style="margin-left: 1.5rem;">
+                    <li>Flexbox vs Grid</li>
+                    <li>Responsive Design Patterns</li>
+                    <li>CSS Variables Guide</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <section class="blog-layout__comments">
+        <h2 style="margin-bottom: 1rem;">Comments (3)</h2>
+        <div style="background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+            <strong>John:</strong> Great article! Really helped me understand grid.
+        </div>
+        <div style="background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+            <strong>Sarah:</strong> When will you cover subgrid?
+        </div>
+        <div style="background: white; padding: 1rem; border-radius: 4px;">
+            <strong>Mike:</strong> The diagrams really made it click for me.
+        </div>
+    </section>
+
+    <footer class="blog-layout__footer">
+        © 2024 My Blog | About | Privacy | Terms
+    </footer>
 </body>
 ```
 
@@ -255,7 +281,7 @@ Purpose: E-commerce product pages.
 
 ### 6.1 Product - Desktop (≥1024px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │               header                │
 ├─────────────────────────────────────┤
@@ -280,7 +306,7 @@ Purpose: E-commerce product pages.
 
 ### 6.2 Product - Mobile (<640px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │               header                │
 ├─────────────────────────────────────┤
@@ -339,7 +365,7 @@ Purpose: Browse and filter content like products, articles, items.
 
 ### 7.1 Search - Desktop (≥1024px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │              header                 │
 ├─────────────────────────────────────┤
@@ -355,7 +381,7 @@ Purpose: Browse and filter content like products, articles, items.
 
 ### 7.2 Search - Mobile (<640px)
 
-```css
+```go
 ┌─────────────────────────────────────┐
 │               header                │
 ├─────────────────────────────────────┤
@@ -374,4 +400,3 @@ Purpose: Browse and filter content like products, articles, items.
 │ └─────────────────────────────────┘ │
 └─────────────────────────────────────┘
 ```
-
