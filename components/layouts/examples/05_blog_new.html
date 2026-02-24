@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Create Post Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 280px;
+            --form-width: 800px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+
+            /* Category colors */
+            --category-tech: #3b82f6;
+            --category-design: #ec4899;
+            --category-dev: #10b981;
+            --category-tutorial: #f59e0b;
+            --category-news: #8b5cf6;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Create Post Layout */
+        .create-post-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Main Form */
+        .create-post-form {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        .form-section {
+            margin-bottom: var(--space-2xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .form-section-title span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group .form-input,
+        .input-group .form-select {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Rich Text Toolbar */
+        .rich-toolbar {
+            display: flex;
+            gap: var(--space-xs);
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 2px;
+            border-right: 1px solid var(--border-color);
+            padding-right: var(--space-xs);
+            margin-right: var(--space-xs);
+        }
+
+        .rich-textarea {
+            border-radius: 0 0 6px 6px;
+            border-top: none;
+        }
+
+        /* Image Upload */
+        .image-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--accent);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .upload-text {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .image-preview {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        .preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--danger);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        /* Category & Tags */
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .category-option {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .category-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .category-option__name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .category-option__count {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .tags-input {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-xs);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .tag-item button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .tags-input input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+            padding: var(--space-xs);
+        }
+
+        /* SEO Section */
+        .seo-preview {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        .seo-preview__title {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .seo-preview__url {
+            color: var(--success);
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .seo-preview__description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Publish Options */
+        .publish-options {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-md);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Right Sidebar */
+        .create-post-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .sidebar-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .sidebar-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .sidebar-card__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        /* Post Stats */
+        .post-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Progress Bar */
+        .progress-item {
+            margin-bottom: var(--space-sm);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        /* Checklist */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .checklist-item span {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .checklist-item .checklist-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .checklist-badge.done {
+            background: var(--success);
+            color: white;
+        }
+
+        .checklist-badge.pending {
+            background: var(--warning);
+            color: white;
+        }
+
+        /* Recent Posts */
+        .recent-post-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recent-post-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-post-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+        }
+
+        .recent-post-info {
+            flex: 1;
+        }
+
+        .recent-post-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .recent-post-date {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .create-post-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .create-post-sidebar {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .create-post-form { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .create-post-sidebar { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .sidebar-card { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .form-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .debug-layout .form-section::before {
+            content: "form-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .category-option.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .image-upload-area {
+            border: 2px dashed #ff6384;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+                <a href="#" class="active">Write</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">SC</div>
+                <span>Sarah Chen ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Create New Post</h1>
+                <p>Write and publish a new blog post</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">📋 Save Draft</button>
+                <button class="btn">👁️ Preview</button>
+                <button class="btn primary">🚀 Publish</button>
+            </div>
+        </div>
+
+        <!-- Create Post Layout -->
+        <div class="create-post-layout">
+            <!-- Main Form -->
+            <div class="create-post-form">
+                <!-- Title & Content -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        Post Content
+                        <span>required</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Post Title <span>*</span></label>
+                        <input type="text" class="form-input" placeholder="e.g., Getting Started with React Hooks" value="Understanding CSS Grid Layout">
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Slug</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">/blog/</span>
+                            <input type="text" class="form-input" value="understanding-css-grid-layout">
+                        </div>
+                        <div class="form-hint">URL-friendly version of the title</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Content <span>*</span></label>
+                        <div class="rich-toolbar">
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn">B</button>
+                                <button class="toolbar-btn">I</button>
+                                <button class="toolbar-btn">U</button>
+                            </div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn">H1</button>
+                                <button class="toolbar-btn">H2</button>
+                                <button class="toolbar-btn">H3</button>
+                            </div>
+                            <div class="toolbar-group">
+                                <button class="toolbar-btn">🔗</button>
+                                <button class="toolbar-btn">📷</button>
+                                <button class="toolbar-btn">📋</button>
+                            </div>
+                            <button class="toolbar-btn">🔍 Preview</button>
+                        </div>
+                        <textarea class="form-textarea rich-textarea">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</textarea>
+                    </div>
+                </div>
+
+                <!-- Featured Image -->
+                <div class="form-section">
+                    <div class="form-section-title">Featured Image</div>
+                    
+                    <div class="image-upload-area">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-hint">PNG, JPG, GIF up to 10MB</div>
+                    </div>
+
+                    <div class="image-preview">
+                        <div class="preview-item">
+                            <img src="https://via.placeholder.com/100" alt="Preview">
+                            <span class="preview-remove">✕</span>
+                        </div>
+                        <div class="preview-item">
+                            <img src="https://via.placeholder.com/100" alt="Preview">
+                            <span class="preview-remove">✕</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Excerpt -->
+                <div class="form-section">
+                    <div class="form-section-title">Excerpt</div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Short Description</label>
+                        <textarea class="form-textarea" rows="3" placeholder="Brief summary of your post...">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</textarea>
+                        <div class="form-hint">Appears in blog listings and search results</div>
+                    </div>
+                </div>
+
+                <!-- Categories & Tags -->
+                <div class="form-section">
+                    <div class="form-section-title">Categories & Tags</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Primary Category</label>
+                            <div class="category-selector">
+                                <div class="category-option selected">
+                                    <div class="category-option__name">Technology</div>
+                                    <div class="category-option__count">24 posts</div>
+                                </div>
+                                <div class="category-option">
+                                    <div class="category-option__name">Design</div>
+                                    <div class="category-option__count">18 posts</div>
+                                </div>
+                                <div class="category-option">
+                                    <div class="category-option__name">Development</div>
+                                    <div class="category-option__count">32 posts</div>
+                                </div>
+                                <div class="category-option">
+                                    <div class="category-option__name">Tutorial</div>
+                                    <div class="category-option__count">15 posts</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Tags</label>
+                            <div class="tags-input">
+                                <span class="tag-item">CSS <button>✕</button></span>
+                                <span class="tag-item">Grid <button>✕</button></span>
+                                <span class="tag-item">Layout <button>✕</button></span>
+                                <span class="tag-item">Web Design <button>✕</button></span>
+                                <input type="text" placeholder="Add tag...">
+                            </div>
+                            <div class="form-hint">Press Enter or comma to add tags</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Settings -->
+                <div class="form-section">
+                    <div class="form-section-title">SEO Settings</div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Meta Title</label>
+                        <input type="text" class="form-input" value="Understanding CSS Grid Layout - A Complete Guide">
+                        <div class="form-hint">Leave empty to use post title (60 characters max)</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Meta Description</label>
+                        <textarea class="form-textarea" rows="2">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</textarea>
+                        <div class="form-hint">160 characters max for optimal search display</div>
+                    </div>
+
+                    <div class="seo-preview">
+                        <div class="seo-preview__title">Understanding CSS Grid Layout - A Complete Guide</div>
+                        <div class="seo-preview__url">https://devblog.com/blog/understanding-css-grid-layout</div>
+                        <div class="seo-preview__description">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+                    </div>
+                </div>
+
+                <!-- Publish Settings -->
+                <div class="form-section">
+                    <div class="form-section-title">Publish Settings</div>
+                    
+                    <div class="publish-options">
+                        <div class="radio-option">
+                            <input type="radio" name="publish" id="publish-now" checked>
+                            <label for="publish-now">Publish immediately</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="publish" id="publish-schedule">
+                            <label for="publish-schedule">Schedule for later</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="publish" id="publish-draft">
+                            <label for="publish-draft">Save as draft</label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: var(--space-md);">
+                        <div class="form-row">
+                            <label class="form-label">Publish Date</label>
+                            <input type="datetime-local" class="form-input" value="2024-12-24T09:00">
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Post Status</label>
+                            <select class="form-select">
+                                <option>Draft</option>
+                                <option selected>Ready for Review</option>
+                                <option>Published</option>
+                                <option>Scheduled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" style="display: flex; justify-content: flex-end; gap: var(--space-md); margin-top: var(--space-xl);">
+                    <button class="btn">Discard</button>
+                    <button class="btn outline">Save Draft</button>
+                    <button class="btn primary">Publish Post</button>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="create-post-sidebar">
+                <!-- Post Stats -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>Post Stats</h3>
+                    </div>
+                    
+                    <div class="post-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">342</div>
+                            <div class="stat-label">Words</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Images</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Links</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Headers</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Readability</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>SEO Score</span>
+                            <span>72%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 72%; background: var(--warning);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Publishing Checklist -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>Publishing Checklist</h3>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>Title added</span>
+                        <span class="checklist-badge done">Done</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>Content written</span>
+                        <span class="checklist-badge done">Done</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox">
+                        <span>Featured image</span>
+                        <span class="checklist-badge pending">Missing</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" checked>
+                        <span>Category selected</span>
+                        <span class="checklist-badge done">Done</span>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox">
+                        <span>SEO meta</span>
+                        <span class="checklist-badge pending">Optional</span>
+                    </div>
+                </div>
+
+                <!-- Recent Posts -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>Your Recent Drafts</h3>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="recent-post-item">
+                        <div class="recent-post-image"></div>
+                        <div class="recent-post-info">
+                            <div class="recent-post-title">Getting Started with React</div>
+                            <div class="recent-post-date">Last edited 2h ago</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-post-item">
+                        <div class="recent-post-image"></div>
+                        <div class="recent-post-info">
+                            <div class="recent-post-title">TypeScript Best Practices</div>
+                            <div class="recent-post-date">Last edited yesterday</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-post-item">
+                        <div class="recent-post-image"></div>
+                        <div class="recent-post-info">
+                            <div class="recent-post-title">API Design Patterns</div>
+                            <div class="recent-post-date">Last edited 3d ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>✏️</span>
+            <span>Write</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>
