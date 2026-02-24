@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Audit Log Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Spacing - Desktop only */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Event type colors */
+            --event-create: #10b981;
+            --event-update: #f59e0b;
+            --event-delete: #ef4444;
+            --event-view: #6b7280;
+            --event-login: #3b82f6;
+            --event-export: #8b5cf6;
+            --event-config: #f97316;
+        }
+
+        /* Application Layout - Desktop Only */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            min-width: 1280px; /* Force desktop width */
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Audit Content */
+        .audit-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .date-range {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: var(--space-xs);
+            align-items: center;
+        }
+
+        .date-range input {
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-change {
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+
+        .stat-change.up { color: var(--success); }
+        .stat-change.down { color: var(--danger); }
+
+        /* Timeline Navigation */
+        .timeline-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-lg);
+        }
+
+        .timeline-tabs {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .timeline-tab {
+            padding: var(--space-sm) var(--space-lg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .timeline-tab.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .timeline-range {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Audit Table */
+        .audit-table-container {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .table-search {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .table-search input {
+            padding: var(--space-sm);
+            border: none;
+            width: 250px;
+        }
+
+        .table-search button {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-primary);
+            border: none;
+            border-left: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .export-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        /* Audit Table */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .audit-table th {
+            text-align: left;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .audit-table td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .audit-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .audit-table tr.system {
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        .audit-table tr.security {
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* Event Badges */
+        .event-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .event-badge.create { background: #d1fae5; color: var(--event-create); }
+        .event-badge.update { background: #fed7aa; color: var(--event-update); }
+        .event-badge.delete { background: #fee2e2; color: var(--event-delete); }
+        .event-badge.view { background: #e5e7eb; color: var(--event-view); }
+        .event-badge.login { background: #dbeafe; color: var(--event-login); }
+        .event-badge.export { background: #ede9fe; color: var(--event-export); }
+        .event-badge.config { background: #ffedd5; color: var(--event-config); }
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .user-details {
+            line-height: 1.3;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .user-email {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* IP Address */
+        .ip-address {
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .ip-tag {
+            background: var(--bg-tertiary);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            margin-left: 4px;
+        }
+
+        /* Resource Link */
+        .resource-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+
+        .resource-type {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        /* Changes Details */
+        .changes-details {
+            font-size: 0.8rem;
+            max-width: 300px;
+        }
+
+        .change-item {
+            display: flex;
+            gap: var(--space-xs);
+            margin-bottom: 2px;
+        }
+
+        .change-field {
+            font-weight: 500;
+            min-width: 60px;
+        }
+
+        .change-old {
+            color: var(--danger);
+            text-decoration: line-through;
+        }
+
+        .change-new {
+            color: var(--success);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .pagination-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            min-width: 40px;
+        }
+
+        .pagination-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--bg-secondary);
+        }
+
+        .pagination-per-page {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .pagination-per-page select {
+            padding: var(--space-xs);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .audit-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .filter-section { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .audit-table-container { background: rgba(153, 102, 255, 0.02); }
+
+        /* Component debug */
+        .debug-layout .audit-table tr {
+            border-bottom: 1px dashed #ff6384;
+        }
+
+        .debug-layout .event-badge {
+            border: 1px dashed currentColor;
+        }
+
+        .debug-layout .stat-card {
+            border: 1px dashed #4bc0c0;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#">Reports</a>
+                <a href="#" class="active">Admin</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe (Admin) ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">🔐</span>
+                    <span>Admin</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">ADMIN TOOLS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>System Health</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Audit Logs</span>
+                    <span class="nav-item__badge">1,284</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔐</span>
+                    <span>Security</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">AUDIT CATEGORIES</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔐</span>
+                    <span>Security Events</span>
+                    <span class="nav-item__badge">342</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Project Changes</span>
+                    <span class="nav-item__badge">567</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>User Management</span>
+                    <span class="nav-item__badge">234</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">⚙️</span>
+                    <span>Configuration</span>
+                    <span class="nav-item__badge">89</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📤</span>
+                    <span>Exports</span>
+                    <span class="nav-item__badge">52</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Audit Content -->
+        <main class="audit-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Audit Logs</h1>
+                    <p>Track all system activities and changes</p>
+                </div>
+                <div class="content-header__actions">
+                    <button class="btn">📅 Schedule Report</button>
+                    <button class="btn primary">📥 Export Logs</button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">1,284</div>
+                    <div class="stat-label">Total Events</div>
+                    <div class="stat-change up">↑ 12.3%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">342</div>
+                    <div class="stat-label">Security</div>
+                    <div class="stat-change down">↓ 3.2%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">567</div>
+                    <div class="stat-label">Projects</div>
+                    <div class="stat-change up">↑ 8.1%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">234</div>
+                    <div class="stat-label">Users</div>
+                    <div class="stat-change up">↑ 5.4%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Config</div>
+                    <div class="stat-change neutral">→ 0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">52</div>
+                    <div class="stat-label">Exports</div>
+                    <div class="stat-change up">↑ 15.7%</div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Date Range</label>
+                        <div class="date-range">
+                            <input type="date" value="2024-12-01">
+                            <span>→</span>
+                            <input type="date" value="2024-12-31">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Event Type</label>
+                        <select class="filter-select">
+                            <option selected>All Events</option>
+                            <option>Create</option>
+                            <option>Update</option>
+                            <option>Delete</option>
+                            <option>View</option>
+                            <option>Login</option>
+                            <option>Export</option>
+                            <option>Configuration</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">User</label>
+                        <select class="filter-select">
+                            <option selected>All Users</option>
+                            <option>John Doe (Admin)</option>
+                            <option>Sarah Chen</option>
+                            <option>Mike Johnson</option>
+                            <option>Alex Rivera</option>
+                            <option>Emma Watson</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Resource</label>
+                        <select class="filter-select">
+                            <option selected">All Resources</option>
+                            <option>Projects</option>
+                            <option>Tasks</option>
+                            <option>Reports</option>
+                            <option>Users</option>
+                            <option>Settings</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">IP Address</label>
+                        <input type="text" class="filter-input" placeholder="e.g., 192.168.1.1">
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select">
+                            <option selected>All</option>
+                            <option>Success</option>
+                            <option>Failure</option>
+                            <option>Warning</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn">Reset</button>
+                    <button class="btn primary">Apply Filters</button>
+                    <button class="btn">Save Filter Preset</button>
+                </div>
+            </div>
+
+            <!-- Timeline Navigation -->
+            <div class="timeline-nav">
+                <div class="timeline-tabs">
+                    <button class="timeline-tab active">Real-time</button>
+                    <button class="timeline-tab">Hourly</button>
+                    <button class="timeline-tab">Daily</button>
+                    <button class="timeline-tab">Weekly</button>
+                    <button class="timeline-tab">Monthly</button>
+                </div>
+                <div class="timeline-range">
+                    <span>←</span>
+                    <span>Dec 1, 2024 - Dec 31, 2024</span>
+                    <span>→</span>
+                </div>
+            </div>
+
+            <!-- Audit Table -->
+            <div class="audit-table-container">
+                <div class="table-header">
+                    <h2>Event Log</h2>
+                    <div class="table-controls">
+                        <div class="table-search">
+                            <input type="text" placeholder="Search logs...">
+                            <button>🔍</button>
+                        </div>
+                        <button class="export-btn">
+                            <span>📥</span>
+                            <span>Export</span>
+                        </button>
+                    </div>
+                </div>
+
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Event Type</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Resource</th>
+                            <th>IP Address</th>
+                            <th>Changes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Security Event -->
+                        <tr class="security">
+                            <td>2024-12-31 23:45:22</td>
+                            <td><span class="event-badge login">LOGIN</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">JD</div>
+                                    <div class="user-details">
+                                        <div class="user-name">John Doe</div>
+                                        <div class="user-email">john.doe@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Successful login</td>
+                            <td>
+                                <a href="#" class="resource-link">User Session</a>
+                                <span class="resource-type">authentication</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">192.168.1.45</span>
+                                <span class="ip-tag">internal</span>
+                            </td>
+                            <td>-</td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+
+                        <!-- Project Update -->
+                        <tr>
+                            <td>2024-12-31 22:15:03</td>
+                            <td><span class="event-badge update">UPDATE</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">SC</div>
+                                    <div class="user-details">
+                                        <div class="user-name">Sarah Chen</div>
+                                        <div class="user-email">sarah.chen@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Updated project status</td>
+                            <td>
+                                <a href="#" class="resource-link">Mobile App</a>
+                                <span class="resource-type">project</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">10.0.2.15</span>
+                                <span class="ip-tag">office</span>
+                            </td>
+                            <td>
+                                <div class="changes-details">
+                                    <div class="change-item">
+                                        <span class="change-field">status:</span>
+                                        <span class="change-old">In Progress</span>
+                                        <span>→</span>
+                                        <span class="change-new">Review</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+
+                        <!-- Configuration Change -->
+                        <tr class="system">
+                            <td>2024-12-31 21:30:47</td>
+                            <td><span class="event-badge config">CONFIG</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">JD</div>
+                                    <div class="user-details">
+                                        <div class="user-name">John Doe</div>
+                                        <div class="user-email">john.doe@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Changed security policy</td>
+                            <td>
+                                <a href="#" class="resource-link">Authentication Settings</a>
+                                <span class="resource-type">configuration</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">192.168.1.45</span>
+                                <span class="ip-tag">internal</span>
+                            </td>
+                            <td>
+                                <div class="changes-details">
+                                    <div class="change-item">
+                                        <span class="change-field">2FA:</span>
+                                        <span class="change-old">Optional</span>
+                                        <span>→</span>
+                                        <span class="change-new">Required</span>
+                                    </div>
+                                    <div class="change-item">
+                                        <span class="change-field">timeout:</span>
+                                        <span class="change-old">30min</span>
+                                        <span>→</span>
+                                        <span class="change-new">15min</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+
+                        <!-- Failed Login -->
+                        <tr class="security">
+                            <td>2024-12-31 20:12:18</td>
+                            <td><span class="event-badge login">LOGIN</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">?</div>
+                                    <div class="user-details">
+                                        <div class="user-name">Unknown</div>
+                                        <div class="user-email">unknown@attempt.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Failed login attempt</td>
+                            <td>
+                                <span class="resource-link">Authentication</span>
+                                <span class="resource-type">security</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">185.142.53.22</span>
+                                <span class="ip-tag">external</span>
+                            </td>
+                            <td>-</td>
+                            <td><span class="event-badge delete">Failed</span></td>
+                        </tr>
+
+                        <!-- Task Creation -->
+                        <tr>
+                            <td>2024-12-31 19:05:33</td>
+                            <td><span class="event-badge create">CREATE</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">MJ</div>
+                                    <div class="user-details">
+                                        <div class="user-name">Mike Johnson</div>
+                                        <div class="user-email">mike.j@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Created new task</td>
+                            <td>
+                                <a href="#" class="resource-link">API Documentation</a>
+                                <span class="resource-type">task</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">10.0.2.22</span>
+                                <span class="ip-tag">office</span>
+                            </td>
+                            <td>
+                                <div class="changes-details">
+                                    <div class="change-item">
+                                        <span class="change-field">assignee:</span>
+                                        <span>Alex Rivera</span>
+                                    </div>
+                                    <div class="change-item">
+                                        <span class="change-field">priority:</span>
+                                        <span>High</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+
+                        <!-- Report Export -->
+                        <tr>
+                            <td>2024-12-31 18:22:41</td>
+                            <td><span class="event-badge export">EXPORT</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">EW</div>
+                                    <div class="user-details">
+                                        <div class="user-name">Emma Watson</div>
+                                        <div class="user-email">emma.w@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Exported Q4 report</td>
+                            <td>
+                                <a href="#" class="resource-link">Project Progress Report</a>
+                                <span class="resource-type">report</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">10.0.2.31</span>
+                                <span class="ip-tag">office</span>
+                            </td>
+                            <td>
+                                <div class="changes-details">
+                                    <div class="change-item">
+                                        <span class="change-field">format:</span>
+                                        <span>PDF</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+
+                        <!-- User Deletion -->
+                        <tr>
+                            <td>2024-12-31 17:10:05</td>
+                            <td><span class="event-badge delete">DELETE</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">JD</div>
+                                    <div class="user-details">
+                                        <div class="user-name">John Doe</div>
+                                        <div class="user-email">john.doe@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Deleted inactive user</td>
+                            <td>
+                                <span class="resource-link">User Account</span>
+                                <span class="resource-type">user</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">192.168.1.45</span>
+                                <span class="ip-tag">internal</span>
+                            </td>
+                            <td>
+                                <div class="changes-details">
+                                    <div class="change-item">
+                                        <span class="change-field">user:</span>
+                                        <span>tom.parker@company.com</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+
+                        <!-- Permission Change -->
+                        <tr class="security">
+                            <td>2024-12-31 16:45:22</td>
+                            <td><span class="event-badge update">UPDATE</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">JD</div>
+                                    <div class="user-details">
+                                        <div class="user-name">John Doe</div>
+                                        <div class="user-email">john.doe@company.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Modified user permissions</td>
+                            <td>
+                                <a href="#" class="resource-link">Role: Developer</a>
+                                <span class="resource-type">permissions</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">192.168.1.45</span>
+                                <span class="ip-tag">internal</span>
+                            </td>
+                            <td>
+                                <div class="changes-details">
+                                    <div class="change-item">
+                                        <span class="change-field">added:</span>
+                                        <span>export, delete</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="event-badge success">Success</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">
+                        Showing 1-8 of 1,284 events
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" disabled>←</button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">3</button>
+                        <button class="pagination-btn">4</button>
+                        <button class="pagination-btn">5</button>
+                        <button class="pagination-btn">...</button>
+                        <button class="pagination-btn">50</button>
+                        <button class="pagination-btn">→</button>
+                    </div>
+                    <div class="pagination-per-page">
+                        <span>Show:</span>
+                        <select>
+                            <option>25 per page</option>
+                            <option selected>50 per page</option>
+                            <option>100 per page</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

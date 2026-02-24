@@ -139,7 +139,22 @@ Landing HTML file provides an example that includes debug info with the followin
 
 ## Layout 4: Application
 
-Purpose: Complex tools with multiple panels (email client, IDE, admin).
+Purpose: Complex tools with multiple panels (email client, IDE, admin).  
+HTML files provide an example that include debug info:
+
+04_application.html                 (Main application dashboard)
+04_application_analytics.html       (Analytics page)
+04_application_projects.html        (Projects list page)
+04_application_project.html         (Single project view)
+04_application_tasks.html           (Tasks list page)
+04_application_task.html            (Single task view)
+04_application_team.html            (Team members list)
+04_application_team_member.html     (Single team member view)
+04_application_reports.html         (Reports list page)
+04_application_report.html          (Single report view/definition)
+04_application_report_run.html      (Run report page)
+04_application_report_target.html   (Report target configuration)
+04_application_reports_comparison.html (Compare reports page)
 
 ### 4.1 Application - Desktop (≥1024px)
 
