@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Category View Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 300px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Category colors */
+            --cat-tech: #3b82f6;
+            --cat-design: #ec4899;
+            --cat-dev: #10b981;
+            --cat-tutorial: #f59e0b;
+            --cat-news: #8b5cf6;
+            --cat-career: #f97316;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Category Header */
+        .category-header {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .category-header__accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--cat-tech);
+        }
+
+        .category-header__content {
+            margin-left: var(--space-lg);
+        }
+
+        .category-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .category-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .category-breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .category-header__title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .category-header__title h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+        }
+
+        .category-header__badge {
+            background: var(--cat-tech);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .category-header__description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 800px;
+            margin-bottom: var(--space-lg);
+        }
+
+        .category-stats {
+            display: flex;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .category-stat {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .category-stat__value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-stat__label {
+            color: var(--text-secondary);
+        }
+
+        .category-follow {
+            margin-left: auto;
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .follow-btn {
+            padding: var(--space-sm) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .follow-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .rss-btn {
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--orange);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--space-xs);
+        }
+
+        .category-tab {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+        }
+
+        .category-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .category-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Category Layout */
+        .category-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Posts Grid */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .post-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .post-image {
+            height: 180px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .post-category-badge {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--cat-tech);
+        }
+
+        .post-content {
+            padding: var(--space-lg);
+        }
+
+        .post-meta {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .post-author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .post-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+            line-height: 1.4;
+        }
+
+        .post-excerpt {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .post-stats {
+            display: flex;
+            gap: var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .post-read-more {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Featured Post */
+        .featured-post {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .featured-post .post-image {
+            height: 100%;
+            min-height: 300px;
+        }
+
+        .featured-post .post-content {
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .featured-post .post-title {
+            font-size: 1.8rem;
+        }
+
+        .featured-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-bottom: var(--space-sm);
+        }
+
+        /* Sidebar */
+        .category-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .sidebar-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .sidebar-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .sidebar-card__header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* About Category */
+        .about-category p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .category-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-meta-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-meta-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-meta-content {
+            flex: 1;
+        }
+
+        .category-meta-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .category-meta-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Top Authors */
+        .top-author-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .top-author-item:last-child {
+            border-bottom: none;
+        }
+
+        .top-author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .top-author-info {
+            flex: 1;
+        }
+
+        .top-author-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .top-author-stats {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .top-author-posts {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Popular Posts in Category */
+        .popular-post-item {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .popular-post-item:last-child {
+            border-bottom: none;
+        }
+
+        .popular-post-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            flex-shrink: 0;
+        }
+
+        .popular-post-info {
+            flex: 1;
+        }
+
+        .popular-post-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .popular-post-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        /* Related Categories */
+        .related-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .related-category {
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .related-category:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Newsletter */
+        .newsletter-card {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            color: white;
+        }
+
+        .newsletter-card h3 {
+            color: white;
+        }
+
+        .newsletter-input {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: var(--space-md);
+        }
+
+        .newsletter-input input {
+            flex: 1;
+            padding: var(--space-sm);
+            border: none;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .newsletter-input button {
+            padding: var(--space-sm) var(--space-lg);
+            background: white;
+            color: var(--accent);
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xs);
+            margin-top: var(--space-xl);
+            grid-column: span 2;
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            background: white;
+        }
+
+        .pagination-item.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-item:hover:not(.active) {
+            background: var(--bg-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .category-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .posts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .featured-post {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-post .post-image {
+                min-height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .category-header__title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .category-header__title h1 {
+                font-size: 2rem;
+            }
+
+            .category-stats {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .category-follow {
+                margin-left: 0;
+                margin-top: var(--space-md);
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-post .post-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .category-tabs {
+                overflow-x: auto;
+                padding-bottom: 0;
+            }
+
+            .category-tab {
+                white-space: nowrap;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .category-header { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .posts-grid { background: rgba(75, 192, 192, 0.02); }
+        .debug-layout .category-sidebar { background: rgba(153, 102, 255, 0.05); }
+
+        /* Component debug */
+        .debug-layout .post-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .featured-post {
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .sidebar-card {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .category-header__accent {
+            background: #ff6384;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#" class="active">Categories</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Category Header -->
+        <div class="category-header">
+            <div class="category-header__accent" style="background: var(--cat-tech);"></div>
+            <div class="category-header__content">
+                <div class="category-breadcrumb">
+                    <a href="#">Home</a>
+                    <span>›</span>
+                    <a href="#">Categories</a>
+                    <span>›</span>
+                    <span>Technology</span>
+                </div>
+
+                <div class="category-header__title">
+                    <h1>Technology</h1>
+                    <span class="category-header__badge" style="background: var(--cat-tech);">86 posts</span>
+                </div>
+
+                <p class="category-header__description">
+                    Explore the latest in technology, from software development and artificial intelligence to cloud computing and emerging tech trends. Stay updated with expert insights and practical tutorials.
+                </p>
+
+                <div class="category-stats">
+                    <div class="category-stat">
+                        <span class="category-stat__value">86</span>
+                        <span class="category-stat__label">articles</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat__value">12</span>
+                        <span class="category-stat__label">authors</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat__value">45.2K</span>
+                        <span class="category-stat__label">monthly views</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat__value">Updated</span>
+                        <span class="category-stat__label">2 days ago</span>
+                    </div>
+                    <div class="category-follow">
+                        <button class="follow-btn">
+                            <span>➕</span>
+                            <span>Follow Category</span>
+                        </button>
+                        <button class="rss-btn">📡 RSS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <span class="category-tab active">Latest</span>
+            <span class="category-tab">Popular</span>
+            <span class="category-tab">Trending</span>
+            <span class="category-tab">Top Rated</span>
+            <span class="category-tab">Series</span>
+        </div>
+
+        <!-- Category Layout -->
+        <div class="category-layout">
+            <!-- Main Content - Posts Grid -->
+            <div>
+                <div class="posts-grid">
+                    <!-- Featured Post -->
+                    <div class="featured-post">
+                        <div class="post-image">🤖</div>
+                        <div class="post-content">
+                            <span class="featured-badge">Featured</span>
+                            <h2 class="post-title">The Future of AI: What Developers Need to Know in 2025</h2>
+                            <div class="post-meta">
+                                <span class="post-author">
+                                    <span class="post-author-avatar">SC</span>
+                                    Sarah Chen
+                                </span>
+                                <span>Dec 20, 2024</span>
+                                <span>12 min read</span>
+                            </div>
+                            <p class="post-excerpt">
+                                As we approach 2025, AI is evolving faster than ever. Learn about the latest trends, tools, and frameworks that every developer should have on their radar.
+                            </p>
+                            <div class="post-footer">
+                                <div class="post-stats">
+                                    <span>👁️ 3.2K</span>
+                                    <span>💬 24</span>
+                                </div>
+                                <a href="#" class="post-read-more">Read More →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Regular Post 1 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            🐍
+                            <span class="post-category-badge">Python</span>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-author">
+                                    <span class="post-author-avatar">MJ</span>
+                                    Mike Johnson
+                                </span>
+                                <span>Dec 18, 2024</span>
+                            </div>
+                            <h2 class="post-title">Python 3.13: New Features and Performance Improvements</h2>
+                            <p class="post-excerpt">
+                                Explore the latest Python release with faster execution, better error messages, and exciting new language features.
+                            </p>
+                            <div class="post-footer">
+                                <div class="post-stats">
+                                    <span>👁️ 1.8K</span>
+                                    <span>💬 12</span>
+                                </div>
+                                <a href="#" class="post-read-more">Read More →</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Regular Post 2 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            ☁️
+                            <span class="post-category-badge">Cloud</span>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-author">
+                                    <span class="post-author-avatar">AR</span>
+                                    Alex Rivera
+                                </span>
+                                <span>Dec 15, 2024</span>
+                            </div>
+                            <h2 class="post-title">Kubernetes for Beginners: A Practical Guide</h2>
+                            <p class="post-excerpt">
+                                Get started with container orchestration. Learn the basics of Kubernetes with hands-on examples and best practices.
+                            </p>
+                            <div class="post-footer">
+                                <div class="post-stats">
+                                    <span>👁️ 2.1K</span>
+                                    <span>💬 18</span>
+                                </div>
+                                <a href="#" class="post-read-more">Read More →</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Regular Post 3 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            ⚛️
+                            <span class="post-category-badge">React</span>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-author">
+                                    <span class="post-author-avatar">SC</span>
+                                    Sarah Chen
+                                </span>
+                                <span>Dec 12, 2024</span>
+                            </div>
+                            <h2 class="post-title">React Server Components: A New Paradigm</h2>
+                            <p class="post-excerpt">
+                                Understand how React Server Components change the way we build applications, with improved performance and developer experience.
+                            </p>
+                            <div class="post-footer">
+                                <div class="post-stats">
+                                    <span>👁️ 2.5K</span>
+                                    <span>💬 21</span>
+                                </div>
+                                <a href="#" class="post-read-more">Read More →</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Regular Post 4 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            🛢️
+                            <span class="post-category-badge">Database</span>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-author">
+                                    <span class="post-author-avatar">EW</span>
+                                    Emma Watson
+                                </span>
+                                <span>Dec 10, 2024</span>
+                            </div>
+                            <h2 class="post-title">PostgreSQL 17: What's New</h2>
+                            <p class="post-excerpt">
+                                Discover the latest features in PostgreSQL 17, including performance improvements, new data types, and enhanced security.
+                            </p>
+                            <div class="post-footer">
+                                <div class="post-stats">
+                                    <span>👁️ 1.2K</span>
+                                    <span>💬 8</span>
+                                </div>
+                                <a href="#" class="post-read-more">Read More →</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Regular Post 5 -->
+                    <article class="post-card">
+                        <div class="post-image">
+                            🔐
+                            <span class="post-category-badge">Security</span>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta">
+                                <span class="post-author">
+                                    <span class="post-author-avatar">TP</span>
+                                    Tom Parker
+                                </span>
+                                <span>Dec 8, 2024</span>
+                            </div>
+                            <h2 class="post-title">Zero-Trust Security for Web Applications</h2>
+                            <p class="post-excerpt">
+                                Implement zero-trust principles in your web applications to protect against modern security threats and data breaches.
+                            </p>
+                            <div class="post-footer">
+                                <div class="post-stats">
+                                    <span>👁️ 1.5K</span>
+                                    <span>💬 14</span>
+                                </div>
+                                <a href="#" class="post-read-more">Read More →</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <span class="pagination-item">←</span>
+                    <span class="pagination-item active">1</span>
+                    <span class="pagination-item">2</span>
+                    <span class="pagination-item">3</span>
+                    <span class="pagination-item">4</span>
+                    <span class="pagination-item">5</span>
+                    <span class="pagination-item">→</span>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="category-sidebar">
+                <!-- About Category -->
+                <div class="sidebar-card about-category">
+                    <div class="sidebar-card__header">
+                        <h3>📌 About this Category</h3>
+                    </div>
+                    <p>
+                        Technology covers all aspects of software development, programming languages, frameworks, tools, and industry trends. Whether you're a beginner or an expert, you'll find valuable resources here.
+                    </p>
+                    
+                    <div class="category-meta-item">
+                        <div class="category-meta-icon">📅</div>
+                        <div class="category-meta-content">
+                            <div class="category-meta-label">Created</div>
+                            <div class="category-meta-value">March 2022</div>
+                        </div>
+                    </div>
+
+                    <div class="category-meta-item">
+                        <div class="category-meta-icon">✍️</div>
+                        <div class="category-meta-content">
+                            <div class="category-meta-label">Contributors</div>
+                            <div class="category-meta-value">12 authors</div>
+                        </div>
+                    </div>
+
+                    <div class="category-meta-item">
+                        <div class="category-meta-icon">👁️</div>
+                        <div class="category-meta-content">
+                            <div class="category-meta-label">Total Views</div>
+                            <div class="category-meta-value">245.8K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Authors in Category -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>✍️ Top Contributors</h3>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="top-author-item">
+                        <div class="top-author-avatar">SC</div>
+                        <div class="top-author-info">
+                            <div class="top-author-name">Sarah Chen</div>
+                            <div class="top-author-stats">24 posts · 45.2K views</div>
+                        </div>
+                        <div class="top-author-posts">24</div>
+                    </div>
+
+                    <div class="top-author-item">
+                        <div class="top-author-avatar">MJ</div>
+                        <div class="top-author-info">
+                            <div class="top-author-name">Mike Johnson</div>
+                            <div class="top-author-stats">18 posts · 32.1K views</div>
+                        </div>
+                        <div class="top-author-posts">18</div>
+                    </div>
+
+                    <div class="top-author-item">
+                        <div class="top-author-avatar">AR</div>
+                        <div class="top-author-info">
+                            <div class="top-author-name">Alex Rivera</div>
+                            <div class="top-author-stats">15 posts · 28.4K views</div>
+                        </div>
+                        <div class="top-author-posts">15</div>
+                    </div>
+
+                    <div class="top-author-item">
+                        <div class="top-author-avatar">EW</div>
+                        <div class="top-author-info">
+                            <div class="top-author-name">Emma Watson</div>
+                            <div class="top-author-stats">12 posts · 21.3K views</div>
+                        </div>
+                        <div class="top-author-posts">12</div>
+                    </div>
+                </div>
+
+                <!-- Popular Posts in Category -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>🔥 Popular in Technology</h3>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">The Future of AI: What Developers Need</div>
+                            <div class="popular-post-meta">
+                                <span>👁️ 3.2K</span>
+                                <span>💬 24</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">React Server Components Explained</div>
+                            <div class="popular-post-meta">
+                                <span>👁️ 2.5K</span>
+                                <span>💬 21</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">Kubernetes for Beginners</div>
+                            <div class="popular-post-meta">
+                                <span>👁️ 2.1K</span>
+                                <span>💬 18</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">Python 3.13 New Features</div>
+                            <div class="popular-post-meta">
+                                <span>👁️ 1.8K</span>
+                                <span>💬 12</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Related Categories -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>🔗 Related Categories</h3>
+                    </div>
+                    
+                    <div class="related-categories">
+                        <a href="#" class="related-category">Development</a>
+                        <a href="#" class="related-category">Programming</a>
+                        <a href="#" class="related-category">Web Dev</a>
+                        <a href="#" class="related-category">AI/ML</a>
+                        <a href="#" class="related-category">Cloud</a>
+                        <a href="#" class="related-category">DevOps</a>
+                        <a href="#" class="related-category">Databases</a>
+                        <a href="#" class="related-category">Security</a>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="sidebar-card newsletter-card">
+                    <div class="sidebar-card__header">
+                        <h3>📧 Get Technology Updates</h3>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                        Get the latest technology articles delivered to your inbox
+                    </p>
+                    <div class="newsletter-input">
+                        <input type="email" placeholder="Your email">
+                        <button>Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📑</span>
+            <span>Categories</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🔍</span>
+            <span>Search</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>

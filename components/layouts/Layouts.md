@@ -208,7 +208,16 @@ HTML files provide an example that include debug info:
 ## Layout 5: Blog
 
 Purpose: Long-form reading, articles, posts.  
-Blog HTML file provides an example that includes debug info.
+Blog HTML files provide an example that include debug info:
+
+- 05_blog_listing.html - Blog homepage / post listing
+- 05_blog_post.html - Single blog post view
+- 05_blog_new.html - Create new blog post
+- 05_blog_author.html - Author public profile
+- 05_blog_center_author.html - Author dashboard (private stats)
+- 05_blog_center_admin.html - Admin dashboard (manage all)
+- 05_blog_categories.html - Categories management
+- 07_search_blogs.html - Blog search results
 
 ### 5.1 Blog - Desktop (≥1024px)
 

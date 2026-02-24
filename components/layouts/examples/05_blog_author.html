@@ -155,14 +155,16 @@
             width: 100%;
         }
 
-        /* Author Profile Header */
         .author-profile-header {
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: var(--space-2xl);
+            padding: 0 0 var(--space-xl) 0;
+            /* Remove top padding */
             margin-bottom: var(--space-xl);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            /* Keep cover image contained */
         }
 
         .author-profile-cover {
@@ -177,7 +179,7 @@
             display: flex;
             gap: var(--space-xl);
             align-items: flex-end;
-            margin-top: -60px;
+            /* margin-top: -60px; */
             padding: 0 var(--space-lg);
         }
 
@@ -187,7 +189,7 @@
             border-radius: 50%;
             background: var(--accent-light);
             border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -279,10 +281,21 @@
             transform: scale(1.1);
         }
 
-        .social-link.twitter { background: var(--twitter); }
-        .social-link.github { background: var(--github); }
-        .social-link.linkedin { background: var(--linkedin); }
-        .social-link.website { background: var(--website); }
+        .social-link.twitter {
+            background: var(--twitter);
+        }
+
+        .social-link.github {
+            background: var(--github);
+        }
+
+        .social-link.linkedin {
+            background: var(--linkedin);
+        }
+
+        .social-link.website {
+            background: var(--website);
+        }
 
         /* Author Tabs */
         .author-tabs {
@@ -337,7 +350,7 @@
 
         .post-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
         }
 
         .post-image {
@@ -501,9 +514,18 @@
             border-color: var(--accent);
         }
 
-        .category-tag.large { font-size: 1rem; padding: 6px 16px; }
-        .category-tag.medium { font-size: 0.9rem; }
-        .category-tag.small { font-size: 0.7rem; }
+        .category-tag.large {
+            font-size: 1rem;
+            padding: 6px 16px;
+        }
+
+        .category-tag.medium {
+            font-size: 0.9rem;
+        }
+
+        .category-tag.small {
+            font-size: 0.7rem;
+        }
 
         /* Recent Comments */
         .recent-comment-item {
@@ -755,7 +777,7 @@
         /* Debug styles */
         .debug-layout [class*="blog-layout__"] {
             position: relative;
-            outline: 1px dotted rgba(0,0,0,0.1);
+            outline: 1px dotted rgba(0, 0, 0, 0.1);
         }
 
         .debug-layout [class*="blog-layout__"]::before {
@@ -774,11 +796,25 @@
         }
 
         /* Section colors */
-        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
-        .debug-layout .author-profile-header { background: rgba(54, 162, 235, 0.05); }
-        .debug-layout .posts-grid { background: rgba(75, 192, 192, 0.02); }
-        .debug-layout .author-sidebar { background: rgba(153, 102, 255, 0.05); }
-        .debug-layout .sidebar-card { background: rgba(255, 159, 64, 0.05); }
+        .debug-layout .blog-layout__header {
+            background: rgba(255, 99, 132, 0.2);
+        }
+
+        .debug-layout .author-profile-header {
+            background: rgba(54, 162, 235, 0.05);
+        }
+
+        .debug-layout .posts-grid {
+            background: rgba(75, 192, 192, 0.02);
+        }
+
+        .debug-layout .author-sidebar {
+            background: rgba(153, 102, 255, 0.05);
+        }
+
+        .debug-layout .sidebar-card {
+            background: rgba(255, 159, 64, 0.05);
+        }
 
         /* Component debug */
         .debug-layout .post-card {
@@ -824,14 +860,16 @@
         <!-- Author Profile Header -->
         <div class="author-profile-header">
             <div class="author-profile-cover"></div>
-            
+
             <div class="author-profile-info">
                 <div class="author-profile-avatar-large">SC</div>
                 <div class="author-profile-details">
                     <h1 class="author-profile-name">Sarah Chen</h1>
                     <div class="author-profile-role">Senior Tech Writer & Frontend Specialist</div>
                     <p class="author-profile-bio">
-                        Passionate about frontend development, CSS, and React. I've been writing tutorials and sharing knowledge with the developer community for over 5 years. Previously at Google, now full-time writer and educator.
+                        Passionate about frontend development, CSS, and React. I've been writing tutorials and sharing
+                        knowledge with the developer community for over 5 years. Previously at Google, now full-time
+                        writer and educator.
                     </p>
                     <div class="author-profile-meta">
                         <span class="author-meta-item">📍 San Francisco, CA</span>
@@ -894,7 +932,8 @@
                         </div>
                         <h2 class="post-title">Understanding React Hooks: A Deep Dive</h2>
                         <p class="post-excerpt">
-                            Learn how to master React Hooks with practical examples. This comprehensive guide covers useState, useEffect, useContext, and custom hooks...
+                            Learn how to master React Hooks with practical examples. This comprehensive guide covers
+                            useState, useEffect, useContext, and custom hooks...
                         </p>
                         <div class="post-footer">
                             <div class="post-stats">
@@ -918,7 +957,8 @@
                         </div>
                         <h2 class="post-title">CSS Grid Layout: Complete Guide</h2>
                         <p class="post-excerpt">
-                            Master CSS Grid with practical examples. Learn how to create complex layouts with rows, columns, and advanced grid features...
+                            Master CSS Grid with practical examples. Learn how to create complex layouts with rows,
+                            columns, and advanced grid features...
                         </p>
                         <div class="post-footer">
                             <div class="post-stats">
@@ -942,7 +982,8 @@
                         </div>
                         <h2 class="post-title">TypeScript Best Practices for 2024</h2>
                         <p class="post-excerpt">
-                            Level up your TypeScript skills with these best practices. Learn about types, interfaces, generics, and advanced patterns...
+                            Level up your TypeScript skills with these best practices. Learn about types, interfaces,
+                            generics, and advanced patterns...
                         </p>
                         <div class="post-footer">
                             <div class="post-stats">
@@ -966,7 +1007,8 @@
                         </div>
                         <h2 class="post-title">Getting Started with Next.js 14</h2>
                         <p class="post-excerpt">
-                            Explore the latest features in Next.js 14. Learn about App Router, Server Components, and performance optimization...
+                            Explore the latest features in Next.js 14. Learn about App Router, Server Components, and
+                            performance optimization...
                         </p>
                         <div class="post-footer">
                             <div class="post-stats">
@@ -990,7 +1032,8 @@
                         </div>
                         <h2 class="post-title">Web Performance Optimization Techniques</h2>
                         <p class="post-excerpt">
-                            Improve your website's performance with these proven techniques. Learn about lazy loading, code splitting, and Core Web Vitals...
+                            Improve your website's performance with these proven techniques. Learn about lazy loading,
+                            code splitting, and Core Web Vitals...
                         </p>
                         <div class="post-footer">
                             <div class="post-stats">
@@ -1014,7 +1057,8 @@
                         </div>
                         <h2 class="post-title">Design Systems with Tailwind CSS</h2>
                         <p class="post-excerpt">
-                            Build consistent design systems using Tailwind CSS. Learn about configuration, theming, and component libraries...
+                            Build consistent design systems using Tailwind CSS. Learn about configuration, theming, and
+                            component libraries...
                         </p>
                         <div class="post-footer">
                             <div class="post-stats">
@@ -1036,7 +1080,7 @@
                         <h3>🔥 Most Popular</h3>
                         <a href="#">View All</a>
                     </div>
-                    
+
                     <div class="popular-post-item">
                         <div class="popular-post-image"></div>
                         <div class="popular-post-info">
@@ -1079,7 +1123,7 @@
                     <div class="sidebar-card__header">
                         <h3>📚 Categories</h3>
                     </div>
-                    
+
                     <div class="categories-cloud">
                         <a href="#" class="category-tag large">React (8)</a>
                         <a href="#" class="category-tag large">CSS (6)</a>
@@ -1095,7 +1139,7 @@
                     <div class="sidebar-card__header">
                         <h3>💬 Recent Comments</h3>
                     </div>
-                    
+
                     <div class="recent-comment-item">
                         <div class="recent-comment-avatar">MJ</div>
                         <div class="recent-comment-content">
@@ -1103,7 +1147,8 @@
                                 <span class="recent-comment-author">Mike Johnson</span>
                                 <span class="recent-comment-time">2h ago</span>
                             </div>
-                            <div class="recent-comment-text">Great explanation! This really helped me understand...</div>
+                            <div class="recent-comment-text">Great explanation! This really helped me understand...
+                            </div>
                             <div class="recent-comment-post">on CSS Grid Layout</div>
                         </div>
                     </div>
@@ -1115,7 +1160,8 @@
                                 <span class="recent-comment-author">Alex Rivera</span>
                                 <span class="recent-comment-time">1d ago</span>
                             </div>
-                            <div class="recent-comment-text">Thanks for the tutorial. Looking forward to more content!</div>
+                            <div class="recent-comment-text">Thanks for the tutorial. Looking forward to more content!
+                            </div>
                             <div class="recent-comment-post">on React Hooks</div>
                         </div>
                     </div>
