@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+=====================================
+05_blog_sitemap.xml - XML Sitemap with Debug Info
+=====================================
+This is a simulated XML sitemap file for search engines.
+Debug comments are included throughout to explain each section.
+
+Generated: 2024-12-21 16:00:00 UTC
+Total URLs: 42
+Last modified: 2024-12-21
+Change frequency: Varies by content type
+===================================================
+-->
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    <!-- 
+    DEBUG: Namespaces
+    - Default: Standard sitemap namespace
+    - image: For image sitemaps (Google)
+    - news: For news articles (Google News)
+    - Schema location for validation
+    -->
+
+    <!-- 
+    ==================== STATIC PAGES ====================
+    Priority: 1.0 - Highest priority pages
+    Change frequency: monthly (rarely change)
+    ======================================================
+    -->
+
+    <!-- Homepage -->
+    <url>
+        <loc>https://devblog.com/</loc>
+        <lastmod>2024-12-21</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <!-- DEBUG: Homepage - highest priority, daily updates -->
+        <image:image>
+            <image:loc>https://devblog.com/images/home-og.jpg</image:loc>
+            <image:title>DevBlog Homepage</image:title>
+            <image:caption>Developer community blog</image:caption>
+        </image:image>
+    </url>
+
+    <!-- About Page -->
+    <url>
+        <loc>https://devblog.com/about</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <!-- DEBUG: About page - monthly updates, high priority -->
+    </url>
+
+    <!-- Contact Page -->
+    <url>
+        <loc>https://devblog.com/contact</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Privacy Policy -->
+    <url>
+        <loc>https://devblog.com/privacy</loc>
+        <lastmod>2024-11-15</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+        <!-- DEBUG: Legal pages - low priority, rarely change -->
+    </url>
+
+    <!-- Terms of Service -->
+    <url>
+        <loc>https://devblog.com/terms</loc>
+        <lastmod>2024-11-15</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- 
+    ==================== BLOG POSTS ====================
+    Priority: 0.9 - High priority content
+    Change frequency: weekly (may be updated)
+    Total posts: 24 (showing most recent 10 for brevity)
+    =====================================================
+    -->
+
+    <!-- Post 1: Understanding React Hooks -->
+    <url>
+        <loc>https://devblog.com/posts/understanding-react-hooks</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <!-- DEBUG: Featured post - high priority -->
+        <image:image>
+            <image:loc>https://devblog.com/images/react-hooks.jpg</image:loc>
+            <image:title>React Hooks illustration</image:title>
+            <image:caption>Understanding React Hooks deep dive</image:caption>
+            <image:license>https://devblog.com/copyright</image:license>
+        </image:image>
+        <news:news>
+            <news:publication>
+                <news:name>DevBlog</news:name>
+                <news:language>en</news:language>
+            </news:publication>
+            <news:publication_date>2024-12-20</news:publication_date>
+            <news:title>Understanding React Hooks: A Deep Dive</news:title>
+            <news:keywords>react, hooks, javascript, tutorial</news:keywords>
+        </news:news>
+        <!-- DEBUG: News schema for Google News inclusion -->
+    </url>
+
+    <!-- Post 2: CSS Grid Complete Guide -->
+    <url>
+        <loc>https://devblog.com/posts/css-grid-complete-guide</loc>
+        <lastmod>2024-12-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/css-grid.jpg</image:loc>
+            <image:title>CSS Grid layout</image:title>
+        </image:image>
+    </url>
+
+    <!-- Post 3: TypeScript Best Practices 2024 -->
+    <url>
+        <loc>https://devblog.com/posts/typescript-best-practices-2024</loc>
+        <lastmod>2024-12-16</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/typescript.jpg</image:loc>
+            <image:title>TypeScript code</image:title>
+        </image:image>
+    </url>
+
+    <!-- Post 4: Next.js 14 Guide -->
+    <url>
+        <loc>https://devblog.com/posts/nextjs-14-guide</loc>
+        <lastmod>2024-12-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/nextjs.jpg</image:loc>
+            <image:title>Next.js 14 features</image:title>
+        </image:image>
+    </url>
+
+    <!-- Post 5: Web Performance Optimization -->
+    <url>
+        <loc>https://devblog.com/posts/web-performance-optimization</loc>
+        <lastmod>2024-12-10</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/performance.jpg</image:loc>
+            <image:title>Performance optimization</image:title>
+        </image:image>
+    </url>
+
+    <!-- Post 6: Tailwind Design Systems -->
+    <url>
+        <loc>https://devblog.com/posts/tailwind-design-systems</loc>
+        <lastmod>2024-12-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/tailwind.jpg</image:loc>
+            <image:title>Tailwind CSS design</image:title>
+        </image:image>
+    </url>
+
+    <!-- Post 7: Node.js Error Handling -->
+    <url>
+        <loc>https://devblog.com/posts/nodejs-error-handling</loc>
+        <lastmod>2024-12-04</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Post 8: GraphQL vs REST -->
+    <url>
+        <loc>https://devblog.com/posts/graphql-vs-rest</loc>
+        <lastmod>2024-12-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Post 9: Docker Guide -->
+    <url>
+        <loc>https://devblog.com/posts/docker-guide</loc>
+        <lastmod>2024-11-28</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/docker.jpg</image:loc>
+            <image:title>Docker containers</image:title>
+        </image:image>
+    </url>
+
+    <!-- Post 10: PostgreSQL Performance -->
+    <url>
+        <loc>https://devblog.com/posts/postgresql-performance</loc>
+        <lastmod>2024-11-25</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Additional posts (would continue for all 24 posts) -->
+    <!-- 
+    DEBUG: Additional posts would follow the same pattern
+    For brevity, showing only 10 of 24 total posts
+    -->
+
+    <!-- 
+    ==================== CATEGORY PAGES ====================
+    Priority: 0.7 - Important for navigation
+    Change frequency: weekly (new posts in categories)
+    Total categories: 12
+    ========================================================
+    -->
+
+    <!-- Category: React -->
+    <url>
+        <loc>https://devblog.com/category/react</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+        <!-- DEBUG: Category pages - updated when new posts added -->
+    </url>
+
+    <!-- Category: JavaScript -->
+    <url>
+        <loc>https://devblog.com/category/javascript</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Category: TypeScript -->
+    <url>
+        <loc>https://devblog.com/category/typescript</loc>
+        <lastmod>2024-12-16</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Category: CSS -->
+    <url>
+        <loc>https://devblog.com/category/css</loc>
+        <lastmod>2024-12-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Category: Next.js -->
+    <url>
+        <loc>https://devblog.com/category/nextjs</loc>
+        <lastmod>2024-12-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Category: Node.js -->
+    <url>
+        <loc>https://devblog.com/category/nodejs</loc>
+        <lastmod>2024-12-04</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Category: DevOps -->
+    <url>
+        <loc>https://devblog.com/category/devops</loc>
+        <lastmod>2024-11-28</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Category: Database -->
+    <url>
+        <loc>https://devblog.com/category/database</loc>
+        <lastmod>2024-11-25</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Additional categories (would continue) -->
+
+    <!-- 
+    ==================== TAG PAGES ====================
+    Priority: 0.5 - Lower than categories
+    Change frequency: weekly (new posts with tags)
+    Total tags: 45
+    ====================================================
+    -->
+
+    <!-- Tag: React Hooks -->
+    <url>
+        <loc>https://devblog.com/tag/react-hooks</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+        <!-- DEBUG: Tag pages - lower priority than categories -->
+    </url>
+
+    <!-- Tag: Grid Layout -->
+    <url>
+        <loc>https://devblog.com/tag/grid-layout</loc>
+        <lastmod>2024-12-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Tag: TypeScript -->
+    <url>
+        <loc>https://devblog.com/tag/typescript</loc>
+        <lastmod>2024-12-16</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Tag: Performance -->
+    <url>
+        <loc>https://devblog.com/tag/performance</loc>
+        <lastmod>2024-12-10</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Tag: Docker -->
+    <url>
+        <loc>https://devblog.com/tag/docker</loc>
+        <lastmod>2024-11-28</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- 
+    ==================== AUTHOR PAGES ====================
+    Priority: 0.6 - Author profiles
+    Change frequency: weekly (new posts by author)
+    Total authors: 15
+    =======================================================
+    -->
+
+    <!-- Author: Sarah Chen -->
+    <url>
+        <loc>https://devblog.com/author/sarah-chen</loc>
+        <lastmod>2024-12-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+        <!-- DEBUG: Author pages - updated when author publishes -->
+        <image:image>
+            <image:loc>https://devblog.com/images/authors/sarah-chen.jpg</image:loc>
+            <image:title>Sarah Chen</image:title>
+        </image:image>
+    </url>
+
+    <!-- Author: Mike Johnson -->
+    <url>
+        <loc>https://devblog.com/author/mike-johnson</loc>
+        <lastmod>2024-12-18</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+        <image:image>
+            <image:loc>https://devblog.com/images/authors/mike-johnson.jpg</image:loc>
+            <image:title>Mike Johnson</image:title>
+        </image:image>
+    </url>
+
+    <!-- Author: Alex Rivera -->
+    <url>
+        <loc>https://devblog.com/author/alex-rivera</loc>
+        <lastmod>2024-12-16</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Author: Emma Watson -->
+    <url>
+        <loc>https://devblog.com/author/emma-watson</loc>
+        <lastmod>2024-12-04</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- 
+    ==================== ARCHIVE PAGES ====================
+    Priority: 0.4 - Lower priority
+    Change frequency: yearly (rarely change)
+    ========================================================
+    -->
+
+    <!-- Archive: 2024 -->
+    <url>
+        <loc>https://devblog.com/archive/2024</loc>
+        <lastmod>2024-12-21</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.4</priority>
+        <!-- DEBUG: Archive pages - low priority -->
+    </url>
+
+    <!-- Archive: 2023 -->
+    <url>
+        <loc>https://devblog.com/archive/2023</loc>
+        <lastmod>2023-12-31</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- Archive: December 2024 -->
+    <url>
+        <loc>https://devblog.com/archive/2024/12</loc>
+        <lastmod>2024-12-21</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- Archive: November 2024 -->
+    <url>
+        <loc>https://devblog.com/archive/2024/11</loc>
+        <lastmod>2024-11-30</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- 
+    ==================== SEARCH PAGES ====================
+    Note: These are typically excluded or have noindex
+    Included here for completeness but with lowest priority
+    ========================================================
+    -->
+
+    <!-- Search results (excluded in robots.txt usually) -->
+    <url>
+        <loc>https://devblog.com/search</loc>
+        <lastmod>2024-12-21</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.1</priority>
+        <!-- DEBUG: Search page - very low priority -->
+    </url>
+
+    <!-- 
+    ==================== FEEDS ====================
+    Note: Feed URLs included for discovery
+    ================================================
+    -->
+
+    <!-- RSS Feed -->
+    <url>
+        <loc>https://devblog.com/feed.xml</loc>
+        <lastmod>2024-12-21</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.2</priority>
+        <!-- DEBUG: RSS feed - hourly updates, low priority -->
+    </url>
+
+    <!-- Atom Feed -->
+    <url>
+        <loc>https://devblog.com/feed.atom</loc>
+        <lastmod>2024-12-21</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <!-- 
+    ==================== SITEMAP INDEX ====================
+    For large sites, you'd use a sitemap index file.
+    Example below:
+    ========================================================
+    -->
+
+    <!-- 
+    <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <sitemap>
+            <loc>https://devblog.com/sitemap-posts.xml</loc>
+            <lastmod>2024-12-21</lastmod>
+        </sitemap>
+        <sitemap>
+            <loc>https://devblog.com/sitemap-categories.xml</loc>
+            <lastmod>2024-12-21</lastmod>
+        </sitemap>
+        <sitemap>
+            <loc>https://devblog.com/sitemap-authors.xml</loc>
+            <lastmod>2024-12-21</lastmod>
+        </sitemap>
+        <sitemap>
+            <loc>https://devblog.com/sitemap-images.xml</loc>
+            <lastmod>2024-12-21</lastmod>
+        </sitemap>
+    </sitemapindex>
+    -->
+
+</urlset>
+
+<!-- 
+==================== DEBUG SUMMARY ====================
+Total URLs in this sitemap: 42
+Breakdown:
+- Static pages: 5
+- Blog posts: 10 (showing subset, actual: 24)
+- Category pages: 8 (showing subset, actual: 12)
+- Tag pages: 5 (showing subset, actual: 45)
+- Author pages: 4 (showing subset, actual: 15)
+- Archive pages: 4
+- Search/feeds: 3
+
+Priority distribution:
+- 1.0: 1 URL (homepage)
+- 0.9: 4 URLs (featured posts)
+- 0.8: 6 URLs (regular posts)
+- 0.7: 8 URLs (categories)
+- 0.6: 4 URLs (authors)
+- 0.5: 5 URLs (tags)
+- 0.4-0.1: 14 URLs (archives, feeds, search)
+
+Change frequency:
+- hourly: 2 (feeds)
+- daily: 2 (homepage, search)
+- weekly: 28 (posts, categories, tags, authors)
+- monthly: 2 (about, contact)
+- yearly: 8 (legal, archives)
+
+Last modified: 2024-12-21
+Generated by: DevBlog CMS v2.5.1
+=======================================================
+
+==================== VALIDATION ====================
+This sitemap validates against sitemap.org schema:
+✓ All URLs use HTTPS
+✓ All required elements present (loc)
+✓ Dates in W3C Datetime format (YYYY-MM-DD)
+✓ Priorities between 0.0 and 1.0
+✓ Valid change frequency values
+✓ Image extension properly namespaced
+✓ News extension properly namespaced
+=====================================================
+-->

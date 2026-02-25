@@ -210,14 +210,92 @@ HTML files provide an example that include debug info:
 Purpose: Long-form reading, articles, posts.  
 Blog HTML files provide an example that include debug info:
 
-- 05_blog_listing.html - Blog homepage / post listing
-- 05_blog_post.html - Single blog post view
-- 05_blog_new.html - Create new blog post
-- 05_blog_author.html - Author public profile
-- 05_blog_center_author.html - Author dashboard (private stats)
-- 05_blog_center_admin.html - Admin dashboard (manage all)
-- 05_blog_categories.html - Categories management
-- 07_search_blogs.html - Blog search results
+05_blog_01_landing.html
+Public homepage of the blog. Usually shows featured posts, hero section, intro text.
+
+05_blog_02_listing.html
+Main blog listing page showing posts in chronological order.
+
+05_blog_03_post.html
+Single blog post page with full content, metadata, tags, author info.
+
+05_blog_04_new.html
+Editor page for creating a new blog post.
+
+05_blog_05_post_stats.html
+Per‑post analytics: views, reads, referrers, engagement metrics.
+
+05_blog_06_categories.html
+Admin page for managing categories (create, rename, delete).
+
+05_blog_07_category_view.html
+Public page showing posts under a specific category.
+
+05_blog_08_author.html
+Public author profile page listing posts by that author.
+
+05_blog_09_author_profile.html
+Admin page where an author edits their profile (bio, avatar, social links).
+
+05_blog_10_center_author.html
+Author dashboard: drafts, published posts, quick actions.
+
+05_blog_11_center_admin.html
+Admin dashboard: global blog settings, user management, moderation.
+
+05_blog_12_archive_grouped.html
+Archive view grouped by year/month.
+
+05_blog_12_archive_timeline.html
+Timeline‑style archive view (chronological, visual).
+
+05_blog_13_comments_moderation.html
+Admin page for moderating comments (approve, delete, flag).
+
+05_blog_14_media_library.html
+Media library showing uploaded images/files.
+
+05_blog_15_media_info.html
+Detail view for a single media item (metadata, replace, delete).
+
+05_blog_16_settings.html
+Blog settings: title, description, domain, theme, SEO basics.
+
+05_blog_17_about.html
+Public “About” page template.
+
+05_blog_18_contact.html
+Public “Contact” page template.
+
+05_blog_19_404.html
+Custom 404 error page.
+
+05_blog_20_500.html
+Custom 500 error page for server errors.
+
+05_blog_21_maintenance.html
+Maintenance mode page shown during updates or downtime.
+
+05_blog_22_privacy_policy.html
+Public privacy policy page (legal requirement in EU).
+
+05_blog_23_terms_service.html
+Public terms of service page (legal requirement for hosted platforms).
+
+05_blog_24_feed.xml
+RSS feed template for syndication (dynamic XML output).
+
+05_blog_25_sitemap.xml
+Sitemap template for SEO and search engine indexing (dynamic XML output).
+
+05_blog_tag_management.html
+Admin page for managing tags (create, rename, delete).
+
+05_blog_tag_view.html
+Public page showing posts under a specific tag.
+
+07_search_blogs.html
+Search results page for blog queries.
 
 ### 5.1 Blog - Desktop (≥1024px)
 
