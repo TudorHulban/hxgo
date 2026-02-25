@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - About Page Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Social colors */
+            --twitter: #1DA1F2;
+            --github: #333333;
+            --linkedin: #0077B5;
+            --youtube: #FF0000;
+            --rss: #f97316;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .about-hero {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            border-radius: 24px;
+            padding: var(--space-3xl) var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .about-hero h1 {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Mission Section */
+        .mission-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            text-align: center;
+        }
+
+        .mission-section h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .mission-section p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Team Section */
+        .team-section {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .team-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--accent);
+            margin: 0 auto var(--space-lg);
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .team-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .team-role {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: var(--space-sm);
+        }
+
+        .team-bio {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .team-social {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .team-social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .team-social-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Values Section */
+        .values-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+
+        .value-item {
+            text-align: center;
+        }
+
+        .value-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 0 auto var(--space-md);
+        }
+
+        .value-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .value-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: var(--space-xl) auto 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: var(--accent-light);
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-xl);
+            position: relative;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-date {
+            width: 120px;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--accent);
+            color: white;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            width: calc(50% - 60px);
+            padding: var(--space-lg);
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-content h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--accent);
+            top: 50%;
+            margin-top: -8px;
+            z-index: 2;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .contact-info p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-lg);
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .contact-detail-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+
+        .contact-text {
+            color: var(--text-secondary);
+        }
+
+        .contact-social {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .contact-social-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .contact-social-link:hover {
+            transform: scale(1.1);
+        }
+
+        .contact-social-link.twitter { background: var(--twitter); }
+        .contact-social-link.github { background: var(--github); }
+        .contact-social-link.linkedin { background: var(--linkedin); }
+        .contact-social-link.rss { background: var(--rss); }
+
+        .contact-form {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        .contact-form h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Footer */
+        .about-footer {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            text-align: center;
+        }
+
+        .footer-newsletter {
+            max-width: 500px;
+            margin: 0 auto var(--space-lg);
+        }
+
+        .footer-newsletter h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-copyright {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .values-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .about-hero h1 {
+                font-size: 2rem;
+            }
+
+            .about-hero p {
+                font-size: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-section {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                flex-direction: column;
+                margin-left: 60px;
+            }
+
+            .timeline-date {
+                width: auto;
+                align-self: flex-start;
+                margin-bottom: var(--space-sm);
+            }
+
+            .timeline-content {
+                width: 100%;
+            }
+
+            .timeline-dot {
+                left: 30px;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: var(--space-sm);
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .about-hero { background: linear-gradient(135deg, #ff6384 0%, #9966ff 100%); }
+        .debug-layout .mission-section { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .stats-grid { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .team-section { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .values-section { background: rgba(255, 159, 64, 0.05); }
+        .debug-layout .contact-section { background: rgba(54, 162, 235, 0.05); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .team-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .timeline-item {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .value-item {
+            border: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#" class="active">About</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Hero Section -->
+        <section class="about-hero">
+            <h1>About DevBlog</h1>
+            <p>A community of developers sharing knowledge, experiences, and insights about web development, programming, and technology.</p>
+        </section>
+
+        <!-- Mission Section -->
+        <section class="mission-section">
+            <h2>Our Mission</h2>
+            <p>To empower developers of all skill levels by providing high-quality, practical, and accessible content that helps them grow, solve real-world problems, and stay up-to-date with the latest technologies.</p>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-value">342</div>
+                <div class="stat-label">Articles Published</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value">15</div>
+                <div class="stat-label">Contributors</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">👁️</div>
+                <div class="stat-value">1.2M</div>
+                <div class="stat-label">Monthly Views</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🌍</div>
+                <div class="stat-value">120+</div>
+                <div class="stat-label">Countries</div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="team-section">
+            <div class="section-header">
+                <h2>Meet the Team</h2>
+                <p>The passionate people behind DevBlog</p>
+            </div>
+
+            <div class="team-grid">
+                <!-- Team Member 1 -->
+                <div class="team-card">
+                    <div class="team-avatar">SC</div>
+                    <h3 class="team-name">Sarah Chen</h3>
+                    <div class="team-role">Founder & Editor-in-Chief</div>
+                    <p class="team-bio">Full-stack developer with 10+ years of experience. Passionate about React, Node.js, and technical writing.</p>
+                    <div class="team-social">
+                        <a href="#" class="team-social-link">𝕏</a>
+                        <a href="#" class="team-social-link">⌨️</a>
+                        <a href="#" class="team-social-link">in</a>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="team-card">
+                    <div class="team-avatar">MJ</div>
+                    <h3 class="team-name">Mike Johnson</h3>
+                    <div class="team-role">Senior Technical Editor</div>
+                    <p class="team-bio">Backend specialist and database enthusiast. Ensures technical accuracy and quality across all posts.</p>
+                    <div class="team-social">
+                        <a href="#" class="team-social-link">𝕏</a>
+                        <a href="#" class="team-social-link">⌨️</a>
+                        <a href="#" class="team-social-link">in</a>
+                    </div>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="team-card">
+                    <div class="team-avatar">AR</div>
+                    <h3 class="team-name">Alex Rivera</h3>
+                    <div class="team-role">Frontend Lead</div>
+                    <p class="team-bio">UI/UX specialist and CSS wizard. Creates engaging tutorials on modern frontend development.</p>
+                    <div class="team-social">
+                        <a href="#" class="team-social-link">𝕏</a>
+                        <a href="#" class="team-social-link">⌨️</a>
+                        <a href="#" class="team-social-link">in</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Values Section -->
+        <section class="values-section">
+            <div class="section-header">
+                <h2>Our Values</h2>
+                <p>What guides everything we do</p>
+            </div>
+
+            <div class="values-grid">
+                <div class="value-item">
+                    <div class="value-icon">📚</div>
+                    <h3 class="value-title">Quality First</h3>
+                    <p class="value-description">We never compromise on quality. Every article goes through rigorous review to ensure accuracy and clarity.</p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">🌱</div>
+                    <h3 class="value-title">Continuous Learning</h3>
+                    <p class="value-description">We believe in lifelong learning and strive to help our readers grow their skills every day.</p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">🤝</div>
+                    <h3 class="value-title">Community First</h3>
+                    <p class="value-description">We're building a supportive community where developers can learn, share, and connect.</p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">🔓</div>
+                    <h3 class="value-title">Free & Open</h3>
+                    <p class="value-description">All our content is freely accessible. Knowledge should be available to everyone.</p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">💡</div>
+                    <h3 class="value-title">Practical Insights</h3>
+                    <p class="value-description">We focus on real-world solutions and practical knowledge you can apply immediately.</p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">🌍</div>
+                    <h3 class="value-title">Global Perspective</h3>
+                    <p class="value-description">We embrace diverse viewpoints and welcome contributors from around the world.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section class="timeline-section">
+            <div class="section-header">
+                <h2>Our Journey</h2>
+                <p>How DevBlog grew over the years</p>
+            </div>
+
+            <div class="timeline">
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2020</div>
+                    <div class="timeline-content">
+                        <h4>DevBlog Launched</h4>
+                        <p>Started as a personal blog by Sarah Chen, publishing first articles about React and JavaScript.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2021</div>
+                    <div class="timeline-content">
+                        <h4>First Contributors Join</h4>
+                        <p>Expanded to 5 authors, launched categories system, and published first series on TypeScript.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2022</div>
+                    <div class="timeline-content">
+                        <h4>Reached 100K Monthly Readers</h4>
+                        <p>Major milestone achieved. Launched newsletter and community forums.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <!-- Timeline Item 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-content">
+                        <h4>Video Tutorials Launched</h4>
+                        <p>Added video content to complement written tutorials. YouTube channel reached 50K subscribers.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <!-- Timeline Item 5 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-content">
+                        <h4>Global Community</h4>
+                        <p>Now with 15 contributors from 8 countries, publishing in multiple languages.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="contact-info">
+                <h3>Get in Touch</h3>
+                <p>Have a question, suggestion, or want to contribute? We'd love to hear from you. Reach out through any of these channels.</p>
+
+                <div class="contact-details">
+                    <div class="contact-detail-item">
+                        <div class="contact-icon">📧</div>
+                        <span class="contact-text">hello@devblog.com</span>
+                    </div>
+
+                    <div class="contact-detail-item">
+                        <div class="contact-icon">📍</div>
+                        <span class="contact-text">San Francisco, CA</span>
+                    </div>
+
+                    <div class="contact-detail-item">
+                        <div class="contact-icon">🕒</div>
+                        <span class="contact-text">Mon-Fri, 9am-5pm PT</span>
+                    </div>
+                </div>
+
+                <div class="contact-social">
+                    <a href="#" class="contact-social-link twitter">𝕏</a>
+                    <a href="#" class="contact-social-link github">⌨️</a>
+                    <a href="#" class="contact-social-link linkedin">in</a>
+                    <a href="#" class="contact-social-link rss">📡</a>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <h3>Send us a message</h3>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" placeholder="Your name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="your@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-input" placeholder="What's this about?">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" placeholder="Your message..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn primary">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="about-footer">
+            <div class="footer-newsletter">
+                <h3>Subscribe to our newsletter</h3>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button class="btn primary">Subscribe</button>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Advertise</a>
+            </div>
+
+            <div class="footer-copyright">
+                © 2024 DevBlog. All rights reserved. Built with ❤️ for the developer community.
+            </div>
+        </footer>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📄</span>
+            <span>About</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📧</span>
+            <span>Contact</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>
