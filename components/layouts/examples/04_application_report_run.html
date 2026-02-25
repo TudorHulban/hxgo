@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Run Report & Chart Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 320px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Chart colors */
+            --chart-1: #3b82f6;
+            --chart-2: #10b981;
+            --chart-3: #f59e0b;
+            --chart-4: #ef4444;
+            --chart-5: #8b5cf6;
+            --chart-6: #ec4899;
+            --chart-7: #14b8a6;
+            --chart-8: #f97316;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Run Report Content */
+        .run-report-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: var(--space-xs);
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Report Selector */
+        .report-selector-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .section-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .report-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+        }
+
+        .report-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .report-card:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .report-card.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            border-width: 2px;
+        }
+
+        .report-card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .report-card__icon.blue { background: #dbeafe; color: var(--chart-1); }
+        .report-card__icon.green { background: #d1fae5; color: var(--chart-2); }
+        .report-card__icon.orange { background: #fed7aa; color: var(--chart-3); }
+        .report-card__icon.purple { background: #ede9fe; color: var(--chart-5); }
+        .report-card__icon.pink { background: #fce7f3; color: var(--chart-6); }
+
+        .report-card__title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .report-card__description {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .report-card__meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .report-card__badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.6rem;
+            font-weight: 500;
+        }
+
+        /* Parameters Section */
+        .parameters-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .parameter-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .parameter-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .parameter-input {
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .parameter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .target-selector {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .target-badge {
+            background: var(--bg-secondary);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .target-badge.mysql { color: var(--db-mysql); }
+        .target-badge.online { border-left: 3px solid var(--success); }
+
+        /* Chart Display Section */
+        .chart-display-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .chart-title h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .chart-title p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .chart-type-selector {
+            display: flex;
+            gap: var(--space-xs);
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .chart-type-btn {
+            padding: var(--space-xs) var(--space-md);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .chart-type-btn.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 300px;
+            margin-bottom: var(--space-lg);
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60px;
+        }
+
+        .bar {
+            width: 40px;
+            background: var(--chart-1);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s;
+            margin-bottom: var(--space-xs);
+        }
+
+        .bar-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .bar-value {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Line Chart */
+        .line-chart {
+            position: relative;
+            height: 300px;
+            margin-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .line-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .line-chart line {
+            stroke: var(--border-color);
+            stroke-width: 1;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--chart-1);
+            stroke-width: 2;
+        }
+
+        .chart-dot {
+            fill: var(--chart-1);
+            r: 4;
+        }
+
+        /* Pie Chart */
+        .pie-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2xl);
+            height: 300px;
+        }
+
+        .pie {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(var(--chart-1) 0% 40%, var(--chart-2) 40% 65%, var(--chart-3) 65% 85%, var(--chart-4) 85% 100%);
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+        }
+
+        .legend-value {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        /* Data Table */
+        .data-table-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .table-header h3 {
+            font-size: 1rem;
+        }
+
+        .table-pagination {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .data-table td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .data-table .trend-up { color: var(--success); }
+        .data-table .trend-down { color: var(--danger); }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .recent-run-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+        }
+
+        .recent-run-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recent-run-info {
+            flex: 1;
+        }
+
+        .recent-run-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .recent-run-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .recent-run-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .saved-chart-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            cursor: pointer;
+        }
+
+        .saved-chart-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .report-selector-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .parameters-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pie-chart {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .run-report-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .report-selector-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .bar-chart {
+                overflow-x: auto;
+                justify-content: flex-start;
+                gap: var(--space-md);
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .chart-type-selector {
+                width: 100%;
+            }
+
+            .chart-type-btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .run-report-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(75, 192, 192, 0.1); }
+
+        /* Component debug */
+        .debug-layout .report-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .report-card.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .parameter-item {
+            background: rgba(153, 102, 255, 0.1);
+            border: 1px dashed #9966ff;
+            padding: var(--space-xs);
+        }
+
+        .debug-layout .bar {
+            background: rgba(255, 159, 64, 0.5);
+            border: 1px dashed #ff9f40;
+        }
+
+        .debug-layout .pie {
+            border: 2px dashed #4bc0c0;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#" class="active">Reports</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search reports...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">3</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">REPORT ACTIONS</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">▶️</span>
+                    <span>Run Report</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Saved Charts</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📅</span>
+                    <span>Scheduled Runs</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">CATEGORIES</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Project Reports</span>
+                    <span class="nav-item__badge">8</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team Reports</span>
+                    <span class="nav-item__badge">5</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">💰</span>
+                    <span>Financial</span>
+                    <span class="nav-item__badge">3</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Run Report Content -->
+        <main class="run-report-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Run Report</h1>
+                    <p>Select a report, set parameters, and visualize results</p>
+                </div>
+                <div class="content-header__actions">
+                    <button class="btn outline">📋 Save Configuration</button>
+                    <button class="btn primary">▶️ Run Report</button>
+                </div>
+            </div>
+
+            <!-- Report Selector -->
+            <div class="report-selector-section">
+                <div class="section-header">
+                    <h2>Select Report</h2>
+                    <button class="btn small outline">Browse All</button>
+                </div>
+
+                <div class="report-selector-grid">
+                    <div class="report-card selected">
+                        <div class="report-card__icon blue">📊</div>
+                        <div class="report-card__title">Project Progress</div>
+                        <div class="report-card__description">Tasks completion by project</div>
+                        <div class="report-card__meta">
+                            <span>24 runs</span>
+                            <span>⭐ 4.8</span>
+                        </div>
+                        <span class="report-card__badge">Popular</span>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-card__icon green">👥</div>
+                        <div class="report-card__title">Team Performance</div>
+                        <div class="report-card__description">Member productivity metrics</div>
+                        <div class="report-card__meta">
+                            <span>18 runs</span>
+                            <span>⭐ 4.5</span>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-card__icon orange">💰</div>
+                        <div class="report-card__title">Budget vs Actual</div>
+                        <div class="report-card__description">Financial tracking</div>
+                        <div class="report-card__meta">
+                            <span>12 runs</span>
+                            <span>⭐ 4.2</span>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-card__icon purple">⏱️</div>
+                        <div class="report-card__title">Time Tracking</div>
+                        <div class="report-card__description">Hours logged by project</div>
+                        <div class="report-card__meta">
+                            <span>21 runs</span>
+                            <span>⭐ 4.6</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parameters Section -->
+            <div class="parameters-section">
+                <div class="section-header">
+                    <h2>Report Parameters</h2>
+                    <div class="target-selector">
+                        <span class="target-badge mysql">🐬 MySQL • Production</span>
+                        <span class="target-badge online">🟢 Online</span>
+                    </div>
+                </div>
+
+                <div class="parameters-grid">
+                    <div class="parameter-item">
+                        <label class="parameter-label">Date Range</label>
+                        <select class="parameter-input">
+                            <option>Last 7 days</option>
+                            <option selected>Last 30 days</option>
+                            <option>Last quarter</option>
+                            <option>Last year</option>
+                            <option>Custom range</option>
+                        </select>
+                    </div>
+
+                    <div class="parameter-item">
+                        <label class="parameter-label">Project</label>
+                        <select class="parameter-input">
+                            <option selected>All Projects</option>
+                            <option>Mobile App</option>
+                            <option>Website Redesign</option>
+                            <option>API Integration</option>
+                        </select>
+                    </div>
+
+                    <div class="parameter-item">
+                        <label class="parameter-label">Team Member</label>
+                        <select class="parameter-input">
+                            <option selected>All Members</option>
+                            <option>Sarah Chen</option>
+                            <option>Mike Johnson</option>
+                            <option>Alex Rivera</option>
+                        </select>
+                    </div>
+
+                    <div class="parameter-item">
+                        <label class="parameter-label">Status</label>
+                        <select class="parameter-input">
+                            <option selected>All Status</option>
+                            <option>Active</option>
+                            <option>Completed</option>
+                            <option>On Hold</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end;">
+                    <button class="btn small">Apply Filters</button>
+                </div>
+            </div>
+
+            <!-- Chart Display Section -->
+            <div class="chart-display-section">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Project Progress - Last 30 Days</h3>
+                        <p>Task completion by project • Updated just now</p>
+                    </div>
+                    <div class="chart-actions">
+                        <div class="chart-type-selector">
+                            <span class="chart-type-btn active">📊 Bar</span>
+                            <span class="chart-type-btn">📈 Line</span>
+                            <span class="chart-type-btn">🥧 Pie</span>
+                            <span class="chart-type-btn">📋 Table</span>
+                        </div>
+                        <button class="btn small outline">💾 Save</button>
+                        <button class="btn small outline">📥 Export</button>
+                    </div>
+                </div>
+
+                <!-- Bar Chart View -->
+                <div class="chart-container">
+                    <div class="bar-chart">
+                        <div class="bar-group">
+                            <div class="bar" style="height: 180px;"></div>
+                            <span class="bar-label">Mobile App</span>
+                            <span class="bar-value">45 tasks</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 240px; background: var(--chart-2);"></div>
+                            <span class="bar-label">Website</span>
+                            <span class="bar-value">62 tasks</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 120px; background: var(--chart-3);"></div>
+                            <span class="bar-label">API</span>
+                            <span class="bar-value">28 tasks</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 200px; background: var(--chart-4);"></div>
+                            <span class="bar-label">Database</span>
+                            <span class="bar-value">51 tasks</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 160px; background: var(--chart-5);"></div>
+                            <span class="bar-label">Frontend</span>
+                            <span class="bar-value">39 tasks</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 140px; background: var(--chart-6);"></div>
+                            <span class="bar-label">Backend</span>
+                            <span class="bar-value">34 tasks</span>
+                        </div>
+                    </div>
+
+                    <!-- Chart Legend -->
+                    <div style="display: flex; gap: var(--space-xl); justify-content: center; margin-top: var(--space-md);">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--chart-1);"></span>
+                            <span>Completed: 156</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--chart-2);"></span>
+                            <span>In Progress: 89</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--chart-3);"></span>
+                            <span>Pending: 34</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alternative: Line Chart (hidden by default) -->
+                <!-- <div class="chart-container" style="display: none;">
+                    <div class="line-chart">
+                        <svg viewBox="0 0 600 300">
+                            <line x1="50" y1="250" x2="550" y2="250" stroke="var(--border-color)" />
+                            <line x1="50" y1="50" x2="50" y2="250" stroke="var(--border-color)" />
+                            <path class="chart-line" d="M50 200 L150 150 L250 180 L350 100 L450 120 L550 80" />
+                            <circle class="chart-dot" cx="50" cy="200" r="4" />
+                            <circle class="chart-dot" cx="150" cy="150" r="4" />
+                            <circle class="chart-dot" cx="250" cy="180" r="4" />
+                            <circle class="chart-dot" cx="350" cy="100" r="4" />
+                            <circle class="chart-dot" cx="450" cy="120" r="4" />
+                            <circle class="chart-dot" cx="550" cy="80" r="4" />
+                        </svg>
+                    </div>
+                </div> -->
+
+                <!-- Alternative: Pie Chart (hidden by default) -->
+                <!-- <div class="chart-container" style="display: none;">
+                    <div class="pie-chart">
+                        <div class="pie"></div>
+                        <div class="pie-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-1);"></span>
+                                <span class="legend-label">Mobile App</span>
+                                <span class="legend-value">40%</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-2);"></span>
+                                <span class="legend-label">Website</span>
+                                <span class="legend-value">25%</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-3);"></span>
+                                <span class="legend-label">API</span>
+                                <span class="legend-value">20%</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-4);"></span>
+                                <span class="legend-label">Database</span>
+                                <span class="legend-value">15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+
+            <!-- Data Table Section -->
+            <div class="data-table-section">
+                <div class="table-header">
+                    <h3>Detailed Results</h3>
+                    <div class="table-pagination">
+                        <button class="btn small outline">←</button>
+                        <button class="btn small outline active">1</button>
+                        <button class="btn small outline">2</button>
+                        <button class="btn small outline">3</button>
+                        <button class="btn small outline">→</button>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Total Tasks</th>
+                            <th>Completed</th>
+                            <th>In Progress</th>
+                            <th>Pending</th>
+                            <th>Completion %</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mobile App</td>
+                            <td>78</td>
+                            <td>45</td>
+                            <td>22</td>
+                            <td>11</td>
+                            <td>58%</td>
+                            <td><span class="trend-up">↑ 12%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Website Redesign</td>
+                            <td>95</td>
+                            <td>62</td>
+                            <td>24</td>
+                            <td>9</td>
+                            <td>65%</td>
+                            <td><span class="trend-up">↑ 8%</span></td>
+                        </tr>
+                        <tr>
+                            <td>API Integration</td>
+                            <td>52</td>
+                            <td>28</td>
+                            <td>15</td>
+                            <td>9</td>
+                            <td>54%</td>
+                            <td><span class="trend-down">↓ 3%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Database Migration</td>
+                            <td>67</td>
+                            <td>51</td>
+                            <td>12</td>
+                            <td>4</td>
+                            <td>76%</td>
+                            <td><span class="trend-up">↑ 15%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Frontend Updates</td>
+                            <td>48</td>
+                            <td>39</td>
+                            <td>7</td>
+                            <td>2</td>
+                            <td>81%</td>
+                            <td><span class="trend-up">↑ 5%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Backend Services</td>
+                            <td>56</td>
+                            <td>34</td>
+                            <td>16</td>
+                            <td>6</td>
+                            <td>61%</td>
+                            <td><span class="trend-neutral">→ 0%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Recent Runs</h3>
+                    <a href="#">View All</a>
+                </div>
+                
+                <div class="recent-run-item">
+                    <div class="recent-run-icon">📊</div>
+                    <div class="recent-run-info">
+                        <div class="recent-run-name">Project Progress</div>
+                        <div class="recent-run-meta">Dec 15, 2024 • 2min ago</div>
+                    </div>
+                    <span class="recent-run-time">1.2s</span>
+                </div>
+
+                <div class="recent-run-item">
+                    <div class="recent-run-icon">👥</div>
+                    <div class="recent-run-info">
+                        <div class="recent-run-name">Team Performance</div>
+                        <div class="recent-run-meta">Dec 14, 2024 • Yesterday</div>
+                    </div>
+                    <span class="recent-run-time">0.8s</span>
+                </div>
+
+                <div class="recent-run-item">
+                    <div class="recent-run-icon">💰</div>
+                    <div class="recent-run-info">
+                        <div class="recent-run-name">Budget Report</div>
+                        <div class="recent-run-meta">Dec 13, 2024 • 2 days ago</div>
+                    </div>
+                    <span class="recent-run-time">1.5s</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Saved Charts</h3>
+                    <a href="#">Manage</a>
+                </div>
+                
+                <div class="saved-chart-item">
+                    <span class="saved-chart-icon">📊</span>
+                    <span>Q4 Progress Overview</span>
+                </div>
+                <div class="saved-chart-item">
+                    <span class="saved-chart-icon">📈</span>
+                    <span>Monthly Trends</span>
+                </div>
+                <div class="saved-chart-item">
+                    <span class="saved-chart-icon">🥧</span>
+                    <span>Resource Allocation</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Quick Tips</h3>
+                </div>
+                
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                    <p style="margin-bottom: var(--space-xs);">• Click chart types to switch views</p>
+                    <p style="margin-bottom: var(--space-xs);">• Hover for detailed values</p>
+                    <p style="margin-bottom: var(--space-xs);">• Save charts to dashboard</p>
+                    <p>• Export as PNG, PDF, or CSV</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📑</span>
+            <span>Reports</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>📋</span>
+            <span>Recent</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

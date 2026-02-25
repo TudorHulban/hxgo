@@ -1,13 +1,13 @@
 package footer
 
 import (
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/forms"
 	"github.com/TudorHulban/hxgo/dsl"
 )
 
 func WidgetFooter() dsl.Node {
-	form := components.NewFormThreeContainers(
-		&components.ParamsNewFormThreeContainers{
+	form := forms.NewFormThreeContainers(
+		&forms.ParamsNewFormThreeContainers{
 			IDEnclosingDiv:  "footer-info",
 			IDForm:          "form-footer",
 			IDContainersDiv: "form-footer-info",

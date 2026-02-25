@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Report Target Configuration Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 320px;
+            --nav-height: 60px;
+            --form-width: 700px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Database colors */
+            --db-mysql: #00758f;
+            --db-oracle: #f80000;
+            --db-mongo: #4db33d;
+            --db-postgres: #336791;
+            --db-redis: #d82c20;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Target Configuration Content */
+        .target-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Target Form */
+        .target-form {
+            max-width: var(--form-width);
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-2xl);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            margin-bottom: var(--space-2xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .form-section-title .badge {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            font-weight: normal;
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group .form-input,
+        .input-group .form-select {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        /* Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Protocol Selector */
+        .protocol-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .protocol-option {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .protocol-option:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .protocol-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .protocol-option__icon {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .protocol-option__name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .protocol-option__version {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Connection String */
+        .connection-string {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-md);
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .connection-string__value {
+            color: var(--text-primary);
+        }
+
+        .connection-string__copy {
+            color: var(--accent);
+            cursor: pointer;
+        }
+
+        /* Credentials Card */
+        .credentials-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            margin-top: var(--space-md);
+        }
+
+        .credentials-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .credentials-header h4 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .credentials-toggle {
+            color: var(--accent);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .credentials-field {
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .credentials-field label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .credentials-field input {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .credentials-field .reveal {
+            position: absolute;
+            right: var(--space-sm);
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Maintenance Hours */
+        .maintenance-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .maintenance-day {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-sm);
+        }
+
+        .maintenance-day__header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-sm);
+        }
+
+        .maintenance-day__header input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .maintenance-day__header label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .maintenance-day__time {
+            display: flex;
+            gap: var(--space-xs);
+            align-items: center;
+        }
+
+        .maintenance-day__time input[type="time"] {
+            flex: 1;
+            padding: var(--space-xs);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Timezone Selector */
+        .timezone-selector {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .timezone-selector select {
+            flex: 1;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* SSL Options */
+        .ssl-options {
+            display: flex;
+            gap: var(--space-xl);
+            margin-top: var(--space-sm);
+        }
+
+        .ssl-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        /* Connection Pool */
+        .pool-settings {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+        }
+
+        /* Test Connection */
+        .test-connection {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .test-status.success {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .test-status.error {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .test-status.pending {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .target-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .target-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .target-item:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .target-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .target-icon.mysql { background: #e6f0f5; color: var(--db-mysql); }
+        .target-icon.oracle { background: #fee7e7; color: var(--db-oracle); }
+        .target-icon.mongo { background: #e6f3e6; color: var(--db-mongo); }
+
+        .target-info {
+            flex: 1;
+        }
+
+        .target-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .target-details {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .target-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .target-status.active { background: var(--success); }
+        .target-status.inactive { background: var(--text-secondary); }
+        .target-status.error { background: var(--danger); }
+
+        .driver-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .protocol-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .maintenance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pool-settings {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .target-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .target-form {
+                padding: var(--space-lg);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .test-connection {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .protocol-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .protocol-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .target-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .target-form { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(153, 102, 255, 0.1); }
+
+        /* Component debug */
+        .debug-layout .form-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .debug-layout .form-section::before {
+            content: "form-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .protocol-option.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .target-item {
+            background: rgba(255, 99, 132, 0.1);
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .credentials-card {
+            background: rgba(75, 192, 192, 0.1);
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .maintenance-day {
+            background: rgba(255, 159, 64, 0.1);
+            border: 1px dashed #ff9f40;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#">Reports</a>
+                <a href="#" class="active">Targets</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search targets...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">3</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">🎯</span>
+                    <span>Report Targets</span>
+                    <span class="nav-item__badge">6</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">TARGET ACTIONS</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">➕</span>
+                    <span>New Target</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>All Targets</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔄</span>
+                    <span>Test Connections</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">CATEGORIES</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🐬</span>
+                    <span>MySQL</span>
+                    <span class="nav-item__badge">3</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🛢️</span>
+                    <span>Oracle</span>
+                    <span class="nav-item__badge">2</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🍃</span>
+                    <span>MongoDB</span>
+                    <span class="nav-item__badge">1</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Target Configuration Content -->
+        <main class="target-content">
+            <div class="target-form">
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Configure Report Target</h1>
+                    <p>Define where reports will run and set access parameters</p>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        Basic Information
+                        <span class="badge">Required</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Target Name <span>*</span></label>
+                        <input type="text" class="form-input" placeholder="e.g., Production MySQL" value="Production MySQL Cluster">
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" placeholder="Describe this target's purpose...">Primary MySQL database for production environment. Contains all project and task data.</textarea>
+                    </div>
+                </div>
+
+                <!-- Protocol Selection -->
+                <div class="form-section">
+                    <div class="form-section-title">Database Protocol</div>
+                    
+                    <div class="protocol-selector">
+                        <div class="protocol-option selected">
+                            <div class="protocol-option__icon">🐬</div>
+                            <div class="protocol-option__name">MySQL</div>
+                            <div class="protocol-option__version">8.0+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">🛢️</div>
+                            <div class="protocol-option__name">Oracle</div>
+                            <div class="protocol-option__version">19c+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">🍃</div>
+                            <div class="protocol-option__name">MongoDB</div>
+                            <div class="protocol-option__version">5.0+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">🐘</div>
+                            <div class="protocol-option__name">PostgreSQL</div>
+                            <div class="protocol-option__version">14+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">📀</div>
+                            <div class="protocol-option__name">SQL Server</div>
+                            <div class="protocol-option__version">2019+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">🔥</div>
+                            <div class="protocol-option__name">Firebase</div>
+                            <div class="protocol-option__version">9+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">🔴</div>
+                            <div class="protocol-option__name">Redis</div>
+                            <div class="protocol-option__version">6.0+</div>
+                        </div>
+                        <div class="protocol-option">
+                            <div class="protocol-option__icon">📊</div>
+                            <div class="protocol-option__name">Elasticsearch</div>
+                            <div class="protocol-option__version">7.x</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection Details -->
+                <div class="form-section">
+                    <div class="form-section-title">Connection Details</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Host / IP Address <span>*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-input" placeholder="192.168.1.100" value="10.0.0.45">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Port</label>
+                            <div class="input-group">
+                                <input type="number" class="form-input" placeholder="3306" value="3306">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Database Name</label>
+                            <input type="text" class="form-input" placeholder="e.g., app_db" value="production_db">
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Connection Timeout (s)</label>
+                            <input type="number" class="form-input" placeholder="30" value="30">
+                        </div>
+                    </div>
+
+                    <!-- Connection String Preview -->
+                    <div class="connection-string">
+                        <span class="connection-string__value">mysql://10.0.0.45:3306/production_db</span>
+                        <span class="connection-string__copy">📋 Copy</span>
+                    </div>
+                </div>
+
+                <!-- Authentication -->
+                <div class="form-section">
+                    <div class="form-section-title">Authentication</div>
+                    
+                    <div class="credentials-card">
+                        <div class="credentials-header">
+                            <h4>Database Credentials</h4>
+                            <span class="credentials-toggle">🔒 Show</span>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="credentials-field">
+                                <label>Username</label>
+                                <input type="text" value="report_user">
+                            </div>
+                            <div class="credentials-field">
+                                <label>Password</label>
+                                <input type="password" value="•••••••••••••••">
+                                <span class="reveal">👁️</span>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="margin-top: var(--space-sm);">
+                            <div class="credentials-field">
+                                <label>SSL Mode</label>
+                                <select class="form-select">
+                                    <option>Disabled</option>
+                                    <option selected>Required</option>
+                                    <option>Verify CA</option>
+                                    <option>Verify Full</option>
+                                </select>
+                            </div>
+                            <div class="credentials-field">
+                                <label>SSL Certificate</label>
+                                <input type="text" placeholder="Path to cert" value="/etc/ssl/certs/mysql.pem">
+                            </div>
+                        </div>
+
+                        <div class="ssl-options">
+                            <label class="ssl-option">
+                                <input type="checkbox" checked> Use SSL
+                            </label>
+                            <label class="ssl-option">
+                                <input type="checkbox"> Allow Self-Signed
+                            </label>
+                            <label class="ssl-option">
+                                <input type="checkbox"> Verify Hostname
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection Pool Settings -->
+                <div class="form-section">
+                    <div class="form-section-title">Connection Pool</div>
+                    
+                    <div class="pool-settings">
+                        <div>
+                            <label class="form-label">Min Pool Size</label>
+                            <input type="number" class="form-input" value="5">
+                        </div>
+                        <div>
+                            <label class="form-label">Max Pool Size</label>
+                            <input type="number" class="form-input" value="20">
+                        </div>
+                        <div>
+                            <label class="form-label">Idle Timeout (min)</label>
+                            <input type="number" class="form-input" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Maintenance Hours -->
+                <div class="form-section">
+                    <div class="form-section-title">Maintenance Hours</div>
+                    
+                    <div class="maintenance-grid">
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="mon" checked>
+                                <label for="mon">Monday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="02:00">
+                                <span>to</span>
+                                <input type="time" value="04:00">
+                            </div>
+                        </div>
+
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="tue" checked>
+                                <label for="tue">Tuesday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="02:00">
+                                <span>to</span>
+                                <input type="time" value="04:00">
+                            </div>
+                        </div>
+
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="wed" checked>
+                                <label for="wed">Wednesday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="02:00">
+                                <span>to</span>
+                                <input type="time" value="04:00">
+                            </div>
+                        </div>
+
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="thu" checked>
+                                <label for="thu">Thursday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="02:00">
+                                <span>to</span>
+                                <input type="time" value="04:00">
+                            </div>
+                        </div>
+
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="fri" checked>
+                                <label for="fri">Friday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="02:00">
+                                <span>to</span>
+                                <input type="time" value="04:00">
+                            </div>
+                        </div>
+
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="sat">
+                                <label for="sat">Saturday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="04:00">
+                                <span>to</span>
+                                <input type="time" value="06:00">
+                            </div>
+                        </div>
+
+                        <div class="maintenance-day">
+                            <div class="maintenance-day__header">
+                                <input type="checkbox" id="sun">
+                                <label for="sun">Sunday</label>
+                            </div>
+                            <div class="maintenance-day__time">
+                                <input type="time" value="04:00">
+                                <span>to</span>
+                                <input type="time" value="06:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timezone-selector">
+                        <span>🌐</span>
+                        <select>
+                            <option>UTC (Coordinated Universal Time)</option>
+                            <option selected>America/New York (EST)</option>
+                            <option>America/Chicago (CST)</option>
+                            <option>America/Denver (MST)</option>
+                            <option>America/Los Angeles (PST)</option>
+                            <option>Europe/London (GMT)</option>
+                            <option>Europe/Paris (CET)</option>
+                            <option>Asia/Tokyo (JST)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-hint">Reports will not run during maintenance windows. All times in selected timezone.</div>
+                </div>
+
+                <!-- Test Connection -->
+                <div class="form-section">
+                    <div class="test-connection">
+                        <button class="btn">🔌 Test Connection</button>
+                        <div class="test-status success">
+                            <span>✓</span>
+                            <span>Connection successful (45ms)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button class="btn outline">Cancel</button>
+                    <button class="btn outline">Test & Save</button>
+                    <button class="btn primary">Save Target</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Recent Targets</h3>
+                    <a href="#">View All</a>
+                </div>
+                
+                <div class="target-list">
+                    <div class="target-item">
+                        <div class="target-icon mysql">🐬</div>
+                        <div class="target-info">
+                            <div class="target-name">Production MySQL</div>
+                            <div class="target-details">10.0.0.45:3306 • MySQL 8.0</div>
+                        </div>
+                        <span class="target-status active"></span>
+                    </div>
+
+                    <div class="target-item">
+                        <div class="target-icon oracle">🛢️</div>
+                        <div class="target-info">
+                            <div class="target-name">Reporting Oracle</div>
+                            <div class="target-details">192.168.1.200:1521 • Oracle 19c</div>
+                        </div>
+                        <span class="target-status active"></span>
+                    </div>
+
+                    <div class="target-item">
+                        <div class="target-icon mongo">🍃</div>
+                        <div class="target-info">
+                            <div class="target-name">Analytics MongoDB</div>
+                            <div class="target-details">10.0.2.15:27017 • MongoDB 6.0</div>
+                        </div>
+                        <span class="target-status inactive"></span>
+                    </div>
+
+                    <div class="target-item">
+                        <div class="target-icon" style="background: #e6f0f5;">🐘</div>
+                        <div class="target-info">
+                            <div class="target-name">Staging PostgreSQL</div>
+                            <div class="target-details">10.0.1.100:5432 • PG 15</div>
+                        </div>
+                        <span class="target-status active"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>JDBC Drivers</h3>
+                </div>
+                
+                <div class="driver-info">MySQL Connector/J 8.0.33</div>
+                <div class="driver-info">Oracle JDBC Driver 21.9.0</div>
+                <div class="driver-info">MongoDB Driver 4.9.0</div>
+                <div class="driver-info">PostgreSQL JDBC 42.6.0</div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Connection Tips</h3>
+                </div>
+                
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                    <p style="margin-bottom: var(--space-sm);">• Use IP addresses for production</p>
+                    <p style="margin-bottom: var(--space-sm);">• SSL recommended for remote connections</p>
+                    <p style="margin-bottom: var(--space-sm);">• Maintenance hours should be off-peak</p>
+                    <p>• Test connection before saving</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>🎯</span>
+            <span>Targets</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>📋</span>
+            <span>Recent</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Archive Timeline View Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 300px;
+            --timeline-line-width: 2px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Timeline colors */
+            --timeline-year: #3b82f6;
+            --timeline-month: #94a3b8;
+            --timeline-dot: #3b82f6;
+            --timeline-line: #e2e8f0;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .content-header h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Archive Stats */
+        .archive-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.total { background: #dbeafe; color: var(--accent); }
+        .stat-icon.year { background: #d1fae5; color: var(--success); }
+        .stat-icon.month { background: #fce7f3; color: var(--pink); }
+        .stat-icon.popular { background: #fee2e2; color: var(--orange); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-lg);
+            background: var(--bg-primary);
+            padding: 4px;
+            border-radius: 8px;
+            width: fit-content;
+            border: 1px solid var(--border-color);
+        }
+
+        .view-toggle-btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .view-toggle-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Archive Layout - Timeline View */
+        .timeline-view {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xl);
+            position: relative;
+        }
+
+        /* Main Timeline Line */
+        .timeline-view::before {
+            content: '';
+            position: absolute;
+            left: 120px;
+            top: 0;
+            bottom: 0;
+            width: var(--timeline-line-width);
+            background: linear-gradient(to bottom, 
+                transparent 0%,
+                var(--timeline-line) 5%,
+                var(--timeline-line) 95%,
+                transparent 100%);
+            z-index: 0;
+        }
+
+        /* Year Section */
+        .timeline-year {
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-year-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            position: relative;
+        }
+
+        .timeline-year-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--timeline-year);
+            border: 3px solid white;
+            box-shadow: 0 0 0 1px var(--timeline-year);
+            margin-left: 112px;
+            z-index: 2;
+        }
+
+        .timeline-year-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: white;
+            padding: var(--space-xs) var(--space-lg);
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .timeline-year-stats {
+            margin-left: auto;
+            display: flex;
+            gap: var(--space-lg);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            background: white;
+            padding: var(--space-xs) var(--space-lg);
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Month Section */
+        .timeline-month {
+            position: relative;
+            margin-bottom: var(--space-lg);
+        }
+
+        .timeline-month-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .timeline-month-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--timeline-month);
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px var(--timeline-month);
+            margin-left: 116px;
+            z-index: 2;
+        }
+
+        .timeline-month-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: white;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .timeline-month-stats {
+            margin-left: auto;
+            display: flex;
+            gap: var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            background: white;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Posts Container */
+        .timeline-posts {
+            margin-left: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            position: relative;
+        }
+
+        .timeline-posts::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, 
+                var(--timeline-month) 0%,
+                var(--timeline-month) 100%);
+            opacity: 0.3;
+        }
+
+        /* Post Card */
+        .timeline-post-card {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .timeline-post-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--accent);
+        }
+
+        .timeline-post-card::before {
+            content: '';
+            position: absolute;
+            left: -36px;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: var(--timeline-month);
+            opacity: 0.3;
+        }
+
+        .timeline-post-date {
+            min-width: 70px;
+            text-align: center;
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .timeline-post-content {
+            flex: 1;
+        }
+
+        .timeline-post-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .timeline-post-meta {
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .timeline-post-category {
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .timeline-post-author {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .timeline-post-author-avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+
+        .timeline-post-stats {
+            display: flex;
+            gap: var(--space-sm);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .timeline-post-excerpt {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+
+        /* Compact Timeline View */
+        .timeline-compact {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .timeline-compact-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .timeline-compact-year {
+            min-width: 60px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .timeline-compact-month {
+            min-width: 40px;
+            color: var(--text-secondary);
+        }
+
+        .timeline-compact-date {
+            min-width: 30px;
+            font-weight: 500;
+        }
+
+        .timeline-compact-title {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .timeline-compact-category {
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Sidebar */
+        .archive-layout {
+            display: grid;
+            grid-template-columns: 1fr 2.5fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        .archive-sidebar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            position: sticky;
+            top: calc(var(--nav-height) + var(--space-xl));
+        }
+
+        .sidebar-header {
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .sidebar-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .year-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .year-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .year-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .year-header.active {
+            background: var(--accent-light);
+            border-left: 3px solid var(--accent);
+        }
+
+        .year-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .year-count {
+            background: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .month-list {
+            padding: var(--space-sm);
+        }
+
+        .month-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .month-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .month-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .month-name {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .month-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .month-count {
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .archive-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .archive-sidebar {
+                position: static;
+            }
+
+            .archive-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .archive-stats {
+                grid-template-columns: 1fr;
+            }
+
+            /* Timeline responsive */
+            .timeline-view::before {
+                left: 40px;
+            }
+
+            .timeline-year-dot {
+                margin-left: 32px;
+            }
+
+            .timeline-month-dot {
+                margin-left: 36px;
+            }
+
+            .timeline-posts {
+                margin-left: 60px;
+            }
+
+            .timeline-post-card::before {
+                left: -26px;
+                width: 10px;
+            }
+
+            .timeline-year-header {
+                flex-wrap: wrap;
+            }
+
+            .timeline-year-stats {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .timeline-month-header {
+                flex-wrap: wrap;
+            }
+
+            .timeline-month-stats {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .timeline-post-card {
+                flex-direction: column;
+            }
+
+            .timeline-post-date {
+                align-self: flex-start;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .archive-stats { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .archive-sidebar { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .timeline-view { background: rgba(153, 102, 255, 0.02); }
+        .debug-layout .timeline-year { background: rgba(255, 159, 64, 0.02); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .timeline-post-card {
+            border: 1px dashed #36a2eb;
+            position: relative;
+        }
+
+        .debug-layout .timeline-post-card::after {
+            content: "timeline-post-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+        }
+
+        .debug-layout .timeline-year-dot {
+            background: #ff6384;
+        }
+
+        .debug-layout .timeline-month-dot {
+            background: #36a2eb;
+        }
+
+        .debug-layout .timeline-view::before {
+            background: #4bc0c0;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">Tags</a>
+                <a href="#" class="active">Archive</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <h1>Blog Archive</h1>
+            <p>Browse all articles by month and year</p>
+        </div>
+
+        <!-- Archive Stats -->
+        <div class="archive-stats">
+            <div class="stat-card">
+                <div class="stat-icon total">📚</div>
+                <div class="stat-content">
+                    <h3>Total Posts</h3>
+                    <div class="value">342</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon year">📅</div>
+                <div class="stat-content">
+                    <h3>Years</h3>
+                    <div class="value">5</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon month">📆</div>
+                <div class="stat-content">
+                    <h3>Months</h3>
+                    <div class="value">42</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon popular">🔥</div>
+                <div class="stat-content">
+                    <h3>Busiest Month</h3>
+                    <div class="value">Mar 2024</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="view-toggle">
+            <span class="view-toggle-btn">📂 Grouped View</span>
+            <span class="view-toggle-btn active">📊 Timeline View</span>
+        </div>
+
+        <!-- Archive Layout -->
+        <div class="archive-layout">
+            <!-- Sidebar - Year Navigation -->
+            <aside class="archive-sidebar">
+                <div class="sidebar-header">
+                    <h2>Browse Archive</h2>
+                    <p>Select a year or month</p>
+                </div>
+
+                <div class="year-list">
+                    <!-- Year 2024 -->
+                    <div class="year-item">
+                        <div class="year-header active">
+                            <span class="year-title">2024</span>
+                            <span class="year-count">98 posts</span>
+                        </div>
+                        <div class="month-list">
+                            <div class="month-item active">
+                                <span class="month-name">
+                                    <span class="month-dot"></span>
+                                    December
+                                </span>
+                                <span class="month-count">12</span>
+                            </div>
+                            <div class="month-item">
+                                <span class="month-name">
+                                    <span class="month-dot"></span>
+                                    November
+                                </span>
+                                <span class="month-count">10</span>
+                            </div>
+                            <div class="month-item">
+                                <span class="month-name">
+                                    <span class="month-dot"></span>
+                                    October
+                                </span>
+                                <span class="month-count">9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Year 2023 -->
+                    <div class="year-item">
+                        <div class="year-header">
+                            <span class="year-title">2023</span>
+                            <span class="year-count">112 posts</span>
+                        </div>
+                    </div>
+
+                    <!-- Year 2022 -->
+                    <div class="year-item">
+                        <div class="year-header">
+                            <span class="year-title">2022</span>
+                            <span class="year-count">86 posts</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content - Timeline View -->
+            <div class="timeline-view">
+                <!-- Year 2024 -->
+                <div class="timeline-year">
+                    <div class="timeline-year-header">
+                        <div class="timeline-year-dot"></div>
+                        <span class="timeline-year-title">2024</span>
+                        <div class="timeline-year-stats">
+                            <span>98 posts</span>
+                            <span>124.5K views</span>
+                        </div>
+                    </div>
+
+                    <!-- December 2024 -->
+                    <div class="timeline-month">
+                        <div class="timeline-month-header">
+                            <div class="timeline-month-dot"></div>
+                            <span class="timeline-month-title">December</span>
+                            <div class="timeline-month-stats">
+                                <span>12 posts</span>
+                                <span>18.2K views</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-posts">
+                            <!-- Post 1 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Dec 15</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">Understanding React Hooks: A Deep Dive</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">React</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">SC</span>
+                                            Sarah Chen
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 3.2K</span>
+                                        <span>💬 24</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post 2 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Dec 12</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">CSS Grid Layout: Complete Guide</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">CSS</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">MJ</span>
+                                            Mike Johnson
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 4.5K</span>
+                                        <span>💬 32</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post 3 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Dec 10</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">TypeScript Best Practices 2024</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">TypeScript</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">AR</span>
+                                            Alex Rivera
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 2.8K</span>
+                                        <span>💬 18</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post 4 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Dec 8</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">Next.js 14: What's New</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">Next.js</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">EW</span>
+                                            Emma Watson
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 1.9K</span>
+                                        <span>💬 12</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- November 2024 -->
+                    <div class="timeline-month">
+                        <div class="timeline-month-header">
+                            <div class="timeline-month-dot"></div>
+                            <span class="timeline-month-title">November</span>
+                            <div class="timeline-month-stats">
+                                <span>10 posts</span>
+                                <span>15.7K views</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-posts">
+                            <!-- Post 1 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Nov 28</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">Getting Started with Next.js 14</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">Next.js</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">SC</span>
+                                            Sarah Chen
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 1.9K</span>
+                                        <span>💬 12</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post 2 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Nov 25</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">Web Performance Optimization Techniques</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">Performance</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">MJ</span>
+                                            Mike Johnson
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 3.1K</span>
+                                        <span>💬 21</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Year 2023 -->
+                <div class="timeline-year">
+                    <div class="timeline-year-header">
+                        <div class="timeline-year-dot"></div>
+                        <span class="timeline-year-title">2023</span>
+                        <div class="timeline-year-stats">
+                            <span>112 posts</span>
+                            <span>156.8K views</span>
+                        </div>
+                    </div>
+
+                    <!-- December 2023 -->
+                    <div class="timeline-month">
+                        <div class="timeline-month-header">
+                            <div class="timeline-month-dot"></div>
+                            <span class="timeline-month-title">December</span>
+                            <div class="timeline-month-stats">
+                                <span>14 posts</span>
+                                <span>21.3K views</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline-posts">
+                            <!-- Post 1 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Dec 18</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">React 18 Features Deep Dive</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">React</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">SC</span>
+                                            Sarah Chen
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 5.2K</span>
+                                        <span>💬 42</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post 2 -->
+                            <div class="timeline-post-card">
+                                <div class="timeline-post-date">Dec 15</div>
+                                <div class="timeline-post-content">
+                                    <div class="timeline-post-title">Tailwind CSS Best Practices</div>
+                                    <div class="timeline-post-meta">
+                                        <span class="timeline-post-category">CSS</span>
+                                        <span class="timeline-post-author">
+                                            <span class="timeline-post-author-avatar">AR</span>
+                                            Alex Rivera
+                                        </span>
+                                    </div>
+                                    <div class="timeline-post-stats">
+                                        <span>👁️ 3.8K</span>
+                                        <span>💬 28</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compact Timeline Alternative (can be toggled) -->
+                <!--
+                <div class="timeline-compact">
+                    <div class="timeline-compact-item">
+                        <span class="timeline-compact-year">2024</span>
+                        <span class="timeline-compact-month">Dec</span>
+                        <span class="timeline-compact-date">15</span>
+                        <span class="timeline-compact-title">Understanding React Hooks</span>
+                        <span class="timeline-compact-category">React</span>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📚</span>
+            <span>Archive</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🔍</span>
+            <span>Search</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>

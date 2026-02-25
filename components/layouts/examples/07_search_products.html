@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results Layout Debug - Fixed Tablet</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 280px;
+            --nav-height: 70px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --rating: #fbbf24;
+        }
+
+        /* Base Layout */
+        .search-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            background: var(--bg-primary);
+        }
+
+        /* Header */
+        .search-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            width: 100%;
+        }
+
+        .search-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .search-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .search-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .search-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .search-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        /* Main Search Bar - FIXED for tablet centering */
+        .search-layout__main-search {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-lg) var(--space-xl);
+            width: 100%;
+            display: flex;
+            justify-content: center; /* Center the container */
+        }
+
+        .search-bar-container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+            margin: 0 auto; /* Ensure centering */
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            display: flex;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .search-input-wrapper input {
+            flex: 1;
+            padding: var(--space-md);
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .search-input-wrapper button {
+            padding: var(--space-md) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-filters-toggle {
+            display: none;
+            padding: var(--space-md) var(--space-lg);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Main Content Area - FIXED for tablet alignment */
+        .search-layout__content {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+            display: flex;
+            gap: var(--space-xl);
+            align-items: flex-start; /* Ensures filters align with products top */
+        }
+
+        /* Filters Sidebar - FIXED for tablet height */
+        .search-layout__filters {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: var(--space-lg);
+            position: sticky;
+            top: calc(var(--nav-height) + var(--space-lg)); /* Below header + spacing */
+            max-height: calc(100vh - var(--nav-height) - calc(var(--space-lg) * 2));
+            overflow-y: auto; /* Scroll if filters are too long */
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filters-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .clear-filters {
+            color: var(--accent);
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .filter-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .filter-section-title {
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .price-range {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .price-range input {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .rating-filter {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--rating);
+        }
+
+        /* Results Area */
+        .search-layout__results {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .results-count {
+            color: var(--text-secondary);
+        }
+
+        .results-sort {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .results-sort select {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+        }
+
+        /* Product Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Product Card */
+        .product-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            aspect-ratio: 1 / 1;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .product-info {
+            padding: var(--space-md);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .product-category {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .stars {
+            color: var(--rating);
+            letter-spacing: 1px;
+        }
+
+        .review-count {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .product-price {
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-top: auto;
+        }
+
+        .product-price small {
+            font-weight: normal;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-left: var(--space-xs);
+        }
+
+        .product-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            width: fit-content;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xs);
+            margin-top: var(--space-xl);
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .pagination-item.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Responsive - FIXED for tablet */
+        @media (max-width: 1024px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            /* Ensure search bar stays centered on tablet */
+            .search-bar-container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-layout__content {
+                flex-direction: column;
+                padding: var(--space-lg);
+            }
+
+            .search-layout__filters {
+                width: 100%;
+                position: static; /* Remove sticky on mobile */
+                max-height: none;
+                display: none; /* Hidden by default on mobile */
+                margin-bottom: var(--space-lg);
+            }
+
+            .search-layout__filters.active {
+                display: block; /* Show when toggled */
+            }
+
+            .search-filters-toggle {
+                display: block;
+            }
+
+            .search-bar-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input-wrapper {
+                width: 100%;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-md);
+            }
+            
+            /* Fix for mobile search centering */
+            .search-layout__main-search {
+                padding: var(--space-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .search-layout__nav {
+                display: none; /* Hide nav on mobile */
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="search-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="search-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .search-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .search-layout__main-search { background: rgba(54, 162, 235, 0.2); }
+        .debug-layout .search-layout__content { background: rgba(255, 206, 86, 0.1); }
+        .debug-layout .search-layout__filters { background: rgba(75, 192, 192, 0.1); }
+        .debug-layout .search-layout__results { background: rgba(153, 102, 255, 0.1); }
+
+        /* Component debug */
+        .debug-layout .product-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .product-card::before {
+            content: "product-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            font-family: monospace;
+            z-index: 50;
+        }
+
+        .debug-layout .filter-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            position: relative;
+        }
+
+        .debug-layout .filter-section::before {
+            content: "filter-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+    </style>
+</head>
+
+<body class="search-layout debug-layout">
+    <!-- Header -->
+    <header class="search-layout__header">
+        <div class="search-layout__header-left">
+            <div class="search-layout__logo">🛍️ Shop</div>
+            <nav class="search-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Electronics</a>
+                <a href="#">Fashion</a>
+                <a href="#">Home & Garden</a>
+                <a href="#">Deals</a>
+            </nav>
+        </div>
+        <div class="search-layout__header-right">
+            <span>👤 Account</span>
+            <span>🛒 Cart (3)</span>
+        </div>
+    </header>
+
+    <!-- Main Search Bar - NOW CENTERED -->
+    <div class="search-layout__main-search">
+        <div class="search-bar-container">
+            <div class="search-input-wrapper">
+                <input type="text" placeholder="Search for products..." value="wireless headphones">
+                <button>Search</button>
+            </div>
+            <button class="search-filters-toggle" onclick="toggleFilters()">🔍 Filters</button>
+        </div>
+    </div>
+
+    <!-- Main Content - FILTERS NOW ALIGN TOP -->
+    <div class="search-layout__content">
+        <!-- Filters Sidebar -->
+        <aside class="search-layout__filters" id="filtersSidebar">
+            <div class="filters-header">
+                <span class="filters-title">Filters</span>
+                <span class="clear-filters">Clear all</span>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-section">
+                <div class="filter-section-title">Category</div>
+                <label class="filter-option">
+                    <input type="checkbox"> Electronics
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Headphones
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Speakers
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Accessories
+                </label>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-section">
+                <div class="filter-section-title">Price Range</div>
+                <div class="price-range">
+                    <input type="number" placeholder="Min" value="0">
+                    <span>-</span>
+                    <input type="number" placeholder="Max" value="500">
+                </div>
+            </div>
+
+            <!-- Brand Filter -->
+            <div class="filter-section">
+                <div class="filter-section-title">Brand</div>
+                <label class="filter-option">
+                    <input type="checkbox"> Sony
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Bose
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Apple
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Samsung
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> JBL
+                </label>
+            </div>
+
+            <!-- Rating Filter -->
+            <div class="filter-section">
+                <div class="filter-section-title">Customer Rating</div>
+                <label class="filter-option">
+                    <input type="checkbox"> <span class="rating-filter">★★★★★ (4.5 & up)</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> <span class="rating-filter">★★★★ & up</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> <span class="rating-filter">★★★ & up</span>
+                </label>
+            </div>
+
+            <!-- Features -->
+            <div class="filter-section">
+                <div class="filter-section-title">Features</div>
+                <label class="filter-option">
+                    <input type="checkbox"> Wireless
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Noise Cancelling
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Bluetooth
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Water Resistant
+                </label>
+            </div>
+        </aside>
+
+        <!-- Results Area -->
+        <main class="search-layout__results">
+            <div class="results-header">
+                <div class="results-count">Showing 1-12 of 156 results for "wireless headphones"</div>
+                <div class="results-sort">
+                    <label>Sort by:</label>
+                    <select>
+                        <option>Relevance</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Customer Rating</option>
+                        <option>Newest</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="results-grid">
+                <!-- Product 1 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Sony WH-1000XM4 Wireless Headphones</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="review-count">(2,345)</span>
+                        </div>
+                        <div class="product-price">
+                            $349.99
+                            <small>$399.99</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Bose QuietComfort 45 Wireless Headphones</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="review-count">(1,892)</span>
+                        </div>
+                        <div class="product-price">
+                            $329.99
+                            <small>$379.99</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Apple AirPods Max</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-count">(3,012)</span>
+                        </div>
+                        <div class="product-price">
+                            $549.99
+                        </div>
+                        <span class="product-badge">Premium</span>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">JBL Live 660NC Wireless Headphones</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-count">(892)</span>
+                        </div>
+                        <div class="product-price">
+                            $199.95
+                            <small>$249.95</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Sennheiser Momentum 4 Wireless</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="review-count">(567)</span>
+                        </div>
+                        <div class="product-price">
+                            $379.95
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Beats Studio3 Wireless</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-count">(1,234)</span>
+                        </div>
+                        <div class="product-price">
+                            $279.99
+                            <small>$349.99</small>
+                        </div>
+                        <span class="product-badge">Sale</span>
+                    </div>
+                </div>
+
+                <!-- Product 7 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Audio-Technica ATH-M50xBT</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="review-count">(2,101)</span>
+                        </div>
+                        <div class="product-price">
+                            $199.00
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 8 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Jabra Elite 85h</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-count">(756)</span>
+                        </div>
+                        <div class="product-price">
+                            $249.99
+                            <small>$299.99</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 9 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Bowers & Wilkins PX7 S2</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="review-count">(423)</span>
+                        </div>
+                        <div class="product-price">
+                            $399.99
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 10 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Anker Soundcore Life Q35</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-count">(2,567)</span>
+                        </div>
+                        <div class="product-price">
+                            $129.99
+                            <small>$159.99</small>
+                        </div>
+                        <span class="product-badge">Best Seller</span>
+                    </div>
+                </div>
+
+                <!-- Product 11 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Marshall Monitor II ANC</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="review-count">(345)</span>
+                        </div>
+                        <div class="product-price">
+                            $319.99
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 12 -->
+                <div class="product-card">
+                    <div class="product-image">🎧</div>
+                    <div class="product-info">
+                        <span class="product-category">Electronics</span>
+                        <div class="product-name">Shure AONIC 50 Wireless</div>
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="review-count">(234)</span>
+                        </div>
+                        <div class="product-price">
+                            $299.00
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="pagination-item">←</span>
+                <span class="pagination-item active">1</span>
+                <span class="pagination-item">2</span>
+                <span class="pagination-item">3</span>
+                <span class="pagination-item">4</span>
+                <span class="pagination-item">5</span>
+                <span class="pagination-item">→</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleFilters() {
+            const filters = document.getElementById('filtersSidebar');
+            filters.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>

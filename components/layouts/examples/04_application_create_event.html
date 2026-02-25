@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Create Event Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --nav-height: 60px;
+            --form-width: 600px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Event type colors */
+            --event-task: #3b82f6;
+            --event-deadline: #ef4444;
+            --event-milestone: #8b5cf6;
+            --event-meeting: #10b981;
+            --event-reminder: #f59e0b;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Create Event Content */
+        .create-event-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Create Event Form */
+        .create-event-form {
+            max-width: var(--form-width);
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-2xl);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .form-header-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .form-header-text h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .form-header-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .form-section-title span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group .form-input,
+        .input-group .form-select {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Event Type Selector */
+        .event-type-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .type-option {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-option:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .type-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            border-width: 2px;
+        }
+
+        .type-option__icon {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .type-option__name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Date/Time Pickers */
+        .datetime-picker {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .date-picker {
+            flex: 2;
+        }
+
+        .time-picker {
+            flex: 1;
+        }
+
+        .all-day-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-top: var(--space-xs);
+        }
+
+        /* Recurrence Selector */
+        .recurrence-selector {
+            display: flex;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .recurrence-option {
+            padding: var(--space-xs) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .recurrence-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .recurrence-option.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+        }
+
+        .color-option.blue { background: var(--event-task); }
+        .color-option.red { background: var(--event-deadline); }
+        .color-option.purple { background: var(--event-milestone); }
+        .color-option.green { background: var(--event-meeting); }
+        .color-option.orange { background: var(--event-reminder); }
+
+        /* Attendees */
+        .attendees-list {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .attendee-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .attendee-item:last-child {
+            border-bottom: none;
+        }
+
+        .attendee-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .attendee-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .attendee-details {
+            line-height: 1.3;
+        }
+
+        .attendee-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .attendee-email {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .attendee-remove {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .add-attendee {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: var(--space-sm);
+        }
+
+        .add-attendee input {
+            flex: 1;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        /* Reminder Options */
+        .reminder-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .reminder-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .reminder-item select {
+            width: 100px;
+            padding: var(--space-xs);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .add-reminder {
+            color: var(--accent);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.secondary {
+            background: var(--bg-secondary);
+        }
+
+        /* Right Panel - Quick Tips */
+        .right-panel {
+            width: 300px;
+            background: white;
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .tip-item {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .tip-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .recent-template {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .recent-template:hover {
+            background: var(--bg-secondary);
+        }
+
+        .template-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .template-type {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .right-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .create-event-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .create-event-form {
+                padding: var(--space-lg);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-type-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .datetime-picker {
+                flex-direction: column;
+            }
+
+            .date-picker,
+            .time-picker {
+                width: 100%;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .create-event-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .create-event-form { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .right-panel { background: rgba(153, 102, 255, 0.1); }
+
+        /* Component debug */
+        .debug-layout .form-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .debug-layout .form-section::before {
+            content: "form-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .type-option.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .attendee-item {
+            border-bottom: 1px dashed #ff6384;
+        }
+
+        .debug-layout .recurrence-option.selected {
+            background: rgba(75, 192, 192, 0.3);
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .color-option.selected {
+            border: 3px solid #ff6384;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#">Reports</a>
+                <a href="#" class="active">Calendar</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📅</span>
+                    <span>Calendar</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Create Event Content -->
+        <main class="create-event-content">
+            <div class="create-event-form">
+                <!-- Form Header -->
+                <div class="form-header">
+                    <div class="form-header-icon">📅</div>
+                    <div class="form-header-text">
+                        <h1>Create New Event</h1>
+                        <p>Add an event to your calendar</p>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        Basic Information
+                        <span>required</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Event Title <span>*</span></label>
+                        <input type="text" class="form-input" placeholder="e.g., Sprint Planning Meeting" value="Design Review Meeting">
+                        <div class="form-hint">Give your event a clear, descriptive title</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Event Type</label>
+                        <div class="event-type-selector">
+                            <div class="type-option selected">
+                                <div class="type-option__icon">✅</div>
+                                <div class="type-option__name">Task</div>
+                            </div>
+                            <div class="type-option">
+                                <div class="type-option__icon">⚠️</div>
+                                <div class="type-option__name">Deadline</div>
+                            </div>
+                            <div class="type-option">
+                                <div class="type-option__icon">🎯</div>
+                                <div class="type-option__name">Milestone</div>
+                            </div>
+                            <div class="type-option">
+                                <div class="type-option__icon">👥</div>
+                                <div class="type-option__name">Meeting</div>
+                            </div>
+                            <div class="type-option">
+                                <div class="type-option__icon">🔔</div>
+                                <div class="type-option__name">Reminder</div>
+                            </div>
+                            <div class="type-option">
+                                <div class="type-option__icon">🎉</div>
+                                <div class="type-option__name">Other</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" placeholder="Add details about this event...">Weekly design review to discuss progress on the mobile app redesign. Topics include:
+- Review new wireframes
+- Discuss user feedback
+- Plan next sprint tasks</textarea>
+                    </div>
+                </div>
+
+                <!-- Date & Time -->
+                <div class="form-section">
+                    <div class="form-section-title">Date & Time</div>
+                    
+                    <div class="form-row">
+                        <div class="datetime-picker">
+                            <div class="date-picker">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-input" value="2024-12-21">
+                            </div>
+                            <div class="time-picker">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-input" value="14:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="datetime-picker">
+                            <div class="date-picker">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-input" value="2024-12-21">
+                            </div>
+                            <div class="time-picker">
+                                <label class="form-label">End Time</label>
+                                <input type="time" class="form-input" value="15:30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="all-day-toggle">
+                        <input type="checkbox" id="allDay">
+                        <label for="allDay">All day event</label>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Recurrence</label>
+                        <div class="recurrence-selector">
+                            <span class="recurrence-option selected">Does not repeat</span>
+                            <span class="recurrence-option">Daily</span>
+                            <span class="recurrence-option">Weekly</span>
+                            <span class="recurrence-option">Bi-weekly</span>
+                            <span class="recurrence-option">Monthly</span>
+                            <span class="recurrence-option">Yearly</span>
+                            <span class="recurrence-option">Custom</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Project -->
+                <div class="form-section">
+                    <div class="form-section-title">Location & Context</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Location</label>
+                            <div class="input-group">
+                                <input type="text" class="form-input" placeholder="e.g., Conference Room A" value="Conference Room B">
+                                <span class="input-group-addon">📍</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Project</label>
+                            <select class="form-select">
+                                <option value="">None</option>
+                                <option value="mobile" selected>Mobile App</option>
+                                <option value="website">Website Redesign</option>
+                                <option value="api">API Integration</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Meeting Link</label>
+                        <div class="input-group">
+                            <input type="url" class="form-input" placeholder="https://..." value="https://meet.google.com/abc-defg-hij">
+                            <span class="input-group-addon">🔗</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color & Appearance -->
+                <div class="form-section">
+                    <div class="form-section-title">Appearance</div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Event Color</label>
+                        <div class="color-picker">
+                            <div class="color-option blue selected" title="Blue"></div>
+                            <div class="color-option red" title="Red"></div>
+                            <div class="color-option purple" title="Purple"></div>
+                            <div class="color-option green" title="Green"></div>
+                            <div class="color-option orange" title="Orange"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendees -->
+                <div class="form-section">
+                    <div class="form-section-title">Attendees</div>
+                    
+                    <div class="attendees-list">
+                        <div class="attendee-item">
+                            <div class="attendee-info">
+                                <div class="attendee-avatar">SC</div>
+                                <div class="attendee-details">
+                                    <div class="attendee-name">Sarah Chen</div>
+                                    <div class="attendee-email">sarah.chen@company.com</div>
+                                </div>
+                            </div>
+                            <span class="attendee-remove">✕</span>
+                        </div>
+                        <div class="attendee-item">
+                            <div class="attendee-info">
+                                <div class="attendee-avatar">MJ</div>
+                                <div class="attendee-details">
+                                    <div class="attendee-name">Mike Johnson</div>
+                                    <div class="attendee-email">mike.j@company.com</div>
+                                </div>
+                            </div>
+                            <span class="attendee-remove">✕</span>
+                        </div>
+                        <div class="attendee-item">
+                            <div class="attendee-info">
+                                <div class="attendee-avatar">AR</div>
+                                <div class="attendee-details">
+                                    <div class="attendee-name">Alex Rivera</div>
+                                    <div class="attendee-email">alex.r@company.com</div>
+                                </div>
+                            </div>
+                            <span class="attendee-remove">✕</span>
+                        </div>
+                    </div>
+
+                    <div class="add-attendee">
+                        <input type="email" placeholder="Enter email address">
+                        <button class="btn small">Add</button>
+                    </div>
+                </div>
+
+                <!-- Reminders -->
+                <div class="form-section">
+                    <div class="form-section-title">Reminders</div>
+                    
+                    <div class="reminder-options">
+                        <div class="reminder-item">
+                            <select>
+                                <option>15 minutes before</option>
+                                <option selected>30 minutes before</option>
+                                <option>1 hour before</option>
+                                <option>2 hours before</option>
+                                <option>1 day before</option>
+                            </select>
+                            <span class="reminder-remove">✕</span>
+                        </div>
+                        <div class="reminder-item">
+                            <select>
+                                <option>15 minutes before</option>
+                                <option>30 minutes before</option>
+                                <option selected>1 hour before</option>
+                                <option>2 hours before</option>
+                                <option>1 day before</option>
+                            </select>
+                            <span class="reminder-remove">✕</span>
+                        </div>
+                        <div class="add-reminder">
+                            <span>+</span>
+                            <span>Add reminder</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy & Visibility -->
+                <div class="form-section">
+                    <div class="form-section-title">Privacy</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Visibility</label>
+                            <select class="form-select">
+                                <option selected>Default visibility</option>
+                                <option>Public</option>
+                                <option>Private</option>
+                                <option>Team only</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Busy status</label>
+                            <select class="form-select">
+                                <option selected>Busy</option>
+                                <option>Free</option>
+                                <option>Tentative</option>
+                                <option>Out of office</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button class="btn">Cancel</button>
+                    <button class="btn secondary">Save as Draft</button>
+                    <button class="btn primary">Create Event</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel - Tips & Templates -->
+        <div class="right-panel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Quick Tips</h3>
+                </div>
+                
+                <div class="tip-item">
+                    <span class="tip-icon">✓</span>
+                    <span>Use clear titles that include the project name</span>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">⏰</span>
+                    <span>Set reminders to never miss important events</span>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">👥</span>
+                    <span>Add attendees to automatically send invites</span>
+                </div>
+                <div class="tip-item">
+                    <span class="tip-icon">🎨</span>
+                    <span>Use colors to distinguish event types</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Recent Templates</h3>
+                </div>
+                
+                <div class="recent-template">
+                    <span class="template-color" style="background: var(--event-meeting);"></span>
+                    <div class="template-info">
+                        <div class="template-title">Sprint Planning</div>
+                        <div class="template-type">Weekly meeting</div>
+                    </div>
+                </div>
+
+                <div class="recent-template">
+                    <span class="template-color" style="background: var(--event-deadline);"></span>
+                    <div class="template-info">
+                        <div class="template-title">Project Milestone</div>
+                        <div class="template-type">End of quarter</div>
+                    </div>
+                </div>
+
+                <div class="recent-template">
+                    <span class="template-color" style="background: var(--event-task);"></span>
+                    <div class="template-info">
+                        <div class="template-title">Design Review</div>
+                        <div class="template-type">Bi-weekly</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Keyboard Shortcuts</h3>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs);">
+                    <span>⌘/Ctrl + S</span>
+                    <span class="text-secondary">Save</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs);">
+                    <span>⌘/Ctrl + D</span>
+                    <span class="text-secondary">Duplicate</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Esc</span>
+                    <span class="text-secondary">Cancel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📅</span>
+            <span>Calendar</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>➕</span>
+            <span>Create</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Media Library Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 260px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* File type colors */
+            --file-image: #3b82f6;
+            --file-document: #10b981;
+            --file-video: #ef4444;
+            --file-audio: #8b5cf6;
+            --file-archive: #f59e0b;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.images { background: #dbeafe; color: var(--file-image); }
+        .stat-icon.documents { background: #d1fae5; color: var(--file-document); }
+        .stat-icon.videos { background: #fee2e2; color: var(--file-video); }
+        .stat-icon.others { background: #f3f4f6; color: var(--text-secondary); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .upload-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .upload-hint {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .upload-formats {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-md) var(--space-lg);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .filter-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 2px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .view-toggle-btn {
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .view-toggle-btn.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Media Grid */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .media-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .media-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .media-item.selected {
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-light);
+        }
+
+        .media-preview {
+            aspect-ratio: 1 / 1;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .media-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-type-badge {
+            position: absolute;
+            top: var(--space-xs);
+            right: var(--space-xs);
+            padding: 2px 6px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.6rem;
+        }
+
+        .media-checkbox {
+            position: absolute;
+            top: var(--space-xs);
+            left: var(--space-xs);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .media-info {
+            padding: var(--space-sm);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .media-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .media-size {
+            font-size: 0.65rem;
+        }
+
+        .media-dimensions {
+            font-size: 0.65rem;
+        }
+
+        /* Media List View */
+        .media-list {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: 40px 2fr 1fr 1fr 1fr 1fr 100px;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .list-item {
+            display: grid;
+            grid-template-columns: 40px 2fr 1fr 1fr 1fr 1fr 100px;
+            padding: var(--space-sm) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .list-item.selected {
+            background: var(--accent-light);
+        }
+
+        .list-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .list-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .list-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .list-type {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .list-size {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .list-dimensions {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .list-date {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .list-action-btn {
+            padding: 4px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Bulk Actions */
+        .bulk-actions {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .bulk-select-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .bulk-actions select {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .bulk-actions-count {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Folder Navigation */
+        .folder-nav {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-sm) var(--space-lg);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .folder-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .folder-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .folder-separator {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-xl);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .pagination-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .pagination-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-body {
+            padding: var(--space-lg);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Preview Modal */
+        .preview-container {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .preview-image {
+            flex: 2;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .preview-details {
+            flex: 1;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .url-box {
+            background: var(--bg-secondary);
+            padding: var(--space-sm);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: var(--space-sm);
+        }
+
+        .url-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 0.8rem;
+        }
+
+        .url-box button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .media-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .media-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .media-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .list-header {
+                display: none;
+            }
+
+            .list-item {
+                grid-template-columns: 1fr;
+                gap: var(--space-xs);
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+            }
+
+            .preview-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .media-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .stats-grid { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .upload-area { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .media-grid { background: rgba(153, 102, 255, 0.02); }
+        .debug-layout .modal { background: rgba(255, 159, 64, 0.1); }
+
+        /* Component debug */
+        .debug-layout .media-item {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .media-item.selected {
+            border: 3px solid #36a2eb;
+        }
+
+        .debug-layout .list-item {
+            border-bottom: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .folder-item.active {
+            background: rgba(54, 162, 235, 0.3);
+            border: 1px dashed #36a2eb;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog Admin</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Authors</a>
+                <a href="#">Categories</a>
+                <a href="#">Tags</a>
+                <a href="#">Comments</a>
+                <a href="#" class="active">Media</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search media...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Media Library</h1>
+                <p>Manage images, documents, and other media files</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn primary">📤 Upload Files</button>
+                <button class="btn outline">📁 New Folder</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon images">🖼️</div>
+                <div class="stat-content">
+                    <h3>Images</h3>
+                    <div class="value">342</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon documents">📄</div>
+                <div class="stat-content">
+                    <h3>Documents</h3>
+                    <div class="value">86</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon videos">🎬</div>
+                <div class="stat-content">
+                    <h3>Videos</h3>
+                    <div class="value">24</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon others">📦</div>
+                <div class="stat-content">
+                    <h3>Other Files</h3>
+                    <div class="value">45</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-area">
+            <div class="upload-icon">📤</div>
+            <div class="upload-title">Drag and drop files here</div>
+            <div class="upload-hint">or click to browse</div>
+            <div class="upload-formats">
+                <span>Images: JPG, PNG, GIF, SVG</span>
+                <span>Documents: PDF, DOC, TXT</span>
+                <span>Videos: MP4, MOV</span>
+                <span>Max size: 10MB</span>
+            </div>
+        </div>
+
+        <!-- Folder Navigation -->
+        <div class="folder-nav">
+            <span class="folder-item active">📁 All Media</span>
+            <span class="folder-separator">/</span>
+            <span class="folder-item">📁 Images</span>
+            <span class="folder-separator">/</span>
+            <span class="folder-item">📁 2024</span>
+            <span class="folder-separator">/</span>
+            <span class="folder-item">📁 December</span>
+            <span style="margin-left: auto;">📊 2.3 GB of 5 GB used</span>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-tabs">
+                <span class="filter-tab active">All Media</span>
+                <span class="filter-tab">Images</span>
+                <span class="filter-tab">Documents</span>
+                <span class="filter-tab">Videos</span>
+                <span class="filter-tab">Unused</span>
+            </div>
+            <div class="filter-actions">
+                <select class="filter-select">
+                    <option>Recent</option>
+                    <option>Oldest</option>
+                    <option>Largest</option>
+                    <option>Smallest</option>
+                </select>
+                <div class="view-toggle">
+                    <span class="view-toggle-btn active">📱 Grid</span>
+                    <span class="view-toggle-btn">📋 List</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions">
+            <div class="bulk-select-info">
+                <input type="checkbox" id="select-all">
+                <label for="select-all">Select All</label>
+            </div>
+            <select>
+                <option>Bulk Actions</option>
+                <option>Delete Selected</option>
+                <option>Move to Folder</option>
+                <option>Download</option>
+            </select>
+            <button class="btn small">Apply</button>
+            <span class="bulk-actions-count">3 items selected</span>
+        </div>
+
+        <!-- Media Grid -->
+        <div class="media-grid">
+            <!-- Image 1 -->
+            <div class="media-item selected">
+                <div class="media-preview">
+                    <img src="https://via.placeholder.com/200" alt="Preview">
+                    <span class="media-type-badge">JPG</span>
+                    <input type="checkbox" class="media-checkbox" checked>
+                </div>
+                <div class="media-info">
+                    <div class="media-name">hero-banner.jpg</div>
+                    <div class="media-meta">
+                        <span class="media-size">245 KB</span>
+                        <span class="media-dimensions">1200×600</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image 2 -->
+            <div class="media-item">
+                <div class="media-preview">
+                    <img src="https://via.placeholder.com/200" alt="Preview">
+                    <span class="media-type-badge">PNG</span>
+                    <input type="checkbox" class="media-checkbox">
+                </div>
+                <div class="media-info">
+                    <div class="media-name">logo-dark.png</div>
+                    <div class="media-meta">
+                        <span class="media-size">124 KB</span>
+                        <span class="media-dimensions">512×512</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image 3 -->
+            <div class="media-item">
+                <div class="media-preview">
+                    <img src="https://via.placeholder.com/200" alt="Preview">
+                    <span class="media-type-badge">JPG</span>
+                    <input type="checkbox" class="media-checkbox">
+                </div>
+                <div class="media-info">
+                    <div class="media-name">author-sarah.jpg</div>
+                    <div class="media-meta">
+                        <span class="media-size">89 KB</span>
+                        <span class="media-dimensions">400×400</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image 4 -->
+            <div class="media-item">
+                <div class="media-preview">
+                    <img src="https://via.placeholder.com/200" alt="Preview">
+                    <span class="media-type-badge">GIF</span>
+                    <input type="checkbox" class="media-checkbox">
+                </div>
+                <div class="media-info">
+                    <div class="media-name">animation.gif</div>
+                    <div class="media-meta">
+                        <span class="media-size">1.2 MB</span>
+                        <span class="media-dimensions">800×400</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image 5 -->
+            <div class="media-item">
+                <div class="media-preview">
+                    <img src="https://via.placeholder.com/200" alt="Preview">
+                    <span class="media-type-badge">JPG</span>
+                    <input type="checkbox" class="media-checkbox">
+                </div>
+                <div class="media-info">
+                    <div class="media-name">featured-post.jpg</div>
+                    <div class="media-meta">
+                        <span class="media-size">345 KB</span>
+                        <span class="media-dimensions">1600×900</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Document -->
+            <div class="media-item">
+                <div class="media-preview">📄</div>
+                <div class="media-info">
+                    <div class="media-name">style-guide.pdf</div>
+                    <div class="media-meta">
+                        <span class="media-size">2.1 MB</span>
+                        <span class="media-dimensions">PDF</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Word Document -->
+            <div class="media-item">
+                <div class="media-preview">📝</div>
+                <div class="media-info">
+                    <div class="media-name">content-draft.docx</div>
+                    <div class="media-meta">
+                        <span class="media-size">456 KB</span>
+                        <span class="media-dimensions">DOCX</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video -->
+            <div class="media-item">
+                <div class="media-preview">🎬</div>
+                <div class="media-info">
+                    <div class="media-name">tutorial.mp4</div>
+                    <div class="media-meta">
+                        <span class="media-size">8.2 MB</span>
+                        <span class="media-dimensions">MP4</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG -->
+            <div class="media-item">
+                <div class="media-preview">
+                    <img src="https://via.placeholder.com/200" alt="Preview">
+                    <span class="media-type-badge">SVG</span>
+                    <input type="checkbox" class="media-checkbox">
+                </div>
+                <div class="media-info">
+                    <div class="media-name">icon-set.svg</div>
+                    <div class="media-meta">
+                        <span class="media-size">45 KB</span>
+                        <span class="media-dimensions">256×256</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ZIP Archive -->
+            <div class="media-item">
+                <div class="media-preview">📦</div>
+                <div class="media-info">
+                    <div class="media-name">assets.zip</div>
+                    <div class="media-meta">
+                        <span class="media-size">4.5 MB</span>
+                        <span class="media-dimensions">ZIP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <div class="pagination-info">Showing 1-10 of 497 media files</div>
+            <div class="pagination-controls">
+                <button class="pagination-btn" disabled>←</button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+                <button class="pagination-btn">4</button>
+                <button class="pagination-btn">5</button>
+                <button class="pagination-btn">→</button>
+            </div>
+        </div>
+
+        <!-- Preview Modal -->
+        <div class="modal" id="previewModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Media Details</h2>
+                    <span class="modal-close">✕</span>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-container">
+                        <div class="preview-image">
+                            <img src="https://via.placeholder.com/400" alt="Preview" style="max-width: 100%;">
+                        </div>
+                        <div class="preview-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Filename</span>
+                                <span class="detail-value">hero-banner.jpg</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">File Type</span>
+                                <span class="detail-value">JPEG Image</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Size</span>
+                                <span class="detail-value">245 KB</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Dimensions</span>
+                                <span class="detail-value">1200 × 600</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Uploaded</span>
+                                <span class="detail-value">December 15, 2024</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Uploaded By</span>
+                                <span class="detail-value">Sarah Chen</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Used In</span>
+                                <span class="detail-value">3 posts</span>
+                            </div>
+                            <div class="url-box">
+                                <input type="text" value="https://devblog.com/media/hero-banner.jpg" readonly>
+                                <button>📋</button>
+                            </div>
+                            <div style="margin-top: var(--space-md);">
+                                <button class="btn small">Download</button>
+                                <button class="btn small">Delete</button>
+                                <button class="btn small">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn outline">Close</button>
+                    <button class="btn primary">Insert into Post</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>🖼️</span>
+            <span>Media</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>💬</span>
+            <span>Comments</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </div>
+    </nav>
+
+    <script>
+        // Simple modal toggle for demo
+        document.querySelectorAll('.media-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('media-checkbox')) {
+                    document.getElementById('previewModal').classList.add('active');
+                }
+            });
+        });
+
+        document.querySelector('.modal-close').addEventListener('click', function() {
+            document.getElementById('previewModal').classList.remove('active');
+        });
+
+        document.querySelector('.modal-footer .btn.outline').addEventListener('click', function() {
+            document.getElementById('previewModal').classList.remove('active');
+        });
+    </script>
+</body>
+
+</html>

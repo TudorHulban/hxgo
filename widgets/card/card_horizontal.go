@@ -3,7 +3,7 @@ package card
 import (
 	"fmt"
 
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/widgets/base"
@@ -40,8 +40,8 @@ func WidgetCardHorizontal(params *ParamsWidgetCardHorizontal) dsl.Node {
 
 		dsl.AttrClass("has-post-thumbnail"),
 
-		components.Image(
-			&components.ParamsImage{
+		primitives.Image(
+			&primitives.ParamsImage{
 				ImageSquareSize: params.ImageSquareSize,
 				ImageSource:     params.ImageSource,
 				ImageAlt:        params.Title,

@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Calendar Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Event type colors */
+            --event-task: #3b82f6;
+            --event-deadline: #ef4444;
+            --event-milestone: #8b5cf6;
+            --event-meeting: #10b981;
+            --event-reminder: #f59e0b;
+            --event-report: #ec4899;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Calendar Content */
+        .calendar-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Calendar Header */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            background: white;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .calendar-nav h2 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .calendar-view-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .view-tab {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .view-tab.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+
+        /* Mini Calendar */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: var(--space-xl);
+        }
+
+        .mini-calendar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .mini-header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .mini-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .mini-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .mini-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .mini-day:hover {
+            background: var(--bg-secondary);
+        }
+
+        .mini-day.current {
+            background: var(--accent);
+            color: white;
+        }
+
+        .mini-day.has-events {
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .mini-day.other-month {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .upcoming-section {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .upcoming-section h4 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .upcoming-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .upcoming-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .upcoming-dot.task { background: var(--event-task); }
+        .upcoming-dot.deadline { background: var(--event-deadline); }
+        .upcoming-dot.milestone { background: var(--event-milestone); }
+        .upcoming-dot.meeting { background: var(--event-meeting); }
+
+        .upcoming-info {
+            flex: 1;
+        }
+
+        .upcoming-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .upcoming-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Calendar */
+        .main-calendar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            overflow-x: auto;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .calendar-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            min-height: 120px;
+        }
+
+        .calendar-day {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-sm);
+            position: relative;
+            min-width: 120px;
+        }
+
+        .calendar-day:nth-child(7n) {
+            border-right: none;
+        }
+
+        .calendar-day.other-month {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+
+        .day-number {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: var(--space-sm);
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .calendar-event {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .calendar-event:hover {
+            filter: brightness(0.95);
+        }
+
+        .event-task { background: #dbeafe; color: var(--event-task); }
+        .event-deadline { background: #fee2e2; color: var(--event-deadline); }
+        .event-milestone { background: #ede9fe; color: var(--event-milestone); }
+        .event-meeting { background: #d1fae5; color: var(--event-meeting); }
+        .event-reminder { background: #fed7aa; color: var(--event-reminder); }
+        .event-report { background: #fce7f3; color: var(--event-report); }
+
+        .more-events {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        /* Legend */
+        .calendar-legend {
+            display: flex;
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+
+        /* Right Panel - Details */
+        .right-panel {
+            width: 300px;
+            background: white;
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .selected-date {
+            background: var(--bg-secondary);
+            padding: var(--space-md);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .selected-date .date {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .selected-date .weekday {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .day-events-list {
+            margin-top: var(--space-md);
+        }
+
+        .day-event-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .day-event-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .event-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            min-width: 45px;
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .event-project {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .calendar-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .calendar-header {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+
+            .calendar-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .calendar-nav h2 {
+                font-size: 1rem;
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .calendar-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .mini-calendar { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .main-calendar { background: rgba(153, 102, 255, 0.02); }
+        .debug-layout .right-panel { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .calendar-day {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .calendar-event {
+            border: 1px dashed currentColor;
+            opacity: 0.8;
+        }
+
+        .debug-layout .mini-day.has-events {
+            border: 1px solid #36a2eb;
+        }
+
+        .debug-layout .day-event-item {
+            border: 1px dashed #4bc0c0;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#">Reports</a>
+                <a href="#" class="active">Calendar</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search events...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">5</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📅</span>
+                    <span>Calendar</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">CALENDARS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">✅</span>
+                    <span>Tasks</span>
+                    <span class="nav-item__badge">24</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🎯</span>
+                    <span>Milestones</span>
+                    <span class="nav-item__badge">8</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">⚠️</span>
+                    <span>Deadlines</span>
+                    <span class="nav-item__badge">12</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Meetings</span>
+                    <span class="nav-item__badge">6</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">PROJECTS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📱</span>
+                    <span>Mobile App</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🌐</span>
+                    <span>Website Redesign</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔌</span>
+                    <span>API Integration</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Calendar Content -->
+        <main class="calendar-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Calendar</h1>
+                    <p>View and manage your schedule, deadlines, and events</p>
+                </div>
+                <div class="content-header__actions">
+                    <button class="btn">🔍 Find Events</button>
+                    <button class="btn primary">+ New Event</button>
+                </div>
+            </div>
+
+            <!-- Calendar Header -->
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button class="nav-btn">←</button>
+                    <h2>December 2024</h2>
+                    <button class="nav-btn">→</button>
+                    <button class="btn small">Today</button>
+                </div>
+                <div class="calendar-view-tabs">
+                    <span class="view-tab active">Month</span>
+                    <span class="view-tab">Week</span>
+                    <span class="view-tab">Day</span>
+                    <span class="view-tab">Agenda</span>
+                </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid">
+                <!-- Mini Calendar & Upcoming -->
+                <div class="mini-calendar">
+                    <div class="mini-header">
+                        <h3>December 2024</h3>
+                        <div>
+                            <button class="nav-btn small">←</button>
+                            <button class="nav-btn small">→</button>
+                        </div>
+                    </div>
+                    <div class="mini-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="mini-days">
+                        <span class="mini-day other-month">24</span>
+                        <span class="mini-day other-month">25</span>
+                        <span class="mini-day other-month">26</span>
+                        <span class="mini-day other-month">27</span>
+                        <span class="mini-day other-month">28</span>
+                        <span class="mini-day other-month">29</span>
+                        <span class="mini-day other-month">30</span>
+                        <span class="mini-day">1</span>
+                        <span class="mini-day">2</span>
+                        <span class="mini-day">3</span>
+                        <span class="mini-day">4</span>
+                        <span class="mini-day">5</span>
+                        <span class="mini-day">6</span>
+                        <span class="mini-day">7</span>
+                        <span class="mini-day">8</span>
+                        <span class="mini-day">9</span>
+                        <span class="mini-day">10</span>
+                        <span class="mini-day">11</span>
+                        <span class="mini-day">12</span>
+                        <span class="mini-day has-events">13</span>
+                        <span class="mini-day has-events">14</span>
+                        <span class="mini-day">15</span>
+                        <span class="mini-day">16</span>
+                        <span class="mini-day">17</span>
+                        <span class="mini-day">18</span>
+                        <span class="mini-day">19</span>
+                        <span class="mini-day">20</span>
+                        <span class="mini-day current">21</span>
+                        <span class="mini-day">22</span>
+                        <span class="mini-day">23</span>
+                        <span class="mini-day">24</span>
+                        <span class="mini-day">25</span>
+                        <span class="mini-day">26</span>
+                        <span class="mini-day">27</span>
+                        <span class="mini-day">28</span>
+                        <span class="mini-day">29</span>
+                        <span class="mini-day">30</span>
+                        <span class="mini-day">31</span>
+                        <span class="mini-day other-month">1</span>
+                        <span class="mini-day other-month">2</span>
+                        <span class="mini-day other-month">3</span>
+                        <span class="mini-day other-month">4</span>
+                    </div>
+
+                    <div class="upcoming-section">
+                        <h4>Upcoming Events</h4>
+                        <div class="upcoming-item">
+                            <span class="upcoming-dot task"></span>
+                            <div class="upcoming-info">
+                                <div class="upcoming-title">Design review</div>
+                                <div class="upcoming-time">Today, 2:00 PM</div>
+                            </div>
+                        </div>
+                        <div class="upcoming-item">
+                            <span class="upcoming-dot deadline"></span>
+                            <div class="upcoming-info">
+                                <div class="upcoming-title">API documentation due</div>
+                                <div class="upcoming-time">Tomorrow, 5:00 PM</div>
+                            </div>
+                        </div>
+                        <div class="upcoming-item">
+                            <span class="upcoming-dot milestone"></span>
+                            <div class="upcoming-info">
+                                <div class="upcoming-title">Mobile App v2 release</div>
+                                <div class="upcoming-time">Dec 15, 2024</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Calendar -->
+                <div class="main-calendar">
+                    <div class="weekdays">
+                        <span>Sunday</span><span>Monday</span><span>Tuesday</span><span>Wednesday</span><span>Thursday</span><span>Friday</span><span>Saturday</span>
+                    </div>
+
+                    <!-- Week 1 -->
+                    <div class="calendar-week">
+                        <div class="calendar-day other-month">
+                            <div class="day-number">1</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">2</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">3</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">4</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">5</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">6</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">7</div>
+                        </div>
+                    </div>
+
+                    <!-- Week 2 -->
+                    <div class="calendar-week">
+                        <div class="calendar-day">
+                            <div class="day-number">8</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">9</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">10</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">11</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">12</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">13</div>
+                            <div class="day-events">
+                                <div class="calendar-event event-task">🔔 Design review (2PM)</div>
+                                <div class="calendar-event event-meeting">👥 Team sync (4PM)</div>
+                            </div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">14</div>
+                            <div class="day-events">
+                                <div class="calendar-event event-deadline">⚠️ Submit Q4 report</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Week 3 -->
+                    <div class="calendar-week">
+                        <div class="calendar-day">
+                            <div class="day-number">15</div>
+                            <div class="day-events">
+                                <div class="calendar-event event-milestone">🎯 Mobile App v2 release</div>
+                            </div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">16</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">17</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">18</div>
+                            <div class="day-events">
+                                <div class="calendar-event event-meeting">👥 Sprint planning</div>
+                            </div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">19</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">20</div>
+                            <div class="day-events">
+                                <div class="calendar-event event-task">✅ Code review</div>
+                            </div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">21</div>
+                            <div class="day-number current">Today</div>
+                            <div class="day-events">
+                                <div class="calendar-event event-task">🔔 Update documentation</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Week 4 -->
+                    <div class="calendar-week">
+                        <div class="calendar-day">
+                            <div class="day-number">22</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">23</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">24</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">25</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">26</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">27</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">28</div>
+                            <div class="more-events">+2 more</div>
+                        </div>
+                    </div>
+
+                    <!-- Week 5 -->
+                    <div class="calendar-week">
+                        <div class="calendar-day">
+                            <div class="day-number">29</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">30</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">31</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">1</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">2</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">3</div>
+                        </div>
+                        <div class="calendar-day other-month">
+                            <div class="day-number">4</div>
+                        </div>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--event-task);"></span>
+                            <span>Tasks</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--event-deadline);"></span>
+                            <span>Deadlines</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--event-milestone);"></span>
+                            <span>Milestones</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--event-meeting);"></span>
+                            <span>Meetings</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: var(--event-reminder);"></span>
+                            <span>Reminders</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel - Event Details -->
+        <div class="right-panel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>December 21, 2024</h3>
+                    <span class="btn small">+ Add</span>
+                </div>
+                <div class="selected-date">
+                    <div class="date">21</div>
+                    <div class="weekday">Saturday</div>
+                </div>
+
+                <div class="day-events-list">
+                    <div class="day-event-item">
+                        <span class="event-time">10:00</span>
+                        <div class="event-details">
+                            <div class="event-title">Update documentation</div>
+                            <div class="event-project">Mobile App</div>
+                        </div>
+                        <span class="event-badge task">Task</span>
+                    </div>
+
+                    <div class="day-event-item">
+                        <span class="event-time">14:00</span>
+                        <div class="event-details">
+                            <div class="event-title">Design review</div>
+                            <div class="event-project">Website Redesign</div>
+                        </div>
+                        <span class="event-badge meeting">Meeting</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Quick Add</h3>
+                </div>
+                <input type="text" placeholder="Event title..." style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: var(--space-sm);">
+                <select style="width: 100%; padding: var(--space-sm); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: var(--space-sm);">
+                    <option>Task</option>
+                    <option>Deadline</option>
+                    <option>Milestone</option>
+                    <option>Meeting</option>
+                </select>
+                <button class="btn primary" style="width: 100%;">Add Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📅</span>
+            <span>Calendar</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🔔</span>
+            <span>Alerts</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

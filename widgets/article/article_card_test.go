@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/buttons"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
@@ -24,13 +26,13 @@ func TestWidgetArticleCard(t *testing.T) {
 				NumberComments: 1,
 			},
 
-			ParamsImage: components.ParamsImage{
+			ParamsImage: primitives.ParamsImage{
 				ImageSquareSize: "260",
 				ImageSource:     "https://images.pexels.com/photos/539694/pexels-photo-539694.jpeg",
 				ImageAlt:        "1",
 			},
 
-			ParamsButtonSubmit: components.ParamsButtonSubmit{
+			ParamsButtonSubmit: buttons.ParamsButtonSubmit{
 				Label: "Continue reading",
 
 				HXActionType: hx.HXPOST,

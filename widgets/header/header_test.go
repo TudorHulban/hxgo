@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
@@ -15,7 +16,7 @@ func TestHeader(t *testing.T) {
 			Title:             "Washing Head",
 			BreadcrumbCaption: "Barbershop/Washing Head",
 
-			ParamsImage: components.ParamsImage{
+			ParamsImage: primitives.ParamsImage{
 				ImageSquareSize: "160",
 				ImageAlt:        "Washing Head",
 				ImageSource:     "https://themes.getmotopress.com/bro-barbershop/wp-content/uploads/sites/64/2024/01/hero-bg-1.jpg",

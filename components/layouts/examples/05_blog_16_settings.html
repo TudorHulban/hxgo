@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Settings Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 260px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Settings Layout */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Settings Sidebar */
+        .settings-sidebar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: sticky;
+            top: calc(var(--nav-height) + var(--space-xl));
+        }
+
+        .settings-section {
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            padding: 0 var(--space-lg);
+            margin-bottom: var(--space-xs);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        .settings-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .settings-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        .settings-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Settings Main */
+        .settings-main {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        .settings-header {
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .settings-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .settings-card {
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-card:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        /* Form Elements */
+        .form-row {
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-xl);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            width: 150px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            padding-top: var(--space-sm);
+        }
+
+        .form-field {
+            flex: 1;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            max-width: 400px;
+        }
+
+        .input-group .form-input {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Toggle Switch */
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .toggle-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: .2s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Radio Group */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Image Upload */
+        .logo-upload {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .logo-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent);
+            border: 1px solid var(--border-color);
+        }
+
+        .logo-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        /* Meta Tags */
+        .meta-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-xs);
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .meta-tag button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* API Keys */
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+        }
+
+        .api-key-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .api-key-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .api-key-preview {
+            font-family: monospace;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            background: #fee2e2;
+        }
+
+        .danger-zone h4 {
+            color: var(--danger);
+            margin-bottom: var(--space-sm);
+        }
+
+        .danger-zone p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: var(--space-xs);
+            }
+
+            .form-label {
+                width: 100%;
+            }
+
+            .form-input,
+            .input-group {
+                max-width: 100%;
+            }
+
+            .logo-upload {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .settings-sidebar { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .settings-main { background: rgba(75, 192, 192, 0.05); }
+
+        /* Component debug */
+        .debug-layout .settings-card {
+            border: 1px dashed #36a2eb;
+            margin-bottom: var(--space-md);
+            padding: var(--space-md);
+        }
+
+        .debug-layout .settings-item.active {
+            background: rgba(54, 162, 235, 0.2);
+            border-left: 2px solid #36a2eb;
+        }
+
+        .debug-layout .api-key-item {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .danger-zone {
+            border: 2px dashed #ef4444;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog Admin</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Authors</a>
+                <a href="#">Categories</a>
+                <a href="#" class="active">Settings</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Blog Settings</h1>
+                <p>Configure your blog's appearance, behavior, and integrations</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">↺ Reset</button>
+                <button class="btn primary">Save Changes</button>
+            </div>
+        </div>
+
+        <!-- Settings Layout -->
+        <div class="settings-layout">
+            <!-- Settings Sidebar -->
+            <div class="settings-sidebar">
+                <div class="settings-section">
+                    <div class="settings-section-title">GENERAL</div>
+                    <div class="settings-item active">
+                        <span class="settings-item__icon">🏠</span>
+                        <span>Site Information</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">🎨</span>
+                        <span>Appearance</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">🌐</span>
+                        <span>SEO & Meta</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">CONTENT</div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">📝</span>
+                        <span>Posts & Pages</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">💬</span>
+                        <span>Comments</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">📧</span>
+                        <span>Email & Notifications</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">INTEGRATIONS</div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">🔌</span>
+                        <span>APIs & Webhooks</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">📊</span>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">🔗</span>
+                        <span>Social Media</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">ADVANCED</div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">⚙️</span>
+                        <span>Performance</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">🔒</span>
+                        <span>Security</span>
+                    </div>
+                    <div class="settings-item">
+                        <span class="settings-item__icon">📦</span>
+                        <span>Backup & Restore</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Main -->
+            <div class="settings-main">
+                <div class="settings-header">
+                    <h2>Site Information</h2>
+                    <p>Basic settings for your blog's identity and presentation</p>
+                </div>
+
+                <!-- Site Identity Card -->
+                <div class="settings-card">
+                    <h3 class="card-title">Site Identity</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Site Logo</div>
+                        <div class="form-field">
+                            <div class="logo-upload">
+                                <div class="logo-preview">📝</div>
+                                <div class="logo-actions">
+                                    <button class="btn small">Upload</button>
+                                    <button class="btn small outline">Remove</button>
+                                </div>
+                            </div>
+                            <div class="form-hint">Recommended size: 200x200px. PNG or SVG preferred.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Site Title <span>*</span></div>
+                        <div class="form-field">
+                            <input type="text" class="form-input" value="DevBlog">
+                            <div class="form-hint">Your blog's name, displayed in the header and browser tabs</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Tagline</div>
+                        <div class="form-field">
+                            <input type="text" class="form-input" value="Stories for developers, by developers">
+                            <div class="form-hint">A brief description of your blog (max 150 characters)</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Site URL</div>
+                        <div class="form-field">
+                            <div class="input-group">
+                                <input type="text" class="form-input" value="https://devblog.com">
+                                <span class="input-group-addon">📋</span>
+                            </div>
+                            <div class="form-hint">Your blog's canonical URL</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language & Regional Card -->
+                <div class="settings-card">
+                    <h3 class="card-title">Language & Regional</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Site Language</div>
+                        <div class="form-field">
+                            <select class="form-select">
+                                <option>English (US)</option>
+                                <option>English (UK)</option>
+                                <option>Spanish</option>
+                                <option>French</option>
+                                <option>German</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Timezone</div>
+                        <div class="form-field">
+                            <select class="form-select">
+                                <option>(GMT-8:00) Pacific Time</option>
+                                <option selected>(GMT-5:00) Eastern Time</option>
+                                <option>(GMT+0:00) UTC</option>
+                                <option>(GMT+1:00) Central European Time</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Date Format</div>
+                        <div class="form-field">
+                            <select class="form-select">
+                                <option>December 24, 2024</option>
+                                <option selected>Dec 24, 2024</option>
+                                <option>2024-12-24</option>
+                                <option>24/12/2024</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Time Format</div>
+                        <div class="form-field">
+                            <select class="form-select">
+                                <option>12-hour (2:30 PM)</option>
+                                <option selected>24-hour (14:30)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Week Starts On</div>
+                        <div class="form-field">
+                            <select class="form-select">
+                                <option>Sunday</option>
+                                <option selected>Monday</option>
+                                <option>Saturday</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO & Meta Card -->
+                <div class="settings-card">
+                    <h3 class="card-title">SEO & Meta</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Meta Title Template</div>
+                        <div class="form-field">
+                            <input type="text" class="form-input" value="%title% | DevBlog">
+                            <div class="form-hint">%title% will be replaced with post/page title</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Meta Description</div>
+                        <div class="form-field">
+                            <textarea class="form-textarea">DevBlog is a community of developers sharing knowledge about web development, programming, and technology.</textarea>
+                            <div class="form-hint">Default description for search engines (max 160 chars)</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Meta Keywords</div>
+                        <div class="form-field">
+                            <div class="meta-tags">
+                                <span class="meta-tag">web development <button>✕</button></span>
+                                <span class="meta-tag">programming <button>✕</button></span>
+                                <span class="meta-tag">tutorials <button>✕</button></span>
+                                <span class="meta-tag">coding <button>✕</button></span>
+                            </div>
+                            <input type="text" placeholder="Add keyword...">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Search Engine Visibility</div>
+                        <div class="form-field">
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>Allow search engines to index</h4>
+                                    <p>Discourage search engines from indexing this site</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Card -->
+                <div class="settings-card">
+                    <h3 class="card-title">Social Media Links</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-label">Twitter</div>
+                        <div class="form-field">
+                            <div class="input-group">
+                                <span class="input-group-addon">@</span>
+                                <input type="text" class="form-input" value="devblog">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">GitHub</div>
+                        <div class="form-field">
+                            <div class="input-group">
+                                <span class="input-group-addon">github.com/</span>
+                                <input type="text" class="form-input" value="devblog">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">LinkedIn</div>
+                        <div class="form-field">
+                            <div class="input-group">
+                                <span class="input-group-addon">linkedin.com/company/</span>
+                                <input type="text" class="form-input" value="devblog">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">YouTube</div>
+                        <div class="form-field">
+                            <div class="input-group">
+                                <span class="input-group-addon">youtube.com/c/</span>
+                                <input type="text" class="form-input" value="devblog">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments Settings Card -->
+                <div class="settings-card">
+                    <h3 class="card-title">Comments Settings</h3>
+                    
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Enable comments</h4>
+                            <p>Allow readers to comment on posts</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Require moderation</h4>
+                            <p>Comments must be approved before appearing</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Allow nested replies</h4>
+                            <p>Enable threaded comments</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-row" style="margin-top: var(--space-md);">
+                        <div class="form-label">Comments per page</div>
+                        <div class="form-field">
+                            <input type="number" class="form-input" value="50" style="max-width: 100px;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">Auto-close comments after</div>
+                        <div class="form-field">
+                            <input type="number" class="form-input" value="30" style="max-width: 100px;"> days
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Keys Card -->
+                <div class="settings-card">
+                    <h3 class="card-title">API Keys</h3>
+                    
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <span class="api-key-name">Production</span>
+                            <span class="api-key-preview">pk_live_••••••••••••••••</span>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn small">Show</button>
+                            <button class="btn small">Regenerate</button>
+                        </div>
+                    </div>
+
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <span class="api-key-name">Development</span>
+                            <span class="api-key-preview">pk_test_••••••••••••••••</span>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn small">Show</button>
+                            <button class="btn small">Regenerate</button>
+                        </div>
+                    </div>
+
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <span class="api-key-name">Webhook Secret</span>
+                            <span class="api-key-preview">whsec_••••••••••••••••</span>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn small">Show</button>
+                            <button class="btn small">Regenerate</button>
+                        </div>
+                    </div>
+
+                    <button class="btn outline small" style="margin-top: var(--space-sm);">+ Generate New Key</button>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-card">
+                    <h3 class="card-title">Danger Zone</h3>
+                    
+                    <div class="danger-zone">
+                        <h4>Export Content</h4>
+                        <p>Download all posts, pages, and settings as a ZIP file</p>
+                        <button class="btn outline">📦 Export</button>
+                    </div>
+
+                    <div class="danger-zone" style="margin-top: var(--space-md);">
+                        <h4>Import Content</h4>
+                        <p>Import posts from WordPress or other platforms</p>
+                        <button class="btn outline">📥 Import</button>
+                    </div>
+
+                    <div class="danger-zone" style="margin-top: var(--space-md); border-color: var(--danger);">
+                        <h4>Delete Blog</h4>
+                        <p>Permanently delete your entire blog and all content. This cannot be undone.</p>
+                        <button class="btn danger">Delete Blog</button>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button class="btn outline">Cancel</button>
+                    <button class="btn outline">Reset to Defaults</button>
+                    <button class="btn primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📑</span>
+            <span>Categories</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>

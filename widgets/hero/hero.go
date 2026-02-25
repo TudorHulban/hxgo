@@ -1,7 +1,7 @@
 package hero
 
 import (
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/primitives"
 	"github.com/TudorHulban/hxgo/dsl"
 )
 
@@ -9,10 +9,10 @@ type ParamsWidgetHero struct {
 	Title   string
 	Message string
 
-	ButtonPrimaryInfo   components.ParamsARef
-	ButtonSecondaryInfo components.ParamsARef
+	ButtonPrimaryInfo   primitives.ParamsARef
+	ButtonSecondaryInfo primitives.ParamsARef
 
-	components.ParamsImage
+	primitives.ParamsImage
 }
 
 func WidgetHero(params *ParamsWidgetHero) dsl.Node {
@@ -44,13 +44,13 @@ func WidgetHero(params *ParamsWidgetHero) dsl.Node {
 				),
 
 				dsl.Raw(
-					components.ARefRaw(
+					primitives.ARefRaw(
 						&params.ButtonPrimaryInfo,
 					),
 				),
 
 				dsl.Raw(
-					components.ARefRaw(
+					primitives.ARefRaw(
 						&params.ButtonSecondaryInfo,
 					),
 				),
@@ -62,7 +62,7 @@ func WidgetHero(params *ParamsWidgetHero) dsl.Node {
 				"hero-image",
 			),
 
-			components.Image(
+			primitives.Image(
 				&params.ParamsImage,
 			),
 		),

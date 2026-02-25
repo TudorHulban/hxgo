@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Analytics Page Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 300px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+            --chart-1: #3b82f6;
+            --chart-2: #10b981;
+            --chart-3: #f59e0b;
+            --chart-4: #ef4444;
+            --chart-5: #8b5cf6;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Analytics Specific Styles */
+        .analytics-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: var(--space-xs);
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Date Range Selector */
+        .date-range {
+            display: flex;
+            gap: var(--space-xs);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-xs);
+        }
+
+        .date-range-btn {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .date-range-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .kpi-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+
+        .kpi-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.85rem;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .trend-neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .chart-card.full-width {
+            grid-column: span 2;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .chart-header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .legend-color.blue { background: var(--chart-1); }
+        .legend-color.green { background: var(--chart-2); }
+        .legend-color.orange { background: var(--chart-3); }
+        .legend-color.red { background: var(--chart-4); }
+        .legend-color.purple { background: var(--chart-5); }
+
+        /* Chart Placeholders */
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(45deg, var(--bg-secondary) 25%, var(--bg-tertiary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 50%, var(--bg-secondary) 75%, var(--bg-tertiary) 75%);
+            background-size: 20px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Fake Chart Lines */
+        .chart-line {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            right: 40px;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--accent);
+            opacity: 0.3;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .chart-bar:nth-child(odd) {
+            background: var(--purple);
+        }
+
+        /* Progress Bars for Demographics */
+        .demographics-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .demographic-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .demographic-label {
+            width: 80px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .demographic-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .demographic-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .demographic-value {
+            width: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Top Pages Table */
+        .top-pages-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .top-pages-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .top-pages-table td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 0.8rem;
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .panel-section__header a {
+            color: var(--accent);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        /* Real-time Stats */
+        .realtime-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .realtime-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .realtime-info {
+            flex: 1;
+        }
+
+        .realtime-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .realtime-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .realtime-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Browser Stats */
+        .browser-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .browser-icon {
+            width: 24px;
+            text-align: center;
+        }
+
+        .browser-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .browser-name {
+            width: 60px;
+            font-size: 0.9rem;
+        }
+
+        .browser-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .browser-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .browser-percent {
+            width: 40px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .analytics-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-range {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .analytics-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(75, 192, 192, 0.1); }
+        .debug-layout .app-layout__mobile-nav { background: rgba(153, 102, 255, 0.2); }
+
+        /* Component debug */
+        .debug-layout .kpi-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .chart-card {
+            background: rgba(54, 162, 235, 0.1);
+            border: 2px dashed #36a2eb;
+            position: relative;
+        }
+
+        .debug-layout .kpi-card::before,
+        .debug-layout .chart-card::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#" class="active">Analytics</a>
+                <a href="#">Reports</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search analytics...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">5</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Reports</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">ANALYTICS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Users</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔍</span>
+                    <span>Traffic Sources</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📄</span>
+                    <span>Content</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">💰</span>
+                    <span>Conversions</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">EXPORTS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📥</span>
+                    <span>Export Data</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📅</span>
+                    <span>Scheduled Reports</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Analytics Content -->
+        <main class="analytics-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Analytics</h1>
+                    <p>Track your key metrics and performance</p>
+                </div>
+                <div class="content-header__actions">
+                    <div class="date-range">
+                        <button class="date-range-btn active">Today</button>
+                        <button class="date-range-btn">Week</button>
+                        <button class="date-range-btn">Month</button>
+                        <button class="date-range-btn">Quarter</button>
+                        <button class="date-range-btn">Year</button>
+                    </div>
+                    <button class="btn">📅 Custom Range</button>
+                    <button class="btn primary">📥 Export</button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Total Users</span>
+                        <span class="kpi-icon">👥</span>
+                    </div>
+                    <div class="kpi-value">24.5K</div>
+                    <div class="kpi-trend">
+                        <span class="trend-up">↑ 12.3%</span>
+                        <span class="trend-neutral">vs last period</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Page Views</span>
+                        <span class="kpi-icon">👁️</span>
+                    </div>
+                    <div class="kpi-value">156.2K</div>
+                    <div class="kpi-trend">
+                        <span class="trend-up">↑ 8.1%</span>
+                        <span class="trend-neutral">vs last period</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Conversion Rate</span>
+                        <span class="kpi-icon">📊</span>
+                    </div>
+                    <div class="kpi-value">3.24%</div>
+                    <div class="kpi-trend">
+                        <span class="trend-down">↓ 0.8%</span>
+                        <span class="trend-neutral">vs last period</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Avg. Session</span>
+                        <span class="kpi-icon">⏱️</span>
+                    </div>
+                    <div class="kpi-value">4:32</div>
+                    <div class="kpi-trend">
+                        <span class="trend-up">↑ 0:45</span>
+                        <span class="trend-neutral">vs last period</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <!-- Traffic Overview Chart -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <h3>Traffic Overview</h3>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color blue"></span>
+                                <span>Direct</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color green"></span>
+                                <span>Organic Search</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color orange"></span>
+                                <span>Social Media</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color red"></span>
+                                <span>Referral</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div class="chart-line">
+                            <div class="chart-bar" style="height: 60px;"></div>
+                            <div class="chart-bar" style="height: 80px;"></div>
+                            <div class="chart-bar" style="height: 45px;"></div>
+                            <div class="chart-bar" style="height: 70px;"></div>
+                            <div class="chart-bar" style="height: 90px;"></div>
+                            <div class="chart-bar" style="height: 55px;"></div>
+                            <div class="chart-bar" style="height: 65px;"></div>
+                            <div class="chart-bar" style="height: 85px;"></div>
+                            <div class="chart-bar" style="height: 50px;"></div>
+                            <div class="chart-bar" style="height: 75px;"></div>
+                            <div class="chart-bar" style="height: 95px;"></div>
+                            <div class="chart-bar" style="height: 60px;"></div>
+                            <div class="chart-bar" style="height: 70px;"></div>
+                            <div class="chart-bar" style="height: 80px;"></div>
+                        </div>
+                        <span style="position: relative; z-index: 10;">📊 Line Chart - Traffic Overview</span>
+                    </div>
+                </div>
+
+                <!-- User Demographics -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>User Demographics</h3>
+                    </div>
+                    <div class="chart-placeholder" style="height: 250px;">
+                        <div style="padding: var(--space-lg); width: 100%;">
+                            <div class="demographics-list">
+                                <div class="demographic-item">
+                                    <span class="demographic-label">18-24</span>
+                                    <div class="demographic-bar">
+                                        <div class="demographic-fill" style="width: 65%; background: var(--chart-1);"></div>
+                                    </div>
+                                    <span class="demographic-value">65%</span>
+                                </div>
+                                <div class="demographic-item">
+                                    <span class="demographic-label">25-34</span>
+                                    <div class="demographic-bar">
+                                        <div class="demographic-fill" style="width: 85%; background: var(--chart-2);"></div>
+                                    </div>
+                                    <span class="demographic-value">85%</span>
+                                </div>
+                                <div class="demographic-item">
+                                    <span class="demographic-label">35-44</span>
+                                    <div class="demographic-bar">
+                                        <div class="demographic-fill" style="width: 55%; background: var(--chart-3);"></div>
+                                    </div>
+                                    <span class="demographic-value">55%</span>
+                                </div>
+                                <div class="demographic-item">
+                                    <span class="demographic-label">45-54</span>
+                                    <div class="demographic-bar">
+                                        <div class="demographic-fill" style="width: 35%; background: var(--chart-4);"></div>
+                                    </div>
+                                    <span class="demographic-value">35%</span>
+                                </div>
+                                <div class="demographic-item">
+                                    <span class="demographic-label">55+</span>
+                                    <div class="demographic-bar">
+                                        <div class="demographic-fill" style="width: 20%; background: var(--chart-5);"></div>
+                                    </div>
+                                    <span class="demographic-value">20%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traffic Sources -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Traffic Sources</h3>
+                    </div>
+                    <div class="chart-placeholder" style="height: 250px;">
+                        <div style="display: flex; justify-content: center; align-items: center; height: 100%; gap: var(--space-lg);">
+                            <div style="position: relative; width: 120px; height: 120px;">
+                                <svg viewBox="0 0 100 100" style="transform: rotate(-90deg); width: 120px; height: 120px;">
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--bg-tertiary)" stroke-width="15"/>
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--chart-1)" stroke-width="15" stroke-dasharray="251.2" stroke-dashoffset="75.36" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="chart-legend" style="flex-direction: column;">
+                                <div class="legend-item"><span class="legend-color blue"></span> Direct (45%)</div>
+                                <div class="legend-item"><span class="legend-color green"></span> Organic (30%)</div>
+                                <div class="legend-item"><span class="legend-color orange"></span> Social (15%)</div>
+                                <div class="legend-item"><span class="legend-color red"></span> Referral (10%)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Pages Table -->
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <h3>Top Performing Pages</h3>
+                    <div class="chart-legend">
+                        <select class="filter-select" style="padding: var(--space-xs) var(--space-md); border: 1px solid var(--border-color); border-radius: 6px;">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                        </select>
+                    </div>
+                </div>
+                <table class="top-pages-table">
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Views</th>
+                            <th>Unique Visitors</th>
+                            <th>Avg. Time</th>
+                            <th>Bounce Rate</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>/dashboard</td>
+                            <td>12,345</td>
+                            <td>8,901</td>
+                            <td>4:32</td>
+                            <td>32%</td>
+                            <td><span class="trend-indicator trend-up">↑ 12%</span></td>
+                        </tr>
+                        <tr>
+                            <td>/projects</td>
+                            <td>9,876</td>
+                            <td>7,234</td>
+                            <td>5:15</td>
+                            <td>28%</td>
+                            <td><span class="trend-indicator trend-up">↑ 8%</span></td>
+                        </tr>
+                        <tr>
+                            <td>/analytics</td>
+                            <td>7,654</td>
+                            <td>5,678</td>
+                            <td>6:45</td>
+                            <td>25%</td>
+                            <td><span class="trend-indicator trend-up">↑ 15%</span></td>
+                        </tr>
+                        <tr>
+                            <td>/settings</td>
+                            <td>5,432</td>
+                            <td>4,321</td>
+                            <td>2:30</td>
+                            <td>45%</td>
+                            <td><span class="trend-indicator trend-down">↓ 5%</span></td>
+                        </tr>
+                        <tr>
+                            <td>/reports</td>
+                            <td>4,321</td>
+                            <td>3,210</td>
+                            <td>3:45</td>
+                            <td>38%</td>
+                            <td><span class="trend-indicator trend-neutral">→ 0%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Real-time</h3>
+                    <a href="#">View Details</a>
+                </div>
+                
+                <div class="realtime-item">
+                    <span class="realtime-dot"></span>
+                    <div class="realtime-info">
+                        <h4>Active Users</h4>
+                        <p>Right now</p>
+                    </div>
+                    <span class="realtime-value">143</span>
+                </div>
+
+                <div class="realtime-item">
+                    <span class="realtime-dot"></span>
+                    <div class="realtime-info">
+                        <h4>Page Views</h4>
+                        <p>Last 30 min</p>
+                    </div>
+                    <span class="realtime-value">2.3K</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Browser Stats</h3>
+                </div>
+                
+                <div class="browser-item">
+                    <span class="browser-icon">🌐</span>
+                    <div class="browser-info">
+                        <span class="browser-name">Chrome</span>
+                        <div class="browser-bar">
+                            <div class="browser-fill" style="width: 65%; background: var(--chart-1);"></div>
+                        </div>
+                    </div>
+                    <span class="browser-percent">65%</span>
+                </div>
+
+                <div class="browser-item">
+                    <span class="browser-icon">🦊</span>
+                    <div class="browser-info">
+                        <span class="browser-name">Firefox</span>
+                        <div class="browser-bar">
+                            <div class="browser-fill" style="width: 20%; background: var(--chart-2);"></div>
+                        </div>
+                    </div>
+                    <span class="browser-percent">20%</span>
+                </div>
+
+                <div class="browser-item">
+                    <span class="browser-icon">🧭</span>
+                    <div class="browser-info">
+                        <span class="browser-name">Safari</span>
+                        <div class="browser-bar">
+                            <div class="browser-fill" style="width: 10%; background: var(--chart-3);"></div>
+                        </div>
+                    </div>
+                    <span class="browser-percent">10%</span>
+                </div>
+
+                <div class="browser-item">
+                    <span class="browser-icon">📱</span>
+                    <div class="browser-info">
+                        <span class="browser-name">Mobile</span>
+                        <div class="browser-bar">
+                            <div class="browser-fill" style="width: 45%; background: var(--chart-4);"></div>
+                        </div>
+                    </div>
+                    <span class="browser-percent">45%</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Quick Insights</h3>
+                </div>
+                
+                <div style="font-size: 0.9rem; margin-bottom: var(--space-sm); padding: var(--space-sm); background: var(--bg-secondary); border-radius: 6px;">
+                    <span style="color: var(--success);">↑ 23%</span> more traffic from mobile this week
+                </div>
+                <div style="font-size: 0.9rem; padding: var(--space-sm); background: var(--bg-secondary); border-radius: 6px;">
+                    <span style="color: var(--warning);">↓ 12%</span> bounce rate improvement
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📈</span>
+            <span>Analytics</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>👥</span>
+            <span>Stats</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

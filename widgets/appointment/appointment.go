@@ -1,7 +1,8 @@
 package appointment
 
 import (
-	"github.com/TudorHulban/hxgo/components"
+	"github.com/TudorHulban/hxgo/components/buttons"
+	"github.com/TudorHulban/hxgo/components/inputs"
 	"github.com/TudorHulban/hxgo/dsl"
 	inputdate "github.com/TudorHulban/hxgo/widgets/input-date"
 	inputslots "github.com/TudorHulban/hxgo/widgets/input-slots"
@@ -14,7 +15,7 @@ type ParamsWidgetAppointment struct {
 	SelectLabel  string
 	SelectValues []string
 
-	components.ParamsButtonSubmit
+	buttons.ParamsButtonSubmit
 }
 
 type ResponseWidgetAppointment struct {
@@ -29,7 +30,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 		&params.ParamsWidgetInputDate,
 	)
 
-	inputSimple := components.InputSelect{
+	inputSimple := inputs.InputSelect{
 		CSSDivID: "resource-selection",
 
 		LabelElementName: params.SelectLabel,
@@ -67,7 +68,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 				),
 			),
 
-			components.ButtonSubmit(
+			buttons.ButtonSubmit(
 				&params.ParamsButtonSubmit,
 			),
 		),

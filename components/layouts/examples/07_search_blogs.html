@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Search Layout Debug - Fixed Tablet Display</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 300px;
+            --nav-height: 70px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --category-react: #3b82f6;
+            --category-dev: #10b981;
+            --category-tutorial: #f59e0b;
+        }
+
+        /* Base Layout */
+        .blog-search-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            background: var(--bg-primary);
+        }
+
+        /* Header */
+        .blog-search-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            width: 100%;
+        }
+
+        .blog-search-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-search-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .blog-search-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-search-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .blog-search-layout__nav a:hover {
+            color: var(--accent);
+        }
+
+        .blog-search-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .subscribe-btn {
+            background: var(--accent);
+            color: white;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Main Search Bar */
+        .blog-search-layout__main-search {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-2xl) var(--space-xl);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .search-container {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            margin: 0 auto;
+        }
+
+        .search-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .search-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: var(--space-md);
+        }
+
+        .search-input-wrapper input {
+            flex: 1;
+            padding: var(--space-lg);
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .search-input-wrapper button {
+            padding: var(--space-lg) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .search-filters-toggle {
+            display: none;
+            padding: var(--space-md) var(--space-lg);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Popular Topics */
+        .popular-topics {
+            display: flex;
+            gap: var(--space-sm);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--space-md);
+        }
+
+        .topic-tag {
+            padding: var(--space-xs) var(--space-md);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topic-tag:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Main Content Area */
+        .blog-search-layout__content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+            display: flex;
+            gap: var(--space-xl);
+            align-items: flex-start;
+        }
+
+        /* Filters Sidebar */
+        .blog-search-layout__filters {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: var(--space-lg);
+            position: sticky;
+            top: calc(var(--nav-height) + var(--space-lg));
+            max-height: calc(100vh - var(--nav-height) - calc(var(--space-lg) * 2));
+            overflow-y: auto;
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filters-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .clear-filters {
+            color: var(--accent);
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .filter-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .filter-section-title {
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .category-count {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .date-range {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .date-range select {
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+        }
+
+        /* Results Area */
+        .blog-search-layout__results {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .results-count {
+            color: var(--text-secondary);
+        }
+
+        .results-sort {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .results-sort select {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+        }
+
+        /* Blog Post Grid - FIXED for proper tablet display */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Simple 2 columns, no minmax */
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Blog Post Card */
+        .blog-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            min-width: 0; /* Allow text truncation if needed */
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .blog-image {
+            aspect-ratio: 16 / 9;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            width: 100%;
+        }
+
+        .blog-content {
+            padding: var(--space-lg);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            width: 100%;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .blog-category {
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .category-react { background: #dbeafe; color: #1e40af; }
+        .category-dev { background: #d1fae5; color: #065f46; }
+        .category-tutorial { background: #fed7aa; color: #92400e; }
+
+        .blog-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin: var(--space-xs) 0;
+            word-wrap: break-word;
+        }
+
+        .blog-excerpt {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: var(--space-md);
+            word-wrap: break-word;
+        }
+
+        .blog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .blog-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .author-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .blog-stats {
+            display: flex;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .read-time {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* Featured Post (first result) - FIXED for tablet */
+        .blog-card.featured {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .blog-card.featured .blog-image {
+            aspect-ratio: auto;
+            height: 100%;
+            width: 100%;
+        }
+
+        .blog-card.featured .blog-content {
+            padding: var(--space-xl);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xs);
+            margin-top: var(--space-xl);
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .pagination-item.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Responsive - FIXED for tablet */
+        @media (max-width: 1024px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr); /* Keep 2 columns, normal sizing */
+                gap: var(--space-md);
+            }
+
+            .blog-card.featured {
+                grid-column: span 2;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .blog-title {
+                font-size: 1.1rem; /* Slightly smaller on tablet */
+            }
+
+            .blog-excerpt {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-search-layout__content {
+                flex-direction: column;
+                padding: var(--space-lg);
+            }
+
+            .blog-search-layout__filters {
+                width: 100%;
+                position: static;
+                max-height: none;
+                display: none;
+                margin-bottom: var(--space-lg);
+            }
+
+            .blog-search-layout__filters.active {
+                display: block;
+            }
+
+            .search-filters-toggle {
+                display: block;
+            }
+
+            .search-container {
+                padding: 0 var(--space-md);
+            }
+
+            .search-title {
+                font-size: 1.5rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr; /* Stack on mobile */
+                gap: var(--space-md);
+            }
+
+            .blog-card.featured {
+                grid-column: span 1;
+                grid-template-columns: 1fr; /* Stack featured on mobile */
+            }
+
+            .blog-card.featured .blog-image {
+                aspect-ratio: 16 / 9;
+            }
+            
+            .blog-card.featured .blog-content {
+                padding: var(--space-lg);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-search-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-search-layout__nav {
+                display: none;
+            }
+
+            .blog-search-layout__header-left {
+                gap: var(--space-md);
+            }
+
+            .search-input-wrapper {
+                flex-direction: column;
+                border-radius: 12px;
+            }
+
+            .search-input-wrapper button {
+                width: 100%;
+            }
+
+            .blog-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            
+            .blog-stats {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-search-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-search-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-search-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .blog-search-layout__main-search { background: rgba(54, 162, 235, 0.2); }
+        .debug-layout .blog-search-layout__content { background: rgba(255, 206, 86, 0.1); }
+        .debug-layout .blog-search-layout__filters { background: rgba(75, 192, 192, 0.1); }
+        .debug-layout .blog-search-layout__results { background: rgba(153, 102, 255, 0.1); }
+
+        /* Component debug */
+        .debug-layout .blog-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .blog-card::before {
+            content: "blog-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            font-family: monospace;
+            z-index: 50;
+        }
+
+        .debug-layout .filter-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            position: relative;
+        }
+
+        .debug-layout .filter-section::before {
+            content: "filter-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+    </style>
+</head>
+
+<body class="blog-search-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-search-layout__header">
+        <div class="blog-search-layout__header-left">
+            <div class="blog-search-layout__logo">📝 DevBlog</div>
+            <nav class="blog-search-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Popular</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+        <div class="blog-search-layout__header-right">
+            <span>🔔</span>
+            <a href="#" class="subscribe-btn">Subscribe</a>
+        </div>
+    </header>
+
+    <!-- Main Search Bar -->
+    <div class="blog-search-layout__main-search">
+        <div class="search-container">
+            <h1 class="search-title">Search Articles & Tutorials</h1>
+            <p class="search-subtitle">Find the best content from our blog archive</p>
+            
+            <div class="search-input-wrapper">
+                <input type="text" placeholder="Search by topic, title, or author..." value="react hooks">
+                <button>Search</button>
+            </div>
+
+            <div class="popular-topics">
+                <span class="topic-tag">React</span>
+                <span class="topic-tag">TypeScript</span>
+                <span class="topic-tag">CSS</span>
+                <span class="topic-tag">Node.js</span>
+                <span class="topic-tag">Python</span>
+                <span class="topic-tag">DevOps</span>
+                <span class="topic-tag">Database</span>
+                <span class="topic-tag">UI/UX</span>
+            </div>
+
+            <button class="search-filters-toggle" onclick="toggleFilters()">🔍 Advanced Filters</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="blog-search-layout__content">
+        <!-- Filters Sidebar -->
+        <aside class="blog-search-layout__filters" id="filtersSidebar">
+            <div class="filters-header">
+                <span class="filters-title">Filter Results</span>
+                <span class="clear-filters">Clear all</span>
+            </div>
+
+            <!-- Categories -->
+            <div class="filter-section">
+                <div class="filter-section-title">Category</div>
+                <label class="filter-option">
+                    <input type="checkbox" checked> React
+                    <span class="category-count">24</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> JavaScript
+                    <span class="category-count">42</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> TypeScript
+                    <span class="category-count">18</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Node.js
+                    <span class="category-count">15</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> CSS/Tailwind
+                    <span class="category-count">22</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Python
+                    <span class="category-count">12</span>
+                </label>
+            </div>
+
+            <!-- Date Range -->
+            <div class="filter-section">
+                <div class="filter-section-title">Published</div>
+                <div class="date-range">
+                    <select>
+                        <option>Any time</option>
+                        <option>Past week</option>
+                        <option>Past month</option>
+                        <option>Past 3 months</option>
+                        <option>Past year</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Reading Time -->
+            <div class="filter-section">
+                <div class="filter-section-title">Reading Time</div>
+                <label class="filter-option">
+                    <input type="checkbox"> Under 5 min
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> 5-10 min
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> 10-15 min
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> 15+ min
+                </label>
+            </div>
+
+            <!-- Author -->
+            <div class="filter-section">
+                <div class="filter-section-title">Author</div>
+                <label class="filter-option">
+                    <input type="checkbox"> Sarah Chen
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Alex Rivera
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Mike Johnson
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Emma Watson
+                </label>
+            </div>
+
+            <!-- Tags -->
+            <div class="filter-section">
+                <div class="filter-section-title">Tags</div>
+                <label class="filter-option">
+                    <input type="checkbox"> Beginner Friendly
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Advanced
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Tutorial
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Best Practices
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox"> Performance
+                </label>
+            </div>
+        </aside>
+
+        <!-- Results Area -->
+        <main class="blog-search-layout__results">
+            <div class="results-header">
+                <div class="results-count">Showing 1-8 of 42 results for "react hooks"</div>
+                <div class="results-sort">
+                    <label>Sort by:</label>
+                    <select>
+                        <option>Relevance</option>
+                        <option>Newest first</option>
+                        <option>Oldest first</option>
+                        <option>Most popular</option>
+                        <option>Reading time</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Blog Posts Grid -->
+            <div class="results-grid">
+                <!-- Featured Post -->
+                <div class="blog-card featured">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-react">React</span>
+                            <span>•</span>
+                            <span>Featured</span>
+                        </div>
+                        <h3 class="blog-title">Complete Guide to React Hooks: useState, useEffect, and Beyond</h3>
+                        <p class="blog-excerpt">Learn how to master React Hooks with practical examples. This comprehensive guide covers all built-in hooks and custom hooks patterns for real-world applications.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">SC</div>
+                                <span class="author-name">Sarah Chen</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Mar 15, 2024</span>
+                                <span class="read-time">⏱️ 12 min read</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 2 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-dev">Development</span>
+                        </div>
+                        <h3 class="blog-title">Custom Hooks: Reusing Logic in React Applications</h3>
+                        <p class="blog-excerpt">Learn how to create reusable custom hooks to share logic between components and keep your code DRY.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">AR</div>
+                                <span class="author-name">Alex Rivera</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Mar 10, 2024</span>
+                                <span class="read-time">⏱️ 8 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 3 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-tutorial">Tutorial</span>
+                        </div>
+                        <h3 class="blog-title">useEffect Explained: When and How to Use It</h3>
+                        <p class="blog-excerpt">Master the useEffect hook with practical examples. Learn about dependencies, cleanup functions, and common patterns.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">MJ</div>
+                                <span class="author-name">Mike Johnson</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Mar 5, 2024</span>
+                                <span class="read-time">⏱️ 6 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 4 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-dev">Development</span>
+                        </div>
+                        <h3 class="blog-title">useContext vs Redux: When to Use Which</h3>
+                        <p class="blog-excerpt">Compare useContext and Redux for state management. Learn which solution fits your use case.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">EW</div>
+                                <span class="author-name">Emma Watson</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Feb 28, 2024</span>
+                                <span class="read-time">⏱️ 10 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 5 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-react">React</span>
+                        </div>
+                        <h3 class="blog-title">useReducer for Complex State Management</h3>
+                        <p class="blog-excerpt">When useState isn't enough, learn how useReducer can help manage complex state logic in your components.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">SC</div>
+                                <span class="author-name">Sarah Chen</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Feb 20, 2024</span>
+                                <span class="read-time">⏱️ 7 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 6 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-tutorial">Tutorial</span>
+                        </div>
+                        <h3 class="blog-title">Testing React Hooks: A Practical Guide</h3>
+                        <p class="blog-excerpt">Learn how to test components with hooks using React Testing Library and Jest.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">AR</div>
+                                <span class="author-name">Alex Rivera</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Feb 15, 2024</span>
+                                <span class="read-time">⏱️ 9 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 7 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-dev">Development</span>
+                        </div>
+                        <h3 class="blog-title">Performance Optimization with useMemo and useCallback</h3>
+                        <p class="blog-excerpt">Optimize your React applications by understanding when and how to use memoization hooks.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">MJ</div>
+                                <span class="author-name">Mike Johnson</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Feb 10, 2024</span>
+                                <span class="read-time">⏱️ 11 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post 8 -->
+                <div class="blog-card">
+                    <div class="blog-image">📝</div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category category-react">React</span>
+                        </div>
+                        <h3 class="blog-title">Building a Todo App with useReducer and useContext</h3>
+                        <p class="blog-excerpt">A practical tutorial on building a complete todo application using advanced React hooks.</p>
+                        <div class="blog-footer">
+                            <div class="blog-author">
+                                <div class="author-avatar">EW</div>
+                                <span class="author-name">Emma Watson</span>
+                            </div>
+                            <div class="blog-stats">
+                                <span>📅 Feb 5, 2024</span>
+                                <span class="read-time">⏱️ 8 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <span class="pagination-item">←</span>
+                <span class="pagination-item active">1</span>
+                <span class="pagination-item">2</span>
+                <span class="pagination-item">3</span>
+                <span class="pagination-item">4</span>
+                <span class="pagination-item">5</span>
+                <span class="pagination-item">→</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleFilters() {
+            const filters = document.getElementById('filtersSidebar');
+            filters.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>

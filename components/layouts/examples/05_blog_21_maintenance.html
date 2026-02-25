@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Maintenance | DevBlog</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            --space-4xl: 6rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --container-width: 800px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Maintenance specific */
+            --maintenance-bg: #1a202c;
+            --maintenance-text: #e2e8f0;
+            --maintenance-accent: #4299e1;
+            --progress-bg: #2d3748;
+            --progress-fill: #4299e1;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--maintenance-bg);
+            color: var(--maintenance-text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+        }
+
+        /* Maintenance Container - FIXED: proper centering and background */
+        .maintenance-container {
+            max-width: var(--container-width);
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            padding: var(--space-2xl);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Icon */
+        .maintenance-icon {
+            font-size: 6rem;
+            margin-bottom: var(--space-lg);
+            animation: wrench 2.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes wrench {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            20% {
+                transform: rotate(15deg);
+            }
+
+            40% {
+                transform: rotate(-15deg);
+            }
+
+            60% {
+                transform: rotate(10deg);
+            }
+
+            80% {
+                transform: rotate(-5deg);
+            }
+        }
+
+        /* Title */
+        .maintenance-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, #fff 0%, #a0aec0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Message */
+        .maintenance-message {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: var(--maintenance-text);
+            opacity: 0.9;
+            margin-bottom: var(--space-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            margin-bottom: var(--space-xl);
+            background: rgba(255, 255, 255, 0.02);
+            padding: var(--space-lg);
+            border-radius: 12px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-xs);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--progress-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: var(--space-xs);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 65%;
+            background: var(--progress-fill);
+            border-radius: 4px;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .progress-details {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            color: var(--maintenance-text);
+            opacity: 0.7;
+            font-size: 0.85rem;
+            margin-top: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        /* Timer */
+        .timer-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .timer-block {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: var(--space-lg) var(--space-md);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timer-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            margin-bottom: var(--space-xs);
+        }
+
+        .timer-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        /* Status Cards */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .status-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .status-detail {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: var(--space-xs);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-badge.completed {
+            background: #276749;
+            color: #9ae6b4;
+        }
+
+        .status-badge.in-progress {
+            background: #744210;
+            color: #faf089;
+        }
+
+        .status-badge.pending {
+            background: #1a365d;
+            color: #90cdf4;
+        }
+
+        /* Updates Section */
+        .updates-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .updates-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+
+        .updates-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .updates-list {
+            list-style: none;
+            margin-bottom: var(--space-lg);
+        }
+
+        .update-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .update-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-time {
+            min-width: 70px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: var(--accent);
+        }
+
+        .update-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .update-status {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: rgba(66, 153, 225, 0.2);
+            color: #90cdf4;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .social-link:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+
+        /* Subscribe Form */
+        .subscribe-section {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .subscribe-input {
+            flex: 1;
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .subscribe-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .subscribe-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .subscribe-button {
+            padding: var(--space-md) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .subscribe-button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .subscribe-note {
+            margin-top: var(--space-sm);
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* Footer */
+        .maintenance-footer {
+            margin-top: var(--space-xl);
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .footer-link {
+            color: var(--maintenance-text);
+            text-decoration: none;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-md);
+            }
+
+            .maintenance-container {
+                padding: var(--space-xl);
+            }
+
+            .maintenance-title {
+                font-size: 2.5rem;
+            }
+
+            .timer-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-sm);
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .subscribe-form {
+                flex-direction: column;
+            }
+
+            .progress-details {
+                flex-direction: column;
+                gap: var(--space-xs);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .maintenance-title {
+                font-size: 2rem;
+            }
+
+            .timer-number {
+                font-size: 2rem;
+            }
+
+            .timer-block {
+                padding: var(--space-md);
+            }
+
+            .updates-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .update-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .update-time {
+                min-width: auto;
+            }
+
+            .maintenance-footer {
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout {
+            position: relative;
+        }
+
+        .debug-layout::before {
+            content: "maintenance-page";
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 99, 132, 0.9);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 9999;
+            font-family: monospace;
+        }
+
+        .debug-layout [class*="maintenance-"] {
+            position: relative;
+            outline: 1px dotted rgba(255, 99, 132, 0.3);
+        }
+
+        /* Section colors for debug */
+        .debug-layout .maintenance-icon {
+            background: rgba(255, 99, 132, 0.1);
+            padding: var(--space-sm);
+            border-radius: 50%;
+        }
+
+        .debug-layout .progress-section {
+            background: rgba(54, 162, 235, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        .debug-layout .timer-section {
+            background: rgba(75, 192, 192, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        .debug-layout .status-grid {
+            background: rgba(153, 102, 255, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        .debug-layout .updates-section {
+            background: rgba(255, 159, 64, 0.1);
+        }
+
+        .debug-layout .social-links {
+            background: rgba(54, 162, 235, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        .debug-layout .subscribe-section {
+            background: rgba(75, 192, 192, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        /* Component debug */
+        .debug-layout .timer-block {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .status-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .update-item {
+            border-bottom: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .social-link {
+            border: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="debug-layout">
+    <!-- Maintenance Container - Now properly centered in the middle of the screen -->
+    <div class="maintenance-container">
+        <!-- Maintenance Icon with Animation -->
+        <div class="maintenance-icon">🔧</div>
+
+        <!-- Title -->
+        <h1 class="maintenance-title">Under Maintenance</h1>
+
+        <!-- Message -->
+        <p class="maintenance-message">
+            We're currently performing scheduled maintenance to improve your experience.
+            We'll be back online shortly. Thank you for your patience!
+        </p>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <span>Progress</span>
+                <span>65% complete</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-details">
+                <span>📦 Database optimization</span>
+                <span>🔄 Cache refresh</span>
+                <span>🔒 Security updates</span>
+            </div>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="timer-section">
+            <div class="timer-grid">
+                <div class="timer-block">
+                    <div class="timer-number">02</div>
+                    <div class="timer-label">Hours</div>
+                </div>
+                <div class="timer-block">
+                    <div class="timer-number">45</div>
+                    <div class="timer-label">Minutes</div>
+                </div>
+                <div class="timer-block">
+                    <div class="timer-number">30</div>
+                    <div class="timer-label">Seconds</div>
+                </div>
+                <div class="timer-block">
+                    <div class="timer-number">00</div>
+                    <div class="timer-label">ETA</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-icon">🗄️</div>
+                <div class="status-name">Database</div>
+                <div class="status-detail">MySQL optimization</div>
+                <span class="status-badge in-progress">In Progress</span>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">🔄</div>
+                <div class="status-name">Cache</div>
+                <div class="status-detail">Redis cache refresh</div>
+                <span class="status-badge in-progress">In Progress</span>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">🔒</div>
+                <div class="status-name">Security</div>
+                <div class="status-detail">SSL certificate update</div>
+                <span class="status-badge pending">Pending</span>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">📦</div>
+                <div class="status-name">Assets</div>
+                <div class="status-detail">CDN cache purge</div>
+                <span class="status-badge completed">Completed</span>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">🔧</div>
+                <div class="status-name">Plugins</div>
+                <div class="status-detail">Plugin updates</div>
+                <span class="status-badge in-progress">In Progress</span>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon">📊</div>
+                <div class="status-name">Analytics</div>
+                <div class="status-detail">Tracking update</div>
+                <span class="status-badge pending">Pending</span>
+            </div>
+        </div>
+
+        <!-- Latest Updates -->
+        <div class="updates-section">
+            <div class="updates-header">
+                <span>📋</span>
+                <h3>Latest Updates</h3>
+            </div>
+
+            <div class="updates-list">
+                <div class="update-item">
+                    <span class="update-time">10:45 AM</span>
+                    <span class="update-text">Database backup completed successfully</span>
+                    <span class="update-status">Completed</span>
+                </div>
+                <div class="update-item">
+                    <span class="update-time">10:30 AM</span>
+                    <span class="update-text">Started MySQL optimization (65% complete)</span>
+                    <span class="update-status">In Progress</span>
+                </div>
+                <div class="update-item">
+                    <span class="update-time">10:15 AM</span>
+                    <span class="update-text">Redis cache cleared, rebuilding...</span>
+                    <span class="update-status">In Progress</span>
+                </div>
+                <div class="update-item">
+                    <span class="update-time">10:00 AM</span>
+                    <span class="update-text">Maintenance mode activated</span>
+                    <span class="update-status">Completed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media Links -->
+        <div class="social-links">
+            <a href="#" class="social-link">𝕏</a>
+            <a href="#" class="social-link">📘</a>
+            <a href="#" class="social-link">💬</a>
+            <a href="#" class="social-link">📧</a>
+        </div>
+
+        <!-- Subscribe for Updates -->
+        <div class="subscribe-section">
+            <div class="subscribe-form">
+                <input type="email" class="subscribe-input" placeholder="Get notified when we're back">
+                <button class="subscribe-button">Notify Me</button>
+            </div>
+            <div class="subscribe-note">
+                We'll send you a single email when maintenance is complete.
+            </div>
+        </div>
+
+        <!-- Footer Links -->
+        <footer class="maintenance-footer">
+            <a href="#" class="footer-link">Status Page</a>
+            <a href="#" class="footer-link">Twitter Updates</a>
+            <a href="#" class="footer-link">Contact Support</a>
+            <a href="#" class="footer-link">Terms of Service</a>
+        </footer>
+    </div>
+</body>
+
+</html>
