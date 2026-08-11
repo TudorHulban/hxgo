@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -64,78 +64,72 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 		c.Close()
 	}()
 
-	for {
-		var msg struct {
-			ID       string                 `json:"id"`
-			Verb     string                 `json:"verb"`
-			Endpoint string                 `json:"endpoint"`
-			Body     map[string]interface{} `json:"body"`
-			CSRF     string                 `json:"csrf"`
-		}
+	handlers := map[string]func(*websocket.Conn, string){
+		"/counter/increment": s.handleIncrement,
+		"/counter/decrement": s.handleDecrement,
+		"/counter/reset":     s.handleReset,
+	}
 
-		if err := c.ReadJSON(&msg); err != nil {
+	for {
+		_, data, err := c.ReadMessage()
+		if err != nil {
 			break
 		}
 
-		if msg.Verb == "" && msg.Endpoint == "" {
-			if msg.ID != "" {
-				c.WriteJSON(map[string]string{"type": "pong"})
-			}
+		msg := string(data)
 
+		// Handle ping
+		if msg == "ping" {
+			c.WriteMessage(websocket.TextMessage, []byte("pong"))
 			continue
 		}
 
-		broadcast := func(value int64) {
-			response := map[string]any{
-				"id":      msg.ID,
-				"payload": fmt.Sprintf(`<div id="counter">%d</div>`, value),
-			}
-			c.WriteJSON(response)
+		// Parse route|value
+		parts := strings.SplitN(msg, "|", 2)
+		route := parts[0]
 
-			s.broadcast(value)
+		handler, exists := handlers[route]
+		if !exists {
+			c.WriteMessage(websocket.TextMessage, []byte("unknown endpoint: "+route))
+			continue
 		}
 
-		switch msg.Endpoint {
-		case "/counter/increment":
-			value := s.counter.Add(1)
-
-			broadcast(value)
-
-			fmt.Println(value)
-
-		case "/counter/decrement":
-			value := s.counter.Add(-1)
-
-			broadcast(value)
-
-			fmt.Println(value)
-
-		case "/counter/reset":
-			s.counter.Store(0)
-
-			broadcast(0)
-
-			fmt.Println(0)
-		}
-
+		handler(c, route)
 	}
 }
 
-func (s *Server) broadcast(val int64) {
-	payload := fmt.Sprintf(`<div id="counter">%d</div>`, val)
-
-	msg := map[string]any{
-		"payload": payload,
-	}
-	data, _ := json.Marshal(msg)
-
+func (s *Server) broadcast(html string) {
 	s.mu.RLock()
 	for c := range s.clients {
-		if err := c.WriteMessage(websocket.TextMessage, data); err != nil {
-			c.Close()
-		}
+		c.WriteMessage(websocket.TextMessage, []byte(html))
 	}
 	s.mu.RUnlock()
+}
+
+func (s *Server) handleIncrement(c *websocket.Conn, route string) {
+	val := s.counter.Add(1)
+
+	html := fmt.Sprintf(`<div id="counter">%d</div>`, val)
+	c.WriteMessage(websocket.TextMessage, []byte(html))
+
+	s.broadcast(html)
+}
+
+func (s *Server) handleDecrement(c *websocket.Conn, route string) {
+	val := s.counter.Add(-1)
+
+	html := fmt.Sprintf(`<div id="counter">%d</div>`, val)
+	c.WriteMessage(websocket.TextMessage, []byte(html))
+
+	s.broadcast(html)
+}
+
+func (s *Server) handleReset(c *websocket.Conn, route string) {
+	s.counter.Store(0)
+	html := `<div id="counter">0</div>`
+	c.WriteMessage(websocket.TextMessage, []byte(html))
+
+	s.broadcast(html)
 }
 
 func (s *Server) Run(addr string) error {

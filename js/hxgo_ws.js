@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             MS_FILE_UPLOAD_RESET_TIMEOUT: 1500,
             WS_REQUEST_TIMEOUT: 30000,
             WS_HEARTBEAT_INTERVAL: 30000,
-            WS_RECONNECT_MAX_BACKOFF: 30000
+            WS_RECONNECT_MAX_BACKOFF: 30000,
+            WS_RECONNECT_JITTER_MAX: 5000
         }
     );
 
@@ -57,16 +58,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let wsBackoff = 1000;
     let wsReconnectTimer = null;
     let wsReconnectAttempts = 0;
-    const pendingActions = new Map(); // msgId -> {element, targets, redirect, timeout}
 
     // --- Auth Token Management ---
     function getAuthToken() {
-        // Try to get from meta tag first
         const metaToken = document.querySelector('meta[name="auth-token"]');
         if (metaToken && metaToken.content) {
             return metaToken.content;
         }
-        // Fallback to cookie
         const match = document.cookie.match(/auth_token=([^;]+)/);
         return match ? match[1] : null;
     }
@@ -101,16 +99,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     baseElement.href = `${window.location.origin}/`;
     document.head.appendChild(baseElement);
 
-    function generateId() {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return crypto.randomUUID();
-        }
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
     function initWs() {
         if (ws?.readyState === WebSocket.CONNECTING || ws?.readyState === WebSocket.OPEN) return;
 
@@ -132,39 +120,44 @@ document.addEventListener('DOMContentLoaded', (event) => {
             console.log('WebSocket connected');
             wsBackoff = 1000;
             wsReconnectAttempts = 0;
-            
-            // Start heartbeat
+
             if (heartbeatInterval) {
                 clearInterval(heartbeatInterval);
             }
             heartbeatInterval = setInterval(() => {
                 if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({ type: 'ping' }));
+                    ws.send('ping');
                 }
             }, CONFIG.WS_HEARTBEAT_INTERVAL);
         };
 
         ws.onmessage = (event) => {
-            let msg;
-            try {
-                msg = JSON.parse(event.data);
-            } catch (e) {
-                console.error('Invalid WS message:', event.data);
+            const html = event.data;
+
+            if (html === 'pong') {
                 return;
             }
 
-            // Handle ping/pong responses
-            if (msg.type === 'pong') {
+            if (html.startsWith('unknown endpoint:')) {
+                showErrorAlert(html);
                 return;
             }
 
-            if (msg.id && pendingActions.has(msg.id)) {
-                resolveWsResponse(msg);
-            } else if (msg.error) {
-                showErrorAlert(msg.error);
-            } else if (msg.payload) {
-                handleWsPush(msg.payload);
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+
+            const elements = temp.querySelectorAll('[id]');
+            if (elements.length === 0) {
+                return;
             }
+
+            elements.forEach(el => {
+                const target = document.getElementById(el.id);
+                if (target) {
+                    target.outerHTML = el.outerHTML;
+                    reattachEventListeners(target);
+                }
+            });
         };
 
         ws.onerror = (err) => {
@@ -177,37 +170,26 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 clearInterval(heartbeatInterval);
                 heartbeatInterval = null;
             }
-            failAllPending('Connection lost');
             scheduleReconnect();
         };
     }
 
     function scheduleReconnect() {
         if (wsReconnectTimer) return;
-        
-        const delay = Math.min(wsBackoff, CONFIG.WS_RECONNECT_MAX_BACKOFF);
+
+        const baseDelay = Math.min(wsBackoff, CONFIG.WS_RECONNECT_MAX_BACKOFF);
+        // Add random jitter up to 5 seconds
+        const jitter = Math.random() * CONFIG.WS_RECONNECT_JITTER_MAX;
+        const delay = baseDelay + jitter;
+
         console.log(`Scheduling reconnect in ${delay}ms (attempt ${wsReconnectAttempts + 1})`);
-        
+
         wsReconnectTimer = setTimeout(() => {
             wsReconnectTimer = null;
             wsReconnectAttempts++;
             initWs();
         }, delay);
         wsBackoff = Math.min(wsBackoff * 2, CONFIG.WS_RECONNECT_MAX_BACKOFF);
-    }
-
-    function failAllPending(reason) {
-        pendingActions.forEach((ctx, id) => {
-            clearTimeout(ctx.timeout);
-            if (ctx.element) {
-                ctx.element.disabled = false;
-            }
-            if (ctx.reject) {
-                ctx.reject(new Error(reason));
-            }
-        });
-        pendingActions.clear();
-        hideLoadingIndicator();
     }
 
     function parseString(inputString, elements) {
@@ -396,151 +378,23 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
 
         const endpoint = element.getAttribute(HX.GET) || element.getAttribute(HX.POST);
-        const targetSelectors = element.getAttribute(HX.SWAP);
-        const targetElements = targetSelectors ? targetSelectors.split(',').map(selector => document.querySelector(selector.trim())).filter(Boolean) : [];
-        const redirectUrl = element.getAttribute(HX.REDIRECT);
         const isPost = element.hasAttribute(HX.POST);
 
         if (isPost && !validateRequirements(element, form)) {
             return;
         }
 
-        let body = null;
-        if (isPost) {
-            const formData = new FormData(form);
-            const hxSend = element.getAttribute(HX.SEND);
-            if (hxSend) {
-                const ids = hxSend.split(',').map(id => id.trim());
-                ids.forEach(
-                    id => {
-                        const elem = document.querySelector(id);
-                        if (elem) {
-                            let value = '';
-                            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(elem.tagName)) {
-                                value = elem.value;
-                            } else {
-                                value = elem.innerText || elem.textContent;
-                            }
-                            formData.append(elem.id, value);
-                        }
-                    },
-                );
-            }
-            // Convert to plain object for JSON; skip files (upload uses HTTP)
-            body = {};
-            for (let [key, value] of formData.entries()) {
-                if (value instanceof File) continue;
-                body[key] = value;
-            }
-            if (Object.keys(body).length === 0) body = null;
-        }
-
-        const msgId = generateId();
-
         element.disabled = true;
         setTimeout(() => {
-            if (!pendingActions.has(msgId)) {
-                element.disabled = false;
-            }
+            element.disabled = false;
         }, CONFIG.MS_DISABLE_TRIGGER_BUTTON);
 
-        showLoadingIndicator();
-
-        const timeout = setTimeout(() => {
-            if (pendingActions.has(msgId)) {
-                const ctx = pendingActions.get(msgId);
-                pendingActions.delete(msgId);
-                if (ctx.element) {
-                    ctx.element.disabled = false;
-                }
-                hideLoadingIndicator();
-                showErrorAlert('Request timed out');
-            }
-        }, CONFIG.WS_REQUEST_TIMEOUT);
-
-        pendingActions.set(msgId, {
-            element,
-            targets: targetElements,
-            redirect: redirectUrl,
-            timeout
-        });
-
-        const csrfToken = getCSRFToken();
-        const message = {
-            id: msgId,
-            verb: isPost ? 'POST' : 'GET',
-            endpoint: endpoint,
-            body: body,
-            swap: targetSelectors || null
-        };
-        
-        // Add CSRF token if available
-        if (csrfToken) {
-            message.csrf = csrfToken;
-        }
-
         try {
-            ws.send(JSON.stringify(message));
+            ws.send(endpoint + '|');
         } catch (e) {
-            pendingActions.delete(msgId);
             element.disabled = false;
-            hideLoadingIndicator();
             showErrorAlert('Failed to send message: ' + e.message);
         }
-    };
-
-    const resolveWsResponse = (msg) => {
-        const ctx = pendingActions.get(msg.id);
-        if (!ctx) return;
-
-        clearTimeout(ctx.timeout);
-        pendingActions.delete(msg.id);
-        hideLoadingIndicator();
-
-        if (ctx.element) {
-            ctx.element.disabled = false;
-        }
-
-        if (msg.error) {
-            showErrorAlert(msg.error);
-            return;
-        }
-
-        if (ctx.redirect) {
-            window.location.href = ctx.redirect;
-            return;
-        }
-
-        if (msg.payload) {
-            let extractedHTML = parseString(msg.payload, ctx.targets);
-            ctx.targets.forEach((targetElement) => {
-                if (targetElement) {
-                    const responseElement = extractedHTML.get(targetElement.id);
-                    if (responseElement) {
-                        targetElement.outerHTML = responseElement;
-                        const fresh = document.getElementById(targetElement.id);
-                        if (fresh) reattachEventListeners(fresh);
-                    }
-                }
-            });
-        }
-    };
-
-    const handleWsPush = (payload) => {
-        if (!payload) return;
-        const parts = payload.split('|');
-        parts.forEach(part => {
-            if (!part.trim()) return;
-            const match = part.match(/id="([^"]+)"/);
-            if (match && match[1]) {
-                const targetElement = document.getElementById(match[1]);
-                if (targetElement) {
-                    targetElement.outerHTML = part;
-                    const fresh = document.getElementById(match[1]);
-                    if (fresh) reattachEventListeners(fresh);
-                }
-            }
-        });
     };
 
     // --- Upload (HTTP only) ---
@@ -571,8 +425,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         const formData = new FormData(form);
         formData.append('file', file);
-        
-        // Add CSRF token to upload
+
         const csrfToken = getCSRFToken();
         if (csrfToken) {
             formData.append('_csrf', csrfToken);
@@ -935,45 +788,27 @@ document.addEventListener('DOMContentLoaded', (event) => {
         },
     );
 
-    // --- Cleanup on page unload ---
     window.addEventListener('beforeunload', () => {
-        // Clear all pending actions
-        if (pendingActions.size > 0) {
-            pendingActions.forEach((ctx) => {
-                clearTimeout(ctx.timeout);
-                if (ctx.element) {
-                    ctx.element.disabled = false;
-                }
-            });
-            pendingActions.clear();
-        }
-        
-        // Clear heartbeat
         if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
             heartbeatInterval = null;
         }
-        
-        // Close WebSocket
+
         if (ws) {
             ws.close(1000, 'Page unloading');
             ws = null;
         }
-        
-        // Clear reconnect timer
+
         if (wsReconnectTimer) {
             clearTimeout(wsReconnectTimer);
             wsReconnectTimer = null;
         }
-        
-        // Hide loading indicator
+
         hideLoadingIndicator();
     });
 
-    // --- Visibility change handling (reconnect when tab becomes visible) ---
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-            // If WebSocket is closed or connecting, try to reconnect
             if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
                 console.log('Tab became visible, reconnecting WebSocket');
                 initWs();
@@ -981,7 +816,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     });
 
-    // --- Network status handling ---
     window.addEventListener('online', () => {
         console.log('Network came back online, reconnecting WebSocket');
         if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -991,9 +825,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     window.addEventListener('offline', () => {
         console.log('Network went offline');
-        // Don't immediately reconnect, let the browser handle it
     });
 
-    // Start WebSocket
     initWs();
 });
