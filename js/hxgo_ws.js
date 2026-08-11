@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let heartbeatInterval = null;
 
     // --- WebSocket State ---
-    const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/hxgo-ws';
+    const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws';
     let ws = null;
     let wsBackoff = 1000;
     let wsReconnectTimer = null;
