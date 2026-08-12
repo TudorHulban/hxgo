@@ -51,7 +51,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let loadingIndicatorTimeout;
     let isInitialLoad = true;
     let heartbeatInterval = null;
-    let inFlightCount = 0;
+    let pendingRequests = new Map();
+    let requestIdCounter = 0;
 
     // --- WebSocket State ---
     const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws';
@@ -60,14 +61,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let wsReconnectTimer = null;
     let wsReconnectAttempts = 0;
 
-    function beginRequest() {
-        inFlightCount++;
-        showLoadingIndicator();
-    }
-
-    function endRequest() {
-        inFlightCount = Math.max(0, inFlightCount - 1);
-        if (inFlightCount === 0) {
+    function retireRequest(id) {
+        if (!id || !pendingRequests.has(id)) return;
+        const entry = pendingRequests.get(id);
+        clearTimeout(entry.timerId);
+        pendingRequests.delete(id);
+        if (pendingRequests.size === 0) {
             hideLoadingIndicator();
         }
     }
@@ -145,14 +144,21 @@ document.addEventListener('DOMContentLoaded', (event) => {
         };
 
         ws.onmessage = (event) => {
-            const html = event.data;
+            let html = event.data;
 
             if (html === 'pong') {
                 return;
             }
 
+            let responseId = null;
+            const commentMatch = html.match(/^<!--\s*_hx_req_id:\s*(\S+)\s*-->\s*/);
+            if (commentMatch) {
+                responseId = commentMatch[1];
+                html = html.slice(commentMatch[0].length);
+            }
+
             if (html.startsWith('unknown endpoint:')) {
-                endRequest();
+                retireRequest(responseId);
                 showErrorAlert(html);
                 return;
             }
@@ -162,6 +168,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             const elements = temp.querySelectorAll('[id]');
             if (elements.length === 0) {
+                retireRequest(responseId);
                 return;
             }
 
@@ -173,7 +180,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 }
             });
 
-            endRequest();
+            retireRequest(responseId);
         };
 
         ws.onerror = (err) => {
@@ -181,7 +188,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
         };
 
         ws.onclose = (event) => {
-            inFlightCount = 0;
+            pendingRequests.forEach(entry => clearTimeout(entry.timerId));
+            pendingRequests.clear();
             hideLoadingIndicator();
 
             console.log('WebSocket closed:', event.code, event.reason);
@@ -427,11 +435,23 @@ document.addEventListener('DOMContentLoaded', (event) => {
         element.disabled = true;
         setTimeout(() => { element.disabled = false; }, CONFIG.MS_DISABLE_TRIGGER_BUTTON);
 
-        beginRequest();
-        const timeoutId = setTimeout(() => {
-            endRequest();
-            showErrorAlert('Request timed out');
+        const id = 'hx' + (++requestIdCounter);
+        const timerId = setTimeout(() => {
+            if (pendingRequests.has(id)) {
+                pendingRequests.delete(id);
+                if (pendingRequests.size === 0) {
+                    hideLoadingIndicator();
+                }
+                showErrorAlert('Request timed out');
+            }
         }, CONFIG.WS_REQUEST_TIMEOUT);
+
+        pendingRequests.set(id, { timerId, element });
+        if (pendingRequests.size === 1) {
+            showLoadingIndicator();
+        }
+
+        params.append('_hx_req_id', id);
 
         // verb + endpoint on the first line, encoded body on the second
         const wire = `${isPost ? 'POST' : 'GET'} ${endpoint}\n${params.toString()}`;
@@ -440,7 +460,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
             ws.send(wire);
         } catch (e) {
             element.disabled = false;
-            endRequest();
+            if (pendingRequests.has(id)) {
+                clearTimeout(pendingRequests.get(id).timerId);
+                pendingRequests.delete(id);
+                if (pendingRequests.size === 0) {
+                    hideLoadingIndicator();
+                }
+            }
             showErrorAlert('Failed to send message: ' + e.message);
         }
     };

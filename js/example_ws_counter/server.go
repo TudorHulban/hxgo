@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sync"
 	"sync/atomic"
 
@@ -14,6 +15,9 @@ import (
 type Server struct {
 	app     *fiber.App
 	counter atomic.Int64
+
+	handlers map[string]func(*websocket.Conn, *helpers.WSMessage)
+
 	clients map[*websocket.Conn]bool
 	mu      sync.RWMutex
 }
@@ -21,6 +25,11 @@ type Server struct {
 func NewServer() *Server {
 	result := Server{
 		clients: make(map[*websocket.Conn]bool),
+	}
+	result.handlers = map[string]func(*websocket.Conn, *helpers.WSMessage){
+		"/counter/increment": result.handleIncrement,
+		"/counter/decrement": result.handleDecrement,
+		"/counter/reset":     result.handleReset,
 	}
 
 	app := fiber.New()
@@ -58,12 +67,6 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 		c.Close()
 	}()
 
-	handlers := map[string]func(*websocket.Conn, string){
-		"/counter/increment": s.handleIncrement,
-		"/counter/decrement": s.handleDecrement,
-		"/counter/reset":     s.handleReset,
-	}
-
 	for {
 		_, messageRaw, errRead := c.ReadMessage()
 		if errRead != nil {
@@ -81,12 +84,12 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 
 		wsMessage, errParse := helpers.ParseWSMessage(messageString)
 		if errParse != nil {
-			break
+			c.WriteMessage(websocket.TextMessage, []byte("bad request: "+errParse.Error()))
+
+			continue
 		}
 
-		fmt.Println(*wsMessage)
-
-		handler, exists := handlers[wsMessage.Endpoint]
+		handler, exists := s.handlers[wsMessage.Endpoint]
 		if !exists {
 			c.WriteMessage(
 				websocket.TextMessage,
@@ -96,42 +99,103 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 			continue
 		}
 
-		handler(c, wsMessage.Endpoint)
+		handler(c, wsMessage)
 	}
 }
 
-func (s *Server) broadcast(html string) {
+func (s *Server) wrapResponse(requestID, html string) string {
+	if requestID == "" {
+		return html
+	}
+
+	return fmt.Sprintf(
+		"<!-- _hx_req_id: %s -->\n%s",
+
+		requestID,
+		html,
+	)
+}
+
+func (s *Server) broadcast(html string, exclude *websocket.Conn) {
 	s.mu.RLock()
 	for c := range s.clients {
-		c.WriteMessage(websocket.TextMessage, []byte(html))
+		if c == exclude {
+			continue
+		}
+
+		if errWrite := c.WriteMessage(
+			websocket.TextMessage,
+			[]byte(html),
+		); errWrite != nil {
+			log.Printf(
+				"write to client failed: %v",
+				errWrite,
+			)
+		}
 	}
 	s.mu.RUnlock()
 }
 
-func (s *Server) handleIncrement(c *websocket.Conn, route string) {
-	val := s.counter.Add(1)
+func (s *Server) handleIncrement(c *websocket.Conn, message *helpers.WSMessage) {
+	html := fmt.Sprintf(
+		`<div id="counter">%d</div>`,
+		s.counter.Add(1),
+	)
 
-	html := fmt.Sprintf(`<div id="counter">%d</div>`, val)
-	c.WriteMessage(websocket.TextMessage, []byte(html))
+	if errWrite := c.WriteMessage(
+		websocket.TextMessage,
+		[]byte(
+			s.wrapResponse(message.RequestID, html),
+		),
+	); errWrite != nil {
+		log.Printf(
+			"write to client failed: %v",
+			errWrite,
+		)
+	}
 
-	s.broadcast(html)
+	s.broadcast(html, c)
 }
 
-func (s *Server) handleDecrement(c *websocket.Conn, route string) {
-	val := s.counter.Add(-1)
+func (s *Server) handleDecrement(c *websocket.Conn, message *helpers.WSMessage) {
+	html := fmt.Sprintf(
+		`<div id="counter">%d</div>`,
+		s.counter.Add(-1),
+	)
 
-	html := fmt.Sprintf(`<div id="counter">%d</div>`, val)
-	c.WriteMessage(websocket.TextMessage, []byte(html))
+	if errWrite := c.WriteMessage(
+		websocket.TextMessage,
+		[]byte(
+			s.wrapResponse(message.RequestID, html),
+		),
+	); errWrite != nil {
+		log.Printf(
+			"write to client failed: %v",
+			errWrite,
+		)
+	}
 
-	s.broadcast(html)
+	s.broadcast(html, c)
 }
 
-func (s *Server) handleReset(c *websocket.Conn, route string) {
+func (s *Server) handleReset(c *websocket.Conn, message *helpers.WSMessage) {
 	s.counter.Store(0)
-	html := `<div id="counter">0</div>`
-	c.WriteMessage(websocket.TextMessage, []byte(html))
 
-	s.broadcast(html)
+	html := `<div id="counter">0</div>`
+
+	if errWrite := c.WriteMessage(
+		websocket.TextMessage,
+		[]byte(
+			s.wrapResponse(message.RequestID, html),
+		),
+	); errWrite != nil {
+		log.Printf(
+			"write to client failed: %v",
+			errWrite,
+		)
+	}
+
+	s.broadcast(html, c)
 }
 
 func (s *Server) Run(addr string) error {

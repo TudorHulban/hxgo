@@ -13,12 +13,13 @@ type WSMessage struct {
 	Endpoint  string
 	CSRFToken string
 
-	Value  string
-	Values url.Values
-	IsPOST bool
+	RequestID string // response should include <!-- _hx_req_id: {id} -->
+	Value     string
+	Values    url.Values
+	IsPOST    bool
 }
 
-func handleFormMessage(raw string) (*WSMessage, error) {
+func parseFormMessage(raw string) (*WSMessage, error) {
 	verbAndEndpoint, body, couldCut := strings.Cut(raw, "\n")
 	if !couldCut {
 		return nil,
@@ -59,12 +60,17 @@ func handleFormMessage(raw string) (*WSMessage, error) {
 	csrf := values.Get("_csrf")
 	values.Del("_csrf")
 
+	requestID := values.Get("_hx_req_id")
+	values.Del("_hx_req_id")
+
 	if verb == "POST" {
 		return &WSMessage{
 				Endpoint:  endpoint,
 				CSRFToken: csrf,
-				Values:    values,
-				IsPOST:    true,
+				RequestID: requestID,
+
+				Values: values,
+				IsPOST: true,
 			},
 			nil
 	}
@@ -73,7 +79,9 @@ func handleFormMessage(raw string) (*WSMessage, error) {
 		return &WSMessage{
 				Endpoint:  endpoint,
 				CSRFToken: csrf,
-				Values:    values,
+				RequestID: requestID,
+
+				Values: values,
 			},
 			nil
 	}
@@ -87,7 +95,7 @@ func handleFormMessage(raw string) (*WSMessage, error) {
 		}
 }
 
-func handlePipeMessage(raw string) (*WSMessage, error) {
+func parsePipeMessage(raw string) (*WSMessage, error) {
 	endpoint, value, couldCut := strings.Cut(raw, "|")
 	if !couldCut || len(endpoint) == 0 {
 		return nil,
@@ -108,8 +116,8 @@ func handlePipeMessage(raw string) (*WSMessage, error) {
 
 func ParseWSMessage(raw string) (*WSMessage, error) {
 	if strings.HasPrefix(raw, "GET ") || strings.HasPrefix(raw, "POST ") {
-		return handleFormMessage(raw)
+		return parseFormMessage(raw)
 	}
 
-	return handlePipeMessage(raw)
+	return parsePipeMessage(raw)
 }
