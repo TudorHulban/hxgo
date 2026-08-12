@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"sync/atomic"
 
+	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/gofiber/contrib/v3/websocket"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/static"
@@ -79,18 +79,24 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 			continue
 		}
 
-		// Parse route|value
-		parts := strings.SplitN(messageString, "|", 2)
-		route := parts[0]
+		wsMessage, errParse := helpers.ParseWSMessage(messageString)
+		if errParse != nil {
+			break
+		}
 
-		handler, exists := handlers[route]
+		fmt.Println(*wsMessage)
+
+		handler, exists := handlers[wsMessage.Endpoint]
 		if !exists {
-			c.WriteMessage(websocket.TextMessage, []byte("unknown endpoint: "+route))
+			c.WriteMessage(
+				websocket.TextMessage,
+				[]byte("unknown endpoint: "+wsMessage.Endpoint),
+			)
 
 			continue
 		}
 
-		handler(c, route)
+		handler(c, wsMessage.Endpoint)
 	}
 }
 

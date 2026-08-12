@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let loadingIndicatorTimeout;
     let isInitialLoad = true;
     let heartbeatInterval = null;
+    let inFlightCount = 0;
 
     // --- WebSocket State ---
     const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws';
@@ -58,6 +59,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let wsBackoff = 1000;
     let wsReconnectTimer = null;
     let wsReconnectAttempts = 0;
+
+    function beginRequest() {
+        inFlightCount++;
+        showLoadingIndicator();
+    }
+
+    function endRequest() {
+        inFlightCount = Math.max(0, inFlightCount - 1);
+        if (inFlightCount === 0) {
+            hideLoadingIndicator();
+        }
+    }
 
     // --- Auth Token Management ---
     function getAuthToken() {
@@ -139,6 +152,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             }
 
             if (html.startsWith('unknown endpoint:')) {
+                endRequest();
                 showErrorAlert(html);
                 return;
             }
@@ -158,6 +172,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     reattachEventListeners(target);
                 }
             });
+
+            endRequest();
         };
 
         ws.onerror = (err) => {
@@ -165,6 +181,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
         };
 
         ws.onclose = (event) => {
+            inFlightCount = 0;
+            hideLoadingIndicator();
+
             console.log('WebSocket closed:', event.code, event.reason);
             if (heartbeatInterval) {
                 clearInterval(heartbeatInterval);
@@ -407,7 +426,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         element.disabled = true;
         setTimeout(() => { element.disabled = false; }, CONFIG.MS_DISABLE_TRIGGER_BUTTON);
-        showLoadingIndicator();
+
+        beginRequest();
+        const timeoutId = setTimeout(() => {
+            endRequest();
+            showErrorAlert('Request timed out');
+        }, CONFIG.WS_REQUEST_TIMEOUT);
 
         // verb + endpoint on the first line, encoded body on the second
         const wire = `${isPost ? 'POST' : 'GET'} ${endpoint}\n${params.toString()}`;
@@ -416,7 +440,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             ws.send(wire);
         } catch (e) {
             element.disabled = false;
-            hideLoadingIndicator();
+            endRequest();
             showErrorAlert('Failed to send message: ' + e.message);
         }
     };
