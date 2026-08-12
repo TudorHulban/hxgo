@@ -19,18 +19,11 @@ type Server struct {
 }
 
 func NewServer() *Server {
-	s := &Server{
+	result := Server{
 		clients: make(map[*websocket.Conn]bool),
 	}
 
 	app := fiber.New()
-
-	app.Get(
-		"/health",
-		func(c fiber.Ctx) error {
-			return c.SendString("OK")
-		},
-	)
 
 	app.Use(
 		"/ws",
@@ -38,18 +31,19 @@ func NewServer() *Server {
 			if c.Get("Upgrade") == "websocket" {
 				return c.Next()
 			}
+
 			return fiber.ErrUpgradeRequired
 		},
 	)
 
-	app.Get("/ws", websocket.New(s.handleWebSocket))
+	app.Get("/ws", websocket.New(result.handleWebSocket))
 
 	app.Use("/", static.New("./public"))
 	app.Use("/", static.New("../"))
 
-	s.app = app
+	result.app = app
 
-	return s
+	return &result
 }
 
 func (s *Server) handleWebSocket(c *websocket.Conn) {
@@ -71,26 +65,28 @@ func (s *Server) handleWebSocket(c *websocket.Conn) {
 	}
 
 	for {
-		_, data, err := c.ReadMessage()
-		if err != nil {
+		_, messageRaw, errRead := c.ReadMessage()
+		if errRead != nil {
 			break
 		}
 
-		msg := string(data)
+		messageString := string(messageRaw)
 
 		// Handle ping
-		if msg == "ping" {
+		if messageString == "ping" {
 			c.WriteMessage(websocket.TextMessage, []byte("pong"))
+
 			continue
 		}
 
 		// Parse route|value
-		parts := strings.SplitN(msg, "|", 2)
+		parts := strings.SplitN(messageString, "|", 2)
 		route := parts[0]
 
 		handler, exists := handlers[route]
 		if !exists {
 			c.WriteMessage(websocket.TextMessage, []byte("unknown endpoint: "+route))
+
 			continue
 		}
 
