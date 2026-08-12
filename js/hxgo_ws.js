@@ -178,7 +178,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (wsReconnectTimer) return;
 
         const baseDelay = Math.min(wsBackoff, CONFIG.WS_RECONNECT_MAX_BACKOFF);
-        // Add random jitter up to 5 seconds
         const jitter = Math.random() * CONFIG.WS_RECONNECT_JITTER_MAX;
         const delay = baseDelay + jitter;
 
@@ -368,14 +367,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
 
         const hxEnable = element.getAttribute(HX.ENABLE);
-        if (hxEnable) {
-            toggleElements(hxEnable, true);
-        }
+        if (hxEnable) toggleElements(hxEnable, true);
 
         const hxDisable = element.getAttribute(HX.DISABLE);
-        if (hxDisable) {
-            toggleElements(hxDisable, false);
-        }
+        if (hxDisable) toggleElements(hxDisable, false);
 
         const endpoint = element.getAttribute(HX.GET) || element.getAttribute(HX.POST);
         const isPost = element.hasAttribute(HX.POST);
@@ -384,15 +379,44 @@ document.addEventListener('DOMContentLoaded', (event) => {
             return;
         }
 
+        const params = new URLSearchParams();
+
+        if (isPost) {
+            const formData = new FormData(form);
+
+            const hxSend = element.getAttribute(HX.SEND);
+            if (hxSend) {
+                hxSend.split(',').map(id => id.trim()).forEach(id => {
+                    const el = document.querySelector(id);
+                    if (!el) return;
+                    const value = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
+                        ? el.value
+                        : (el.innerText || el.textContent);
+                    formData.append(el.id, value);
+                });
+            }
+
+            for (const [key, value] of formData.entries()) {
+                if (value instanceof File) continue; // uploads go via handleUpload/XHR
+                params.append(key, value);
+            }
+        }
+
+        const csrf = getCSRFToken();
+        if (csrf) params.append('_csrf', csrf);
+
         element.disabled = true;
-        setTimeout(() => {
-            element.disabled = false;
-        }, CONFIG.MS_DISABLE_TRIGGER_BUTTON);
+        setTimeout(() => { element.disabled = false; }, CONFIG.MS_DISABLE_TRIGGER_BUTTON);
+        showLoadingIndicator();
+
+        // verb + endpoint on the first line, encoded body on the second
+        const wire = `${isPost ? 'POST' : 'GET'} ${endpoint}\n${params.toString()}`;
 
         try {
-            ws.send(endpoint + '|');
+            ws.send(wire);
         } catch (e) {
             element.disabled = false;
+            hideLoadingIndicator();
             showErrorAlert('Failed to send message: ' + e.message);
         }
     };
