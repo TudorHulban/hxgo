@@ -21,6 +21,30 @@ type WSMessage struct {
 	IsPOST bool
 }
 
+func (m WSMessage) String() string {
+	var sb strings.Builder
+
+	// Pre-allocate memory to minimize allocations
+	sb.Grow(256)
+
+	fmt.Fprintf(&sb, "WSMessage{\n")
+	fmt.Fprintf(&sb, "  Endpoint:  %q\n", m.Endpoint)
+	fmt.Fprintf(&sb, "  IsPOST:    %t\n", m.IsPOST)
+	fmt.Fprintf(&sb, "  CSRFToken: %q\n", m.CSRFToken)
+	fmt.Fprintf(&sb, "  RequestID: %q (<!-- _hx_req_id: %s -->)\n", m.RequestID, m.RequestID)
+	fmt.Fprintf(&sb, "  Value:     %q\n", m.Value)
+
+	if len(m.Values) > 0 {
+		fmt.Fprintf(&sb, "  Values:    %s\n", m.Values.Encode())
+	} else {
+		fmt.Fprintf(&sb, "  Values:    empty\n")
+	}
+
+	sb.WriteString("}")
+
+	return sb.String()
+}
+
 func parseFormMessage(raw string) (*WSMessage, error) {
 	verbAndEndpoint, body, couldCut := strings.Cut(raw, "\n")
 	if !couldCut {

@@ -79,6 +79,8 @@ func (s *ServerWS) HandleWebSocket(c *websocket.Conn) {
 
 		messageString := string(messageRaw)
 
+		// fmt.Println(messageString)
+
 		// Handle ping
 		if messageString == "ping" {
 			c.WriteMessage(
@@ -98,6 +100,8 @@ func (s *ServerWS) HandleWebSocket(c *websocket.Conn) {
 
 			continue
 		}
+
+		// fmt.Println(wsMessage)
 
 		handler, exists := s.Handlers[wsMessage.Endpoint]
 		if !exists {

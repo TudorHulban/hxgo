@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/TudorHulban/hxgo/helpers/ws"
 	"github.com/gofiber/contrib/v3/websocket"
 	"github.com/gofiber/fiber/v3"
@@ -17,6 +19,8 @@ func NewServer() *Server {
 		app:      fiber.New(),
 		serverWS: ws.NewServer(),
 	}
+
+	result.serverWS.Handlers["/login"] = result.login
 
 	result.app.Use(
 		"/ws",
@@ -39,4 +43,8 @@ func NewServer() *Server {
 
 func (s *Server) Run(addr string) error {
 	return s.app.Listen(addr)
+}
+
+func (s *Server) login(c *websocket.Conn, message *ws.WSMessage) {
+	fmt.Println(message)
 }
