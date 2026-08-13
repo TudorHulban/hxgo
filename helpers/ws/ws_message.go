@@ -1,4 +1,4 @@
-package helpers
+package ws
 
 import (
 	"errors"
@@ -10,13 +10,15 @@ import (
 )
 
 type WSMessage struct {
+	Values url.Values
+
 	Endpoint  string
 	CSRFToken string
 
 	RequestID string // response should include <!-- _hx_req_id: {id} -->
 	Value     string
-	Values    url.Values
-	IsPOST    bool
+
+	IsPOST bool
 }
 
 func parseFormMessage(raw string) (*WSMessage, error) {
@@ -33,6 +35,7 @@ func parseFormMessage(raw string) (*WSMessage, error) {
 
 	verb, endpoint, _ := strings.Cut(verbAndEndpoint, " ")
 	endpoint = strings.TrimSpace(endpoint)
+
 	if len(endpoint) == 0 {
 		return nil,
 			hxerrors.ErrInvalidInput{
