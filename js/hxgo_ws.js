@@ -166,6 +166,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const temp = document.createElement('div');
             temp.innerHTML = html;
 
+            // Check for hx-redirect (same as file upload)
+            const redirectElement = temp.querySelector('[hx-redirect]');
+            if (redirectElement) {
+                const redirectUrl = redirectElement.getAttribute('hx-redirect');
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                    retireRequest(responseId);
+                    return;
+                }
+            }
+
             const elements = temp.querySelectorAll('[id]');
             if (elements.length === 0) {
                 retireRequest(responseId);
