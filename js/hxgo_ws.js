@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     );
 
-    const VERSION = "0.0.83";
+    const VERSION = "0.0.84";
 
     console.log("version %s", VERSION);
 
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (metaToken && metaToken.content) {
             return metaToken.content;
         }
-        const match = document.cookie.match(/auth_token=([^;]+)/);
+        const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]+)/);
         return match ? match[1] : null;
     }
 
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (metaToken && metaToken.content) {
             return metaToken.content;
         }
-        const match = document.cookie.match(/csrf_token=([^;]+)/);
+        const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
         return match ? match[1] : null;
     }
 
@@ -110,6 +110,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const baseElement = document.createElement('base');
     baseElement.href = `${window.location.origin}/`;
     document.head.appendChild(baseElement);
+
+    // --- DOM swap helper ---
+    // Single source of truth for "replace element by id, then reattach listeners
+    // on exactly that element's subtree". Both the WS message handler and the
+    // upload response handler funnel through this so listener (re)binding is
+    // driven only by the ids the backend actually told us about — no blanket
+    // subtree observation, and no double-binding.
+    function swapElementById(id, outerHTML) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        target.outerHTML = outerHTML;
+        const fresh = document.getElementById(id);
+        if (fresh) reattachEventListeners(fresh);
+    }
 
     function initWs() {
         if (ws?.readyState === WebSocket.CONNECTING || ws?.readyState === WebSocket.OPEN) return;
@@ -183,13 +197,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 return;
             }
 
-            elements.forEach(el => {
-                const target = document.getElementById(el.id);
-                if (target) {
-                    target.outerHTML = el.outerHTML;
-                    reattachEventListeners(target);
-                }
-            });
+            // Swap strictly by the ids present in this response. This is the
+            // only place that binds listeners for WS-driven updates.
+            elements.forEach(el => swapElementById(el.id, el.outerHTML));
 
             retireRequest(responseId);
         };
@@ -332,7 +342,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const passwordsMatch = elementPw1.value === elementPw2.value;
         const bothFilled = elementPw1.value.length > 0 && elementPw2.value.length > 0;
 
-        if (showMatchPopup && bothFilled && !passwordsMatch) {
+        if (showMatchPopup && bothFilled && !passwordsMatch && !isInitialLoad) {
             showPopover(elementPw2, 'Passwords must match');
             targetElement.disabled = true;
             return false;
@@ -351,7 +361,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
             for (let id of requiredIds) {
                 const requiredElement = document.querySelector(id.trim());
                 if (requiredElement && !requiredElement.value) {
-                    showPopover(requiredElement, 'This field is required.');
+                    if (!isInitialLoad) {
+                        showPopover(requiredElement, 'This field is required.');
+                    }
                     return false;
                 }
             }
@@ -540,15 +552,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     const data = xhr.responseText;
                     if (data) {
                         let extractedHTML = parseString(data, targetElements);
+                        // Swap strictly by the ids resolved above — same helper
+                        // the WS handler uses, so listener (re)binding stays
+                        // driven only by known ids, with no double-binding.
                         targetElements.forEach(
                             (targetElement) => {
-                                if (targetElement) {
-                                    const responseElement = extractedHTML.get(targetElement.id);
-                                    if (responseElement) {
-                                        targetElement.outerHTML = responseElement;
-                                        const fresh = document.getElementById(targetElement.id);
-                                        if (fresh) reattachEventListeners(fresh);
-                                    }
+                                if (!targetElement) return;
+                                const responseElement = extractedHTML.get(targetElement.id);
+                                if (responseElement) {
+                                    swapElementById(targetElement.id, responseElement);
                                 }
                             },
                         );
@@ -595,14 +607,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const element = event.currentTarget;
         const form = document.createElement('form');
 
-        let hiddenInput = form.querySelector('input[name="selectedOption"]');
-        if (!hiddenInput) {
-            hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'selectedOption';
-            form.appendChild(hiddenInput);
-        }
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'selectedOption';
         hiddenInput.value = element.value;
+        form.appendChild(hiddenInput);
 
         sendWsAction(element, form);
     };
@@ -623,17 +632,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
             fileInput.name = 'file';
             fileInput.style.display = 'none';
             form.appendChild(fileInput);
+        }
 
-            fileInput.addEventListener('change', function () {
-                const fileUploaded = fileInput.files[0];
-                handleUpload(element, form, fileUploaded);
-            }, { once: true });
+        // Reset the value first so selecting the same file again still fires
+        // 'change', then always reopen the dialog on click (fixes stale
+        // re-submission of the previously chosen file on repeat clicks).
+        fileInput.value = '';
 
-            fileInput.click();
-        } else {
+        fileInput.addEventListener('change', function onChange() {
             const fileUploaded = fileInput.files[0];
             handleUpload(element, form, fileUploaded);
-        }
+            setTimeout(() => {
+                fileInput.value = '';
+            }, CONFIG.MS_FILE_UPLOAD_RESET_TIMEOUT);
+        }, { once: true });
+
+        fileInput.click();
     };
 
     const handleDblClickClear = (event) => {
@@ -715,6 +729,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         );
     }
 
+    // Binds handlers on a single freshly-inserted element and its descendants.
+    // This is the ONLY reattachment path in the app: it's invoked explicitly
+    // by swapElementById() with the exact id the backend told us changed.
+    // There is no MutationObserver watching the whole document for this —
+    // that would rebind listeners on every DOM change (popovers, alerts,
+    // loading indicator) for content we already know about, and it was the
+    // root cause of elements getting double-bound.
     const reattachEventListeners = (element) => {
         if (!element) return;
 
@@ -843,23 +864,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         },
     );
 
-    const observer = new MutationObserver(
-        (mutationsList) => {
-            for (let mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach(
-                        node => {
-                            if (node.nodeType === Node.ELEMENT_NODE) {
-                                reattachEventListeners(node);
-                            }
-                        },
-                    );
-                }
-            }
-        },
-    );
-
-    observer.observe(document.body, { childList: true, subtree: true });
+    // NOTE: no MutationObserver here. All dynamic DOM swaps in this app
+    // (WS message handling, upload response handling) go through
+    // swapElementById(), which reattaches listeners on exactly the element
+    // that changed. If a future feature injects hx-* markup through some
+    // other path (e.g. a third-party script), call reattachEventListeners()
+    // on that specific node explicitly rather than reintroducing a
+    // document-wide observer.
 
     function openInNewTab(event) {
         event.preventDefault();
