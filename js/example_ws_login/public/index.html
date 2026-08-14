@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="auth-token" content="">
     <meta name="csrf-token" content="">
-    <script src="/hxgo_ws.js"></script>
+
     <title>Login</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         * {
             margin: 0;
@@ -40,6 +42,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -167,6 +170,7 @@
                 opacity: 0;
                 transform: translateY(-5px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -192,6 +196,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -206,6 +211,7 @@
             from {
                 transform: rotate(0deg);
             }
+
             to {
                 transform: rotate(360deg);
             }
@@ -228,6 +234,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-header">
@@ -238,49 +245,20 @@
         <form id="loginForm" hx-post="/login" autocomplete="off">
             <div class="form-group">
                 <label for="username">Username or Email</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    required
-                    hx-require="#username"
-                    hx-min="3"
-                    hx-max="50"
-                    placeholder="Enter your username"
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    aria-autocomplete="none"
-                    data-lpignore="true"
-                    data-form-type="other"
-                >
+                <input type="text" id="username" name="username" required hx-require="#username" hx-min="3" hx-max="50"
+                    placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="off"
+                    spellcheck="false" aria-autocomplete="none" data-lpignore="true" data-form-type="other">
                 <div class="error-message" id="usernameError"></div>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required
-                    hx-require="#password"
-                    hx-min="6"
-                    hx-max="100"
-                    placeholder="Enter your password"
-                    autocomplete="current-password"
-                >
+                <input type="password" id="password" name="password" required hx-require="#password" hx-min="6"
+                    hx-max="100" placeholder="Enter your password" autocomplete="current-password">
                 <div class="error-message" id="passwordError"></div>
             </div>
 
-            <button 
-                type="submit" 
-                class="login-button"
-                hx-post="/login"
-                hx-disable="#loginButton"
-                id="loginButton"
-            >
+            <button type="submit" class="login-button" hx-post="/login" hx-disable="#loginButton" id="loginButton">
                 Login
             </button>
         </form>
@@ -290,18 +268,40 @@
         </div>
     </div>
 
+    <!-- Load scripts at the end of body -->
+    <script src="/hxgo_core_ws.js"></script>
+    <script src="/hxgo_plugin_listeners.js"></script>
+    <script src="/hxgo_plugin_ui.js"></script>
+    <script src="/hxgo_plugin_validation.js"></script>
+
     <script>
+        window.addEventListener('load', () => {
+            console.log('window.hx exists:', !!window.hx);
+            console.log('window.hx.version:', window.hx?.version);
+
+            // Check if core initialized
+            document.addEventListener('hx:init', () => {
+                console.log('hx:init fired');
+            });
+
+            // Check if events are working
+            setTimeout(() => {
+                console.log('Firing test event');
+                window.hx.fireEvent('test', { message: 'testing' });
+            }, 1000);
+        });
+
         // Additional script to clear username field on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const usernameInput = document.getElementById('username');
             if (usernameInput) {
                 // Clear any autofilled value
                 setTimeout(() => {
                     usernameInput.value = '';
                 }, 100);
-                
+
                 // Prevent browser from remembering the username
-                usernameInput.addEventListener('focus', function() {
+                usernameInput.addEventListener('focus', function () {
                     this.select();
                 });
             }
@@ -313,4 +313,5 @@
         });
     </script>
 </body>
+
 </html>
