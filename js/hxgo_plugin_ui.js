@@ -1,13 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const CONFIG = {
         MS_LOADING_INDICATOR_DELAY: 100,
-        MS_DISABLE_TRIGGER_BUTTON: 500,
         MS_DURATION_DISPLAY_POPOVER: 3000,
         MS_DURATION_DISPLAY_ERROR_ALERT: 7000
     };
 
+    // Safety net only – must be longer than the core's request timeout.
+    const BUTTON_SAFETY_MS = (window.hx?.config?.WS_REQUEST_TIMEOUT || 30000) + 5000;
+
     let loadingIndicatorTimeout;
-    
+
     const loadingIndicator = document.createElement('div');
     loadingIndicator.className = 'loading-indicator';
     loadingIndicator.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000;font-family:Material Symbols Outlined;font-size:48px;color:rgba(0,0,0,.8);padding:10px 20px;background-color:hsl(48,85%,26%);border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,.5);display:none;';
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, CONFIG.MS_DURATION_DISPLAY_ERROR_ALERT);
     }
 
-    // Loading indicator events
+    // ---------- Loading indicator ----------
     document.addEventListener('hx:beforeRequest', () => showLoadingIndicator());
     document.addEventListener('hx:afterResponse', (e) => {
         if (e.detail.pendingCount === 0) hideLoadingIndicator();
@@ -65,14 +67,71 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('hx:uploadComplete', hideLoadingIndicator);
     document.addEventListener('hx:uploadCancelled', hideLoadingIndicator);
 
-    // Button disabling
-    document.addEventListener('hx:beforeRequest', (e) => {
-        const { element } = e.detail;
-        element.disabled = true;
-        setTimeout(() => { element.disabled = false; }, CONFIG.MS_DISABLE_TRIGGER_BUTTON);
+    // ---------- Button disable / re-enable (centralized) ----------
+    // element → { safetyTimer }
+    const pendingButtons = new Map();
+
+    const REENABLE_EVENTS = [
+        'hx:afterResponse',
+        'hx:requestCancelled',
+        'hx:timeout',
+        'hx:connectionError',
+        'hx:uploadComplete',
+        'hx:uploadCancelled'
+    ];
+
+    function reenableButton(element) {
+        if (!element || !pendingButtons.has(element)) return;
+        element.disabled = false;
+        clearTimeout(pendingButtons.get(element).safetyTimer);
+        pendingButtons.delete(element);
+    }
+
+    // Single set of permanent listeners
+    REENABLE_EVENTS.forEach(name => {
+        document.addEventListener(name, (ev) => {
+            const el = ev.detail?.element;
+            if (el) reenableButton(el);
+        });
     });
 
-    // Error handling
+    document.addEventListener('hx:beforeRequest', (e) => {
+        const { element } = e.detail;
+        if (!element) return;
+
+        element.disabled = true;
+
+        // Replace any previous entry for this element
+        if (pendingButtons.has(element)) {
+            clearTimeout(pendingButtons.get(element).safetyTimer);
+        }
+
+        const safetyTimer = setTimeout(() => {
+            reenableButton(element);
+        }, BUTTON_SAFETY_MS);
+
+        pendingButtons.set(element, { safetyTimer });
+    });
+
+    // Also cover upload buttons
+    document.addEventListener('hx:beforeUpload', (e) => {
+        const { element } = e.detail;
+        if (!element) return;
+
+        element.disabled = true;
+
+        if (pendingButtons.has(element)) {
+            clearTimeout(pendingButtons.get(element).safetyTimer);
+        }
+
+        const safetyTimer = setTimeout(() => {
+            reenableButton(element);
+        }, BUTTON_SAFETY_MS);
+
+        pendingButtons.set(element, { safetyTimer });
+    });
+
+    // ---------- Error handling ----------
     document.addEventListener('hx:error', (e) => {
         if (e.detail.message) showErrorAlert(e.detail.message);
         else if (e.detail.error) showErrorAlert('Error: ' + e.detail.error.message);
@@ -86,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showErrorAlert('Not connected to server. Reconnecting...');
     });
 
-    // Expose UI functions
+    // ---------- Public API ----------
     window.hx.ui = {
         showPopover,
         showErrorAlert,
