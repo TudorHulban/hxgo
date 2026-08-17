@@ -171,16 +171,10 @@
         const elements = temp.querySelectorAll('[id]');
         if (elements.length === 0) return;
 
-        // Fire the same beforeSwap that the core uses
-        window.hx.fireEvent('beforeSwap', {
-            elements: Array.from(elements),
-            requestId: null,
-            fromCache: true
-        });
-
-        // Use the core swap helper → this fires afterSwap + reattachListeners
+        // No batch beforeSwap – only the per-element event inside swapElementById
+        // (requestId = null for cache hits)
         elements.forEach(el => {
-            window.hx.swapElementById(el.id, el.outerHTML);
+            window.hx.swapElementById(el.id, el.outerHTML, null);
         });
     }
 

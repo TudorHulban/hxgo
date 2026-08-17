@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ONCHANGE_ENABLE: 'hx-onchange-enable'
     });
 
-    const VERSION = "0.1.1-core";
+    const VERSION = "0.1.3-core";
     console.log("version %s", VERSION);
 
     // --- WebSocket State ---
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     // --- Request Management ---
-    function retireRequest(id, responseData = null) {
+    function retireRequest(id, responseData = null, extra = {}) {
         if (!id || !pendingRequests.has(id)) return;
         const entry = pendingRequests.get(id);
         clearTimeout(entry.timerId);
@@ -78,21 +78,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
             response: responseData,
             element: entry.element,
             endpoint: entry.endpoint,
-            method: entry.method
+            method: entry.method,
+            ...extra
         });
     }
 
     // --- DOM Swap Helper ---
-    function swapElementById(id, outerHTML) {
+    // Single, consistent beforeSwap / afterSwap per element.
+    // requestId is optional (present for live WS responses, null for cache hits).
+    function swapElementById(id, outerHTML, requestId = null) {
         const target = document.getElementById(id);
         if (!target) return;
 
-        fireEvent('beforeSwap', { id, target, content: outerHTML });
+        fireEvent('beforeSwap', { id, target, content: outerHTML, requestId });
         target.outerHTML = outerHTML;
         const fresh = document.getElementById(id);
 
         if (fresh) {
-            fireEvent('afterSwap', { id, target: fresh });
+            fireEvent('afterSwap', { id, target: fresh, requestId });
             // Let plugins handle listener reattachment
             fireEvent('reattachListeners', { element: fresh });
         }
@@ -102,6 +105,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function initWs() {
         if (ws?.readyState === WebSocket.CONNECTING || ws?.readyState === WebSocket.OPEN) return;
 
+        // Always re-read the current auth token (supports token refresh)
         const authToken = getAuthToken();
         let wsUrl = WS_URL;
         if (authToken) {
@@ -142,7 +146,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             }
 
             if (html.startsWith('unknown endpoint:')) {
-                retireRequest(responseId);
+                retireRequest(responseId, null, { error: html });
                 fireEvent('error', { message: html, requestId: responseId });
                 return;
             }
@@ -154,16 +158,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const redirectElement = temp.querySelector('[hx-redirect]');
             if (redirectElement) {
                 const redirectUrl = redirectElement.getAttribute('hx-redirect');
-                retireRequest(responseId);
 
-                // Fire event first (allows plugins to intercept)
+                // Fire redirect first so plugins can cancel before we retire
                 const redirectEvent = fireEvent('redirect', {
                     url: redirectUrl,
                     requestId: responseId,
+                    response: html,
                     cancelable: true
                 });
 
-                // If not cancelled, perform default redirect
+                // Always retire so pendingCount stays accurate
+                retireRequest(responseId, html, { redirected: true, redirectUrl });
+
                 if (!redirectEvent.defaultPrevented) {
                     window.location.href = redirectUrl;
                 }
@@ -172,13 +178,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             const elements = temp.querySelectorAll('[id]');
             if (elements.length === 0) {
-                retireRequest(responseId);
+                // Empty / non-swap response – still retire cleanly
+                retireRequest(responseId, html);
                 return;
             }
 
-            fireEvent('beforeSwap', { elements: Array.from(elements), requestId: responseId });
-
-            elements.forEach(el => swapElementById(el.id, el.outerHTML));
+            // No batch beforeSwap – only the per-element event inside swapElementById
+            elements.forEach(el => swapElementById(el.id, el.outerHTML, responseId));
 
             retireRequest(responseId, html);
         };
@@ -188,8 +194,32 @@ document.addEventListener('DOMContentLoaded', (event) => {
         };
 
         ws.onclose = (event) => {
-            pendingRequests.forEach(entry => clearTimeout(entry.timerId));
+            // Notify every in-flight request so listeners (loading indicator, etc.) can clean up
+            const pendingSnapshot = Array.from(pendingRequests.entries());
             pendingRequests.clear();
+
+            pendingSnapshot.forEach(([id, entry]) => {
+                clearTimeout(entry.timerId);
+                fireEvent('timeout', {
+                    requestId: id,
+                    element: entry.element,
+                    endpoint: entry.endpoint,
+                    method: entry.method,
+                    reason: 'connection_closed',
+                    code: event.code,
+                    closeReason: event.reason
+                });
+                fireEvent('afterResponse', {
+                    requestId: id,
+                    pendingCount: 0,
+                    response: null,
+                    element: entry.element,
+                    endpoint: entry.endpoint,
+                    method: entry.method,
+                    connectionClosed: true
+                });
+            });
+
             fireEvent('disconnected', { code: event.code, reason: event.reason });
 
             if (heartbeatInterval) {
@@ -217,6 +247,35 @@ document.addEventListener('DOMContentLoaded', (event) => {
         wsBackoff = Math.min(wsBackoff * 2, CONFIG.WS_RECONNECT_MAX_BACKOFF);
     }
 
+    /**
+     * Force a clean reconnect (useful after auth-token refresh).
+     * Closes the current socket (if any) and immediately starts a new connection
+     * with the latest token from meta/cookie.
+     */
+    function reconnect() {
+        if (wsReconnectTimer) {
+            clearTimeout(wsReconnectTimer);
+            wsReconnectTimer = null;
+        }
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
+        }
+        if (ws) {
+            // Avoid the normal onclose reconnect logic racing with us
+            const oldWs = ws;
+            ws = null;
+            try {
+                oldWs.onopen = null;
+                oldWs.onclose = null;
+                oldWs.close(1000, 'Manual reconnect');
+            } catch (_) { /* ignore */ }
+        }
+        wsBackoff = 1000;
+        wsReconnectAttempts = 0;
+        initWs();
+    }
+
     // --- Core Request Sending ---
     const sendWsAction = (element, form) => {
         // Fire before request - plugins can cancel
@@ -240,25 +299,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const isPost = element.hasAttribute(HX.POST);
         const params = new URLSearchParams();
 
-        if (isPost) {
-            const formData = new FormData(form);
+        // Collect form data + hx-send values for BOTH GET and POST
+        const formData = new FormData(form);
 
-            const hxSend = element.getAttribute(HX.SEND);
-            if (hxSend) {
-                hxSend.split(',').map(id => id.trim()).forEach(id => {
-                    const el = document.querySelector(id);
-                    if (!el) return;
-                    const value = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
-                        ? el.value
-                        : (el.innerText || el.textContent);
-                    formData.append(el.id, value);
-                });
-            }
+        const hxSend = element.getAttribute(HX.SEND);
+        if (hxSend) {
+            hxSend.split(',').map(id => id.trim()).forEach(id => {
+                const el = document.querySelector(id);
+                if (!el) return;
+                const value = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)
+                    ? el.value
+                    : (el.innerText || el.textContent);
+                formData.append(el.id || id, value);
+            });
+        }
 
-            for (const [key, value] of formData.entries()) {
-                if (value instanceof File) continue;
-                params.append(key, value);
-            }
+        for (const [key, value] of formData.entries()) {
+            if (value instanceof File) continue;
+            params.append(key, value);
         }
 
         const csrf = getCSRFToken();
@@ -267,12 +325,36 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const id = 'hx' + (++requestIdCounter);
         const timerId = setTimeout(() => {
             if (pendingRequests.has(id)) {
+                const entry = pendingRequests.get(id);
                 pendingRequests.delete(id);
-                fireEvent('timeout', { requestId: id, element });
+                clearTimeout(entry.timerId);
+
+                fireEvent('timeout', {
+                    requestId: id,
+                    element: entry.element,
+                    endpoint: entry.endpoint,
+                    method: entry.method
+                });
+
+                // Always emit afterResponse so UI plugins can hide spinners etc.
+                fireEvent('afterResponse', {
+                    requestId: id,
+                    pendingCount: pendingRequests.size,
+                    response: null,
+                    element: entry.element,
+                    endpoint: entry.endpoint,
+                    method: entry.method,
+                    timedOut: true
+                });
             }
         }, CONFIG.WS_REQUEST_TIMEOUT);
 
-        pendingRequests.set(id, { timerId, element, endpoint, method: isPost ? 'POST' : 'GET' });
+        pendingRequests.set(id, {
+            timerId,
+            element,
+            endpoint,
+            method: isPost ? 'POST' : 'GET'
+        });
         params.append('_hx_req_id', id);
 
         const wire = `${isPost ? 'POST' : 'GET'} ${endpoint}\n${params.toString()}`;
@@ -285,7 +367,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 endpoint,
                 method: isPost ? 'POST' : 'GET'
             });
-            // Fixed: emit afterRequest so cache invalidation (and other plugins) can react
+            // Emit afterRequest so cache invalidation (and other plugins) can react
             fireEvent('afterRequest', {
                 requestId: id,
                 element,
@@ -298,6 +380,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 pendingRequests.delete(id);
             }
             fireEvent('error', { error: e, element });
+            // Ensure afterResponse still fires for consistency
+            fireEvent('afterResponse', {
+                requestId: id,
+                pendingCount: pendingRequests.size,
+                response: null,
+                element,
+                endpoint,
+                method: isPost ? 'POST' : 'GET',
+                error: e
+            });
         }
     };
 
@@ -317,7 +409,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         const endpoint = element.getAttribute(HX.UPLOAD);
         const targetSelectors = element.getAttribute(HX.SWAP);
-        const targetElements = targetSelectors ? targetSelectors.split(',').map(selector => document.querySelector(selector.trim())) : [];
+        const targetElements = targetSelectors
+            ? targetSelectors.split(',').map(selector => document.querySelector(selector.trim()))
+            : [];
         const redirectUrl = element.getAttribute(HX.REDIRECT);
 
         if (!file) return;
@@ -449,7 +543,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // --- Event Delegation for Dynamic Elements ---
     // This ensures buttons and selects work even after DOM swaps
     document.addEventListener('click', (event) => {
-        const element = event.target.closest(`button[${HX.GET}], button[${HX.POST}], button[${HX.UPLOAD}], a[${HX.GET}], a[${HX.POST}], a[${HX.UPLOAD}]`);
+        const element = event.target.closest(
+            `button[${HX.GET}], button[${HX.POST}], button[${HX.UPLOAD}], a[${HX.GET}], a[${HX.POST}], a[${HX.UPLOAD}]`
+        );
         if (element) {
             event.preventDefault();
             handleButtonClick({ currentTarget: element, preventDefault: () => { } });
@@ -510,6 +606,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         swapElementById,
         getAuthToken,
         getCSRFToken,
+        reconnect,          // force reconnect with fresh token
         config: CONFIG,
         constants: HX
     };
