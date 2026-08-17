@@ -6,6 +6,7 @@
  *   <div hx-get="/api/data" hx-cache="true" hx-cache-ttl="60">
  *   <div hx-get="/api/user" hx-cache="true" hx-cache-ttl="300">
  *   <button hx-post="/refresh" hx-cache-invalidate="/api/data">
+ *   <button hx-post="/refresh" hx-cache-invalidate="/api/data,/api/user">
  */
 
 (function () {
@@ -75,29 +76,49 @@
 
         const cachedResponse = cacheManager.get(cacheKey);
         if (cachedResponse) {
-            const cacheEvent = new CustomEvent('hx:cacheHit', {
-                detail: {
-                    cacheKey,
-                    response: cachedResponse,
-                    element
-                }
+            // Fire a proper cacheHit event
+            window.hx.fireEvent('cacheHit', {
+                cacheKey,
+                response: cachedResponse,
+                element,
+                endpoint,
+                method
             });
-            document.dispatchEvent(cacheEvent);
 
-            applyCachedResponse(cachedResponse, element);
+            // Apply using the same swap path as the core
+            applyCachedResponse(cachedResponse);
+
+            // Synthesize afterResponse so UI plugin hides the loading indicator
+            // and any other afterResponse listeners still run
+            window.hx.fireEvent('afterResponse', {
+                requestId: null,
+                pendingCount: 0,          // critical for loading indicator
+                response: cachedResponse,
+                element,
+                endpoint,
+                method,
+                fromCache: true
+            });
 
             e.preventDefault();
         }
     });
 
     document.addEventListener('hx:afterResponse', (e) => {
+        // Skip if this is the synthetic event we just fired ourselves
+        if (e.detail.fromCache) return;
+
         const { element, response, endpoint, method } = e.detail;
         const shouldCache = element?.getAttribute('hx-cache') === 'true';
         if (!shouldCache || !response) return;
 
         const ttl = parseInt(element.getAttribute('hx-cache-ttl')) || cacheManager.defaultTTL;
         const form = element.closest('form') || document.createElement('form');
-        const cacheKey = buildCacheKey(method || 'GET', endpoint || element.getAttribute('hx-get') || element.getAttribute('hx-post'), form);
+        const cacheKey = buildCacheKey(
+            method || 'GET',
+            endpoint || element.getAttribute('hx-get') || element.getAttribute('hx-post'),
+            form
+        );
 
         cacheManager.set(cacheKey, response, ttl);
     });
@@ -106,11 +127,21 @@
         const { element } = e.detail;
         const invalidateAttr = element.getAttribute('hx-cache-invalidate');
 
-        if (invalidateAttr) {
-            invalidateAttr.split(',').forEach(key => {
-                cacheManager.invalidate(key.trim());
+        if (!invalidateAttr) return;
+
+        invalidateAttr.split(',').forEach(raw => {
+            const key = raw.trim();
+            if (!key) return;
+
+            // Exact match (in case someone puts a full key)
+            cacheManager.invalidate(key);
+
+            // Endpoint-style invalidation (the common case)
+            ['GET', 'POST'].forEach(method => {
+                // Match both "GET:/api/data" and "GET:/api/data:params..."
+                cacheManager.invalidatePrefix(`${method}:${key}`);
             });
-        }
+        });
     });
 
     function buildCacheKey(method, endpoint, form) {
@@ -119,16 +150,37 @@
         return `${method}:${endpoint}:${params.toString()}`;
     }
 
-    function applyCachedResponse(html, element) {
+    function applyCachedResponse(html) {
         const temp = document.createElement('div');
         temp.innerHTML = html;
 
-        const elements = temp.querySelectorAll('[id]');
-        elements.forEach(el => {
-            const target = document.getElementById(el.id);
-            if (target) {
-                target.outerHTML = el.outerHTML;
+        const redirectElement = temp.querySelector('[hx-redirect]');
+        if (redirectElement) {
+            const redirectUrl = redirectElement.getAttribute('hx-redirect');
+            const redirectEvent = window.hx.fireEvent('redirect', {
+                url: redirectUrl,
+                fromCache: true,
+                cancelable: true
+            });
+            if (!redirectEvent.defaultPrevented) {
+                window.location.href = redirectUrl;
             }
+            return;
+        }
+
+        const elements = temp.querySelectorAll('[id]');
+        if (elements.length === 0) return;
+
+        // Fire the same beforeSwap that the core uses
+        window.hx.fireEvent('beforeSwap', {
+            elements: Array.from(elements),
+            requestId: null,
+            fromCache: true
+        });
+
+        // Use the core swap helper → this fires afterSwap + reattachListeners
+        elements.forEach(el => {
+            window.hx.swapElementById(el.id, el.outerHTML);
         });
     }
 
