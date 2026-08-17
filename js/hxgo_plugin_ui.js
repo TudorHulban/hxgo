@@ -57,8 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('hx:afterResponse', (e) => {
         if (e.detail.pendingCount === 0) hideLoadingIndicator();
     });
+    document.addEventListener('hx:requestCancelled', hideLoadingIndicator);
+    document.addEventListener('hx:timeout', hideLoadingIndicator);
+    document.addEventListener('hx:connectionError', hideLoadingIndicator);
+
     document.addEventListener('hx:beforeUpload', () => showLoadingIndicator());
     document.addEventListener('hx:uploadComplete', hideLoadingIndicator);
+    document.addEventListener('hx:uploadCancelled', hideLoadingIndicator);
 
     // Button disabling
     document.addEventListener('hx:beforeRequest', (e) => {
