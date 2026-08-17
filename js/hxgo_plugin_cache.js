@@ -91,14 +91,15 @@
     });
 
     document.addEventListener('hx:afterResponse', (e) => {
-        const { element } = e.detail;
+        const { element, response, endpoint, method } = e.detail;
         const shouldCache = element?.getAttribute('hx-cache') === 'true';
-        if (!shouldCache) return;
+        if (!shouldCache || !response) return;
 
         const ttl = parseInt(element.getAttribute('hx-cache-ttl')) || cacheManager.defaultTTL;
+        const form = element.closest('form') || document.createElement('form');
+        const cacheKey = buildCacheKey(method || 'GET', endpoint || element.getAttribute('hx-get') || element.getAttribute('hx-post'), form);
 
-        // Store in cache
-        // Note: Needs response data from core
+        cacheManager.set(cacheKey, response, ttl);
     });
 
     document.addEventListener('hx:afterRequest', (e) => {

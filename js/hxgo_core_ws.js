@@ -66,12 +66,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     // --- Request Management ---
-    function retireRequest(id) {
+    function retireRequest(id, responseData = null) {
         if (!id || !pendingRequests.has(id)) return;
         const entry = pendingRequests.get(id);
         clearTimeout(entry.timerId);
         pendingRequests.delete(id);
-        fireEvent('afterResponse', { requestId: id, pendingCount: pendingRequests.size });
+
+        fireEvent('afterResponse', {
+            requestId: id,
+            pendingCount: pendingRequests.size,
+            response: responseData,
+            element: entry.element,
+            endpoint: entry.endpoint,
+            method: entry.method
+        });
     }
 
     // --- DOM Swap Helper ---
@@ -172,7 +180,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             elements.forEach(el => swapElementById(el.id, el.outerHTML));
 
-            retireRequest(responseId);
+            retireRequest(responseId, html);
         };
 
         ws.onerror = (err) => {
@@ -264,7 +272,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             }
         }, CONFIG.WS_REQUEST_TIMEOUT);
 
-        pendingRequests.set(id, { timerId, element });
+        pendingRequests.set(id, { timerId, element, endpoint, method: isPost ? 'POST' : 'GET' });
         params.append('_hx_req_id', id);
 
         const wire = `${isPost ? 'POST' : 'GET'} ${endpoint}\n${params.toString()}`;
@@ -272,6 +280,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         try {
             ws.send(wire);
             fireEvent('requestSent', {
+                requestId: id,
+                element,
+                endpoint,
+                method: isPost ? 'POST' : 'GET'
+            });
+            // Fixed: emit afterRequest so cache invalidation (and other plugins) can react
+            fireEvent('afterRequest', {
                 requestId: id,
                 element,
                 endpoint,
