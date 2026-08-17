@@ -56,7 +56,8 @@ func extractCredentials(v url.Values) (string, string) {
 
 	var username, password string
 
-	for _, pair := range strings.Split(raw, "&") {
+	// SplitSeq yields index and substring
+	for pair := range strings.SplitSeq(raw, "&") {
 		key, val, couldCut := strings.Cut(pair, "=")
 		if !couldCut {
 			continue
@@ -78,7 +79,7 @@ func (s *Server) wslogin(c *websocket.Conn, message *ws.WSMessage) {
 	user, password := extractCredentials(message.Values)
 
 	if user == "admin" && password == "password" {
-		c.WriteMessage(
+		_ = c.WriteMessage(
 			websocket.TextMessage,
 			[]byte(
 				s.serverWS.WrapResponse(
@@ -92,7 +93,7 @@ func (s *Server) wslogin(c *websocket.Conn, message *ws.WSMessage) {
 		)
 	}
 
-	c.WriteMessage(
+	_ = c.WriteMessage(
 		websocket.TextMessage,
 		[]byte(
 			s.serverWS.WrapResponse(
@@ -106,19 +107,19 @@ func (s *Server) wslogin(c *websocket.Conn, message *ws.WSMessage) {
 	)
 }
 
-func (s *Server) httpLogin(c fiber.Ctx) error {
+func (*Server) httpLogin(c fiber.Ctx) error {
 	return c.SendFile(
 		"./public/index.html",
 	)
 }
 
-func (s *Server) authorized(c fiber.Ctx) error {
+func (*Server) authorized(c fiber.Ctx) error {
 	return c.SendFile(
 		"./public/page_authorized.html",
 	)
 }
 
-func (s *Server) notauthorized(c fiber.Ctx) error {
+func (*Server) notauthorized(c fiber.Ctx) error {
 	return c.SendFile(
 		"./public/page_not_authorized.html",
 	)

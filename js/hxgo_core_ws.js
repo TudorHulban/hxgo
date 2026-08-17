@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
         WS_HEARTBEAT_INTERVAL: 30000,
         WS_RECONNECT_MAX_BACKOFF: 30000,
         WS_RECONNECT_JITTER_MAX: 5000,
-        MS_FILE_UPLOAD_RESET_TIMEOUT: 1500
+        MS_FILE_UPLOAD_RESET_TIMEOUT: 1500,
+        CACHE_MAX_ENTRIES: 100,
+        CACHE_DEFAULT_TTL: 300
     });
 
     const HX = Object.freeze({

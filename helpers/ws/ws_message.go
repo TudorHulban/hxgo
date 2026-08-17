@@ -27,21 +27,33 @@ func (m WSMessage) String() string {
 	// Pre-allocate memory to minimize allocations
 	sb.Grow(256)
 
-	fmt.Fprintf(&sb, "WSMessage{\n")
-	fmt.Fprintf(&sb, "  Endpoint:  %q\n", m.Endpoint)
-	fmt.Fprintf(&sb, "  IsPOST:    %t\n", m.IsPOST)
-	fmt.Fprintf(&sb, "  CSRFToken: %q\n", m.CSRFToken)
+	fmt.Fprint(&sb, "WSMessage{\n")
+	fmt.Fprintf(&sb,
+		"  Endpoint:  %q\n",
+		m.Endpoint,
+	)
+	fmt.Fprintf(&sb,
+		"  IsPOST:    %t\n",
+		m.IsPOST,
+	)
+	fmt.Fprintf(&sb,
+		"  CSRFToken: %q\n",
+		m.CSRFToken,
+	)
 	fmt.Fprintf(&sb,
 		"  RequestID: %q (<!-- _hx_req_id: %s -->)\n",
 		m.RequestID,
 		m.RequestID,
 	)
-	fmt.Fprintf(&sb, "  Value:     %q\n", m.Value)
+	fmt.Fprintf(&sb,
+		"  Value:     %q\n",
+		m.Value,
+	)
 
 	if len(m.Values) > 0 {
 		fmt.Fprintf(&sb, "  Values:    %s\n", m.Values.Encode())
 	} else {
-		fmt.Fprintf(&sb, "  Values:    empty\n")
+		fmt.Fprint(&sb, "  Values:    empty\n")
 	}
 
 	sb.WriteString("}")
