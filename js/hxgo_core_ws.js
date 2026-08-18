@@ -278,16 +278,34 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // --- Core Request Sending ---
     const sendWsAction = (element, form) => {
+        const id = 'hx' + (++requestIdCounter);
+
         // Fire before request - plugins can cancel
         const beforeEvent = fireEvent('beforeRequest', {
             element,
             form,
+            requestId: id,
             cancelable: true
         });
 
         if (beforeEvent.defaultPrevented) {
-            fireEvent('requestCancelled', { element });
-            return;
+            fireEvent('requestCancelled', {
+                element,
+                requestId: id
+            });
+
+            // Also fire afterResponse so UI knows to clean up
+            fireEvent('afterResponse', {
+                requestId: id,
+                pendingCount: pendingRequests.size,
+                response: null,
+                element,
+                endpoint: element.getAttribute(HX.GET) || element.getAttribute(HX.POST),
+                method: element.hasAttribute(HX.POST) ? 'POST' : 'GET',
+                cancelled: true  // ← Flag to indicate cancellation
+            });
+
+            return;// do not proceed with actual request
         }
 
         if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -322,7 +340,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const csrf = getCSRFToken();
         if (csrf) params.append('_csrf', csrf);
 
-        const id = 'hx' + (++requestIdCounter);
         const timerId = setTimeout(() => {
             if (pendingRequests.has(id)) {
                 const entry = pendingRequests.get(id);

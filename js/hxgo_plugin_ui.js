@@ -77,7 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'hx:timeout',
         'hx:connectionError',
         'hx:uploadComplete',
-        'hx:uploadCancelled'
+        'hx:uploadCancelled',
+        'hx:error'
     ];
 
     function reenableButton(element) {
