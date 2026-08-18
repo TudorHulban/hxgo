@@ -55,17 +55,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------- Loading indicator ----------
-    document.addEventListener('hx:beforeRequest', () => showLoadingIndicator());
+    // Only show once a request/upload is actually underway — i.e. after the
+    // beforeRequest/beforeUpload cancellation checkpoint has already cleared.
+    // This makes the show/hide pairing independent of plugin listener order:
+    // a cancelling plugin (validation, cache) simply prevents requestSent /
+    // uploadStarted from ever firing, so there's nothing here to race.
+    document.addEventListener('hx:requestSent', () => showLoadingIndicator());
+    document.addEventListener('hx:uploadStarted', () => showLoadingIndicator());
+
     document.addEventListener('hx:afterResponse', (e) => {
         if (e.detail.pendingCount === 0) hideLoadingIndicator();
     });
     document.addEventListener('hx:requestCancelled', hideLoadingIndicator);
     document.addEventListener('hx:timeout', hideLoadingIndicator);
     document.addEventListener('hx:connectionError', hideLoadingIndicator);
-
-    document.addEventListener('hx:beforeUpload', () => showLoadingIndicator());
     document.addEventListener('hx:uploadComplete', hideLoadingIndicator);
     document.addEventListener('hx:uploadCancelled', hideLoadingIndicator);
+    document.addEventListener('hx:error', hideLoadingIndicator);
 
     // ---------- Button disable / re-enable (centralized) ----------
     // element → { safetyTimer }
@@ -96,8 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.addEventListener('hx:beforeRequest', (e) => {
-        const { element } = e.detail;
+    function disableButton(element) {
         if (!element) return;
 
         element.disabled = true;
@@ -112,25 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, BUTTON_SAFETY_MS);
 
         pendingButtons.set(element, { safetyTimer });
-    });
+    }
 
-    // Also cover upload buttons
-    document.addEventListener('hx:beforeUpload', (e) => {
-        const { element } = e.detail;
-        if (!element) return;
-
-        element.disabled = true;
-
-        if (pendingButtons.has(element)) {
-            clearTimeout(pendingButtons.get(element).safetyTimer);
-        }
-
-        const safetyTimer = setTimeout(() => {
-            reenableButton(element);
-        }, BUTTON_SAFETY_MS);
-
-        pendingButtons.set(element, { safetyTimer });
-    });
+    // Disable only once a request/upload is actually underway (same
+    // post-checkpoint events as the loading indicator, same reasoning).
+    document.addEventListener('hx:requestSent', (e) => disableButton(e.detail.element));
+    document.addEventListener('hx:uploadStarted', (e) => disableButton(e.detail.element));
 
     // ---------- Error handling ----------
     document.addEventListener('hx:error', (e) => {
