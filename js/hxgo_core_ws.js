@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ONCHANGE_ENABLE: 'hx-onchange-enable'
     });
 
-    const VERSION = "0.1.3-core";
+    const VERSION = "0.1.3-core-ws";
     console.log("version %s", VERSION);
 
     // --- WebSocket State ---
