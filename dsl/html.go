@@ -7,6 +7,9 @@ func A(children ...Node) Node {
 	)
 }
 
+// The <aside> HTML element represents a portion of a document
+// whose content is only indirectly related to the document's main content.
+// Asides are frequently presented as sidebars or call-out boxes.
 func Aside(children ...Node) Node {
 	return el(
 		"aside",
@@ -144,13 +147,6 @@ func Th(children ...Node) Node {
 func Tr(children ...Node) Node {
 	return el(
 		"tr",
-		children...,
-	)
-}
-
-func Nav(children ...Node) Node {
-	return el(
-		"nav",
 		children...,
 	)
 }
