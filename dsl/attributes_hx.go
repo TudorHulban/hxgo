@@ -102,6 +102,13 @@ func AttrHXPOST(value string) Node {
 	)
 }
 
+func AttrHXGET(value string) Node {
+	return AttrWithValue(
+		hx.HXGET,
+		value,
+	)
+}
+
 func AttrHXShow(values ...string) Node {
 	return AttrIf(
 		len(values) > 0,

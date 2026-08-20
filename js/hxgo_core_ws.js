@@ -96,7 +96,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         if (fresh) {
             fireEvent('afterSwap', { id, target: fresh, requestId });
-            // Let plugins handle listener reattachment
             fireEvent('reattachListeners', { element: fresh });
         }
     }
