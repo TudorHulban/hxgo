@@ -1,8 +1,10 @@
 package inputs
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
@@ -19,9 +21,15 @@ func TestElementSelectInput(t *testing.T) {
 			},
 		},
 
-		SelectValues: []string{
-			"a",
-			"b",
+		SelectOptions: []Option{
+			{
+				Value: "a",
+				Label: "a",
+			},
+			{
+				Value: "b",
+				Label: "b",
+			},
 		},
 	}
 
@@ -31,6 +39,11 @@ func TestElementSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
+
+	fmt.Println(
+		string(dsl.RenderFast()),
+	)
+
 	require.NotNil(t, output) // TODO: review
 }
 
@@ -67,9 +80,15 @@ func TestOnChangeSelectInput(t *testing.T) {
 			},
 		},
 
-		SelectValues: []string{
-			"a",
-			"b",
+		SelectOptions: []Option{
+			{
+				Value: "a",
+				Label: "a",
+			},
+			{
+				Value: "b",
+				Label: "b",
+			},
 		},
 	}
 
