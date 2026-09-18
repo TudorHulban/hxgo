@@ -8,6 +8,7 @@ import (
 
 	"github.com/TudorHulban/hxgo/components"
 	"github.com/TudorHulban/hxgo/components/buttons"
+	"github.com/TudorHulban/hxgo/components/inputs"
 	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/widgets/base"
@@ -25,9 +26,15 @@ func TestAppointment(t *testing.T) {
 	widget := WidgetAppointment(
 		&ParamsWidgetAppointment{
 			SelectLabel: "Doctor",
-			SelectValues: []string{
-				"John Smith",
-				"Martha Doe",
+			SelectOptions: []inputs.Option{
+				{
+					Value: "p1",
+					Label: "John Smith",
+				},
+				{
+					Value: "p2",
+					Label: "Martha Doe",
+				},
 			},
 
 			ParamsWidgetSlots: inputslots.ParamsWidgetSlots{

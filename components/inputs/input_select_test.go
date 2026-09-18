@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TudorHulban/hxgo/dsl"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
 )
@@ -23,11 +22,11 @@ func TestElementSelectInput(t *testing.T) {
 
 		SelectOptions: []Option{
 			{
-				Value: "a",
+				Value: "a1",
 				Label: "a",
 			},
 			{
-				Value: "b",
+				Value: "b2",
 				Label: "b",
 			},
 		},
@@ -41,10 +40,10 @@ func TestElementSelectInput(t *testing.T) {
 	output := el.Raw()
 
 	fmt.Println(
-		string(dsl.RenderFast()),
+		"elem:",
+		output.Canonical(),
 	)
-
-	require.NotNil(t, output) // TODO: review
+	require.NotNil(t, output)
 }
 
 func TestEmptyElementSelectInput(t *testing.T) {
@@ -65,7 +64,12 @@ func TestEmptyElementSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.NotNil(t, output) // TODO: review
+
+	fmt.Println(
+		"elem:",
+		output.Canonical(),
+	)
+	require.NotNil(t, output)
 }
 
 func TestOnChangeSelectInput(t *testing.T) {
@@ -82,11 +86,11 @@ func TestOnChangeSelectInput(t *testing.T) {
 
 		SelectOptions: []Option{
 			{
-				Value: "a",
+				Value: "a1",
 				Label: "a",
 			},
 			{
-				Value: "b",
+				Value: "b2",
 				Label: "b",
 			},
 		},
@@ -98,5 +102,10 @@ func TestOnChangeSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.NotNil(t, output) // TODO: review
+
+	fmt.Println(
+		"elem:",
+		output.Canonical(),
+	)
+	require.NotNil(t, output)
 }
