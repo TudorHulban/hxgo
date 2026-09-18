@@ -1,0 +1,14 @@
+<!doctype html><html lang=""><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TestWidgetInputDate</title><link rel="stylesheet" href="css_base.css"><link rel="stylesheet" href="css_site.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"><link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css"><link rel="stylesheet" href="input_date.css"></head><body><script src="https://cdn.jsdelivr.net/npm/flatpickr"></script><div class="input-date"><input class="flatpickr-input" type="text" id="schedule" value="2026-09-18" min="2026-09-19" max="2026-09-21"/><script>
+					document.addEventListener('DOMContentLoaded', function() {
+					const inputElement = document.getElementById('schedule');
+					if (inputElement) {
+							flatpickr(inputElement, {
+								dateFormat: "Y-m-d",
+								inline: true,
+								defaultDate: inputElement.value,
+								minDate: inputElement.getAttribute('min'),
+								maxDate: inputElement.getAttribute('max')
+							});
+						}
+					});
+					</script></div></body></html>

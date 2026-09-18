@@ -7,8 +7,8 @@ import (
 
 	"github.com/TudorHulban/hxgo/components/buttons"
 	"github.com/TudorHulban/hxgo/dsl"
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 func TestNewForm3Containers(t *testing.T) {
@@ -75,7 +75,7 @@ func TestNewForm3Containers(t *testing.T) {
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(html),
 		)

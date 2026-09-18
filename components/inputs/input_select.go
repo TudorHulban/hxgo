@@ -8,6 +8,11 @@ import (
 	"github.com/TudorHulban/hxgo/hx"
 )
 
+type Option struct {
+	Value string
+	Label string
+}
+
 type InputSelect struct {
 	CSSDivID    string
 	CSSDivClass string
@@ -19,7 +24,7 @@ type InputSelect struct {
 	LabelElementName string // translated value
 
 	SelectedValue string
-	SelectValues  []string
+	SelectOptions []Option
 
 	Action hx.Action
 
@@ -29,24 +34,23 @@ type InputSelect struct {
 
 const optionEmpty = `<option label=" "></option>`
 
-func (el InputSelect) optionSelect(value string) string {
+func (el InputSelect) optionSelect(opt Option) string {
 	return helpers.Sprintf(
 		`<option value="%s"%s>%s</option>`,
 
-		strings.ToLower(value),
+		strings.ToLower(opt.Value),
 		helpers.Ternary(
-			value == el.SelectedValue,
-
+			opt.Value == el.SelectedValue,
 			" selected",
 			"",
 		),
-		value,
+		opt.Label,
 	)
 }
 
 func (el InputSelect) generateOptions() string {
 	options := helpers.ForEachValue(
-		el.SelectValues,
+		el.SelectOptions,
 		el.optionSelect,
 	)
 

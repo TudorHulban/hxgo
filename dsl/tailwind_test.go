@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/helpers"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 func TestMethodsTailwind(t *testing.T) {
 	c := TW()
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			len(
 				helpers.MethodNamesOf(c),
@@ -29,7 +30,7 @@ func TestTailwind(t *testing.T) {
 			AsNode(),
 	)
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(RenderFast(el)),
 		)

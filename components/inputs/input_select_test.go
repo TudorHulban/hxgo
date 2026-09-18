@@ -19,9 +19,15 @@ func TestElementSelectInput(t *testing.T) {
 			},
 		},
 
-		SelectValues: []string{
-			"a",
-			"b",
+		SelectOptions: []Option{
+			{
+				Value: "a1",
+				Label: "a",
+			},
+			{
+				Value: "b2",
+				Label: "b",
+			},
 		},
 	}
 
@@ -31,7 +37,13 @@ func TestElementSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.NotNil(t, output) // TODO: review
+
+	// fmt.Println(
+	// 	"elem:",
+	// 	output.Canonical(),
+	// )
+
+	require.NotNil(t, output)
 }
 
 func TestEmptyElementSelectInput(t *testing.T) {
@@ -52,7 +64,13 @@ func TestEmptyElementSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.NotNil(t, output) // TODO: review
+
+	// fmt.Println(
+	// 	"elem:",
+	// 	output.Canonical(),
+	// )
+
+	require.NotNil(t, output)
 }
 
 func TestOnChangeSelectInput(t *testing.T) {
@@ -67,9 +85,15 @@ func TestOnChangeSelectInput(t *testing.T) {
 			},
 		},
 
-		SelectValues: []string{
-			"a",
-			"b",
+		SelectOptions: []Option{
+			{
+				Value: "a1",
+				Label: "a",
+			},
+			{
+				Value: "b2",
+				Label: "b",
+			},
 		},
 	}
 
@@ -79,5 +103,11 @@ func TestOnChangeSelectInput(t *testing.T) {
 	// </div>
 
 	output := el.Raw()
-	require.NotNil(t, output) // TODO: review
+
+	// fmt.Println(
+	// 	"elem:",
+	// 	output.Canonical(),
+	// )
+
+	require.NotNil(t, output)
 }

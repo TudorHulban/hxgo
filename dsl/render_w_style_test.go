@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 func TestStyledDiv(t *testing.T) {
@@ -29,7 +29,7 @@ func TestStyledDiv(t *testing.T) {
 	require.NotZero(t, html)
 	require.NotZero(t, css, "should have css")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(
 				html,

@@ -12,8 +12,8 @@ type ParamsWidgetAppointment struct {
 	inputslots.ParamsWidgetSlots
 	inputdate.ParamsWidgetInputDate
 
-	SelectLabel  string
-	SelectValues []string
+	SelectLabel   string
+	SelectOptions []inputs.Option
 
 	buttons.ParamsButtonSubmit
 }
@@ -34,7 +34,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 		CSSDivID: "resource-selection",
 
 		LabelElementName: params.SelectLabel,
-		SelectValues:     params.SelectValues,
+		SelectOptions:    params.SelectOptions,
 
 		WithEmptyOption: true,
 	}

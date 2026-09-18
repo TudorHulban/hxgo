@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 // This file itself contains the usage.
@@ -47,7 +47,7 @@ func TestMultiLineScanDetectsAbsolute(t *testing.T) {
 	require.NoError(t, errScan)
 	require.Contains(t, usedMethods, "LeadingNormal")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		require.NoError(t,
 			Writer(
 				os.Stdout,
