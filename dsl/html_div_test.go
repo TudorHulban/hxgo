@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/stretchr/testify/require"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 func Test01Div(t *testing.T) {
@@ -118,7 +118,7 @@ func Test04DivStyle(t *testing.T) {
 			require.NotZero(t, html)
 			require.NotZero(t, styles, "should have style")
 
-			if !helpers.IsRunningInCI() {
+			if !hxhelpers.IsRunningInCI() {
 				fmt.Println(
 					string(html),
 				)
@@ -154,7 +154,7 @@ func Test04DivStyle(t *testing.T) {
 			require.NotZero(t, html)
 			require.NotZero(t, styles, "should have style")
 
-			if !helpers.IsRunningInCI() {
+			if !hxhelpers.IsRunningInCI() {
 				fmt.Println(
 					string(html),
 				)
@@ -181,7 +181,7 @@ func Test06Tailwind(t *testing.T) {
 	require.Zero(t, styles)
 	require.Zero(t, css)
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(html),
 		)
@@ -237,7 +237,7 @@ func Test07DivFull(t *testing.T) {
 	require.NotZero(t, styles, "should have style")
 	require.NotZero(t, css, "should have css")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(html),
 		)
@@ -277,7 +277,7 @@ func Test08DivCSS(t *testing.T) {
 	require.Zero(t, styles, "no styles")
 	require.NotZero(t, css, "should have css")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(html), // <div>hi!</div>
 		)
@@ -315,7 +315,7 @@ func Test09DivCSS(t *testing.T) {
 	require.Zero(t, styles, "no styles")
 	require.NotZero(t, css, "should have css")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(html), // <div>hi!</div>
 		)

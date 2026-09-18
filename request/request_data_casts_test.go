@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/timeutil"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 func TestExtractOptionalTimestamp(t *testing.T) {
@@ -16,7 +16,7 @@ func TestExtractOptionalTimestamp(t *testing.T) {
 	}
 	// TODO: add testable conditions
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			data.ExtractOptionalTimestampInLocation(
 				"time",

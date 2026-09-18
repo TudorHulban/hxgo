@@ -53,6 +53,8 @@ github.com/tudorhulban/hxerrors v0.0.2-0.20260730145821-55e4d22a89bf h1:CEReztxZ
 github.com/tudorhulban/hxerrors v0.0.2-0.20260730145821-55e4d22a89bf/go.mod h1:hOn42e3DQQR6RKUkggdx9uaWHdUHM0bDDXxhy0s4dqQ=
 github.com/tudorhulban/hxhelpers v0.0.0-20260610124716-f43512018869 h1:hSxA+lJBPJGjlWq3ph6rwlvCzjHuAfTkma4sGKOjcQs=
 github.com/tudorhulban/hxhelpers v0.0.0-20260610124716-f43512018869/go.mod h1:V227coyOupW/OPDvMnCDOfmKWmz9hjVGASHBYBeaJTI=
+github.com/tudorhulban/hxhelpers v0.0.2-0.20260918114531-5650ce7d056f h1:e3K8p67/4BI0E77OBrtJquaNke5YGw+7f/OetqgCk5A=
+github.com/tudorhulban/hxhelpers v0.0.2-0.20260918114531-5650ce7d056f/go.mod h1:T5/KxotTN+8Qqoj/FXt4mulwOzEp9HC0gUqMhHK+i0M=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.72.0 h1:R7kYdoWhn1ye1fVpP+cDHDJwYm3NkwLliwgzJ/Abg7M=

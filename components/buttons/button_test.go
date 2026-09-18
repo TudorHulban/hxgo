@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/TudorHulban/hxgo/dsl"
-	"github.com/TudorHulban/hxgo/helpers"
 	"github.com/TudorHulban/hxgo/hx"
 	"github.com/stretchr/testify/require"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 func TestButton(t *testing.T) {
@@ -58,7 +58,7 @@ func TestButton(t *testing.T) {
 	require.NotZero(t, html, "valid HTML")
 	require.NotZero(t, css, "valid CSS")
 
-	if !helpers.IsRunningInCI() {
+	if !hxhelpers.IsRunningInCI() {
 		fmt.Println(
 			string(html),
 		)

@@ -1,7 +1,6 @@
 package inputs
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/TudorHulban/hxgo/hx"
@@ -39,10 +38,11 @@ func TestElementSelectInput(t *testing.T) {
 
 	output := el.Raw()
 
-	fmt.Println(
-		"elem:",
-		output.Canonical(),
-	)
+	// fmt.Println(
+	// 	"elem:",
+	// 	output.Canonical(),
+	// )
+
 	require.NotNil(t, output)
 }
 
@@ -65,10 +65,11 @@ func TestEmptyElementSelectInput(t *testing.T) {
 
 	output := el.Raw()
 
-	fmt.Println(
-		"elem:",
-		output.Canonical(),
-	)
+	// fmt.Println(
+	// 	"elem:",
+	// 	output.Canonical(),
+	// )
+
 	require.NotNil(t, output)
 }
 
@@ -103,9 +104,10 @@ func TestOnChangeSelectInput(t *testing.T) {
 
 	output := el.Raw()
 
-	fmt.Println(
-		"elem:",
-		output.Canonical(),
-	)
+	// fmt.Println(
+	// 	"elem:",
+	// 	output.Canonical(),
+	// )
+
 	require.NotNil(t, output)
 }
