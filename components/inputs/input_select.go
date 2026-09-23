@@ -84,7 +84,8 @@ func (el InputSelect) selectAttributes() string {
 			len(el.CSSInputName) > 0,
 
 			`name="`+strings.ToLower(el.CSSInputName)+`"`+" ",
-			`name="`+strings.ToLower(helpers.Coalesce(el.ElementName, el.LabelElementName))+`"`+" ",
+			`name="`+strings.ToLower(
+				helpers.Coalesce(el.ElementName, el.LabelElementName))+`"`+" ",
 		),
 	)
 
@@ -146,6 +147,10 @@ func (el InputSelect) selectAttributes() string {
 }
 
 func (el InputSelect) tagLabel() string {
+	if len(el.LabelElementName) == 0 {
+		return ""
+	}
+
 	return helpers.Ternary(
 		len(el.CSSInputID) > 0,
 
@@ -196,6 +201,7 @@ func (el InputSelect) Raw() dsl.Node {
 			strings.Join(
 				[]string{
 					el.tagLabel(),
+
 					helpers.Sprintf(
 						`<select %s>%s</select>`,
 

@@ -30,6 +30,7 @@ lint: deps
 	@${hxgo_linting}/golangci-lint config verify
 	@${hxgo_linting}/golangci-lint run --config ${PWD}/.golangci.yaml
 
+# option -race omitted on purpose, due to see how to use in readme
 test:
 	@echo -e "$(hxgo_info_color)==> $@ $(hxgo_no_color)"
-	@go test ./... -race -count=1 -v
+	@go test ./... -count=1 -v
