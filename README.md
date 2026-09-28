@@ -503,4 +503,4 @@ See [Contributing](Contributing.md).
 
 ## 15. License
 
-AGPL‑3.0
+See license file.
