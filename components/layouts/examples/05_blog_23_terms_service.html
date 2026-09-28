@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | DevBlog</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --container-width: 900px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Legal specific */
+            --legal-heading: #1e293b;
+            --legal-border: #e2e8f0;
+            --legal-highlight: #f8fafc;
+            --legal-date: #64748b;
+            --legal-caution: #fee2e2;
+            --legal-caution-border: #ef4444;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a:hover {
+            color: var(--accent);
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            margin-bottom: var(--space-xl);
+            text-align: center;
+        }
+
+        .content-header h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .last-updated {
+            display: inline-block;
+            margin-top: var(--space-sm);
+            padding: var(--space-xs) var(--space-md);
+            background: var(--bg-tertiary);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .toc h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .toc-item {
+            padding: var(--space-xs) var(--space-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .toc-item:hover {
+            border-left-color: var(--accent);
+            color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        /* Legal Content */
+        .legal-content {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .policy-section {
+            margin-bottom: var(--space-2xl);
+            scroll-margin-top: calc(var(--nav-height) + var(--space-lg));
+        }
+
+        .policy-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .section-content {
+            padding-left: calc(32px + var(--space-sm));
+        }
+
+        .section-content p {
+            margin-bottom: var(--space-md);
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .section-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-content h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin: var(--space-lg) 0 var(--space-sm);
+        }
+
+        .section-content h4 {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin: var(--space-md) 0 var(--space-xs);
+        }
+
+        .section-content ul,
+        .section-content ol {
+            margin: var(--space-md) 0 var(--space-md) var(--space-xl);
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .section-content li {
+            margin-bottom: var(--space-xs);
+        }
+
+        .section-content li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: var(--legal-highlight);
+            border-left: 4px solid var(--accent);
+            padding: var(--space-lg);
+            border-radius: 8px;
+            margin: var(--space-lg) 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+            font-style: italic;
+        }
+
+        /* Caution Box */
+        .caution-box {
+            background: var(--legal-caution);
+            border-left: 4px solid var(--legal-caution-border);
+            padding: var(--space-lg);
+            border-radius: 8px;
+            margin: var(--space-lg) 0;
+        }
+
+        .caution-box h4 {
+            color: var(--danger);
+            margin-bottom: var(--space-xs);
+        }
+
+        .caution-box p {
+            margin-bottom: 0;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--space-lg) 0;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Card */
+        .contact-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin: var(--space-lg) 0;
+            display: flex;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .contact-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .contact-details {
+            flex: 1;
+        }
+
+        .contact-details h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .contact-details p {
+            margin-bottom: 4px;
+        }
+
+        .contact-details a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .contact-details a:hover {
+            text-decoration: underline;
+        }
+
+        /* Agreement Box */
+        .agreement-box {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin: var(--space-xl) 0;
+            text-align: center;
+        }
+
+        .agreement-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-top: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        /* Footer Navigation */
+        .legal-footer {
+            margin-top: var(--space-xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .legal-footer-links {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .legal-footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .legal-footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .legal-footer-copyright {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Print styles */
+        @media print {
+            .blog-layout__header,
+            .toc,
+            .agreement-box,
+            .legal-footer,
+            .mobile-nav {
+                display: none;
+            }
+
+            .legal-content {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+
+            .section-content {
+                padding-left: 0;
+            }
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .content-header h1 {
+                font-size: 2rem;
+            }
+
+            .toc-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .legal-content {
+                padding: var(--space-lg);
+            }
+
+            .section-content {
+                padding-left: 0;
+            }
+
+            .contact-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .agreement-buttons {
+                flex-direction: column;
+            }
+
+            .legal-footer {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .legal-footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .toc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0, 0, 0, 0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header {
+            background: rgba(255, 99, 132, 0.2);
+        }
+
+        .debug-layout .toc {
+            background: rgba(54, 162, 235, 0.05);
+        }
+
+        .debug-layout .legal-content {
+            background: rgba(75, 192, 192, 0.02);
+        }
+
+        .debug-layout .policy-section {
+            border: 1px dashed #ff6384;
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+        }
+
+        .debug-layout .policy-section::before {
+            content: "terms-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+        }
+
+        /* Component debug */
+        .debug-layout .highlight-box {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .caution-box {
+            border: 1px dashed #ef4444;
+        }
+
+        .debug-layout .contact-card {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .agreement-box {
+            border: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <a href="/" class="blog-layout__logo">📝 DevBlog</a>
+            <nav class="blog-layout__nav">
+                <a href="/">Home</a>
+                <a href="/latest">Latest</a>
+                <a href="/categories">Categories</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <h1>Terms of Service</h1>
+            <p>Please read these terms carefully before using DevBlog</p>
+            <span class="last-updated">Last Updated: December 21, 2024 | Effective: January 1, 2025</span>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
+            <div class="toc-grid">
+                <a href="#acceptance" class="toc-item">1. Acceptance of Terms</a>
+                <a href="#eligibility" class="toc-item">2. Eligibility</a>
+                <a href="#account" class="toc-item">3. Account Registration</a>
+                <a href="#content" class="toc-item">4. User Content</a>
+                <a href="#conduct" class="toc-item">5. Acceptable Use</a>
+                <a href="#intellectual-property" class="toc-item">6. Intellectual Property</a>
+                <a href="#third-party" class="toc-item">7. Third-Party Links</a>
+                <a href="#termination" class="toc-item">8. Termination</a>
+                <a href="#disclaimers" class="toc-item">9. Disclaimers</a>
+                <a href="#limitation" class="toc-item">10. Limitation of Liability</a>
+                <a href="#indemnification" class="toc-item">11. Indemnification</a>
+                <a href="#governing-law" class="toc-item">12. Governing Law</a>
+                <a href="#changes" class="toc-item">13. Changes to Terms</a>
+                <a href="#contact" class="toc-item">14. Contact Information</a>
+            </div>
+        </div>
+
+        <!-- Legal Content -->
+        <div class="legal-content">
+            <!-- Section 1: Acceptance -->
+            <section id="acceptance" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">1</span>
+                    <h2>Acceptance of Terms</h2>
+                </div>
+                <div class="section-content">
+                    <p>Welcome to DevBlog. By accessing or using our website, services, or applications (collectively, the "Services"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our Services.</p>
+
+                    <div class="highlight-box">
+                        <p>📝 These Terms constitute a legally binding agreement between you and DevBlog. Please read them carefully.</p>
+                    </div>
+
+                    <p>Your use of our Services is also subject to our <a href="/privacy" style="color: var(--accent);">Privacy Policy</a>, which explains how we collect and use your information.</p>
+                </div>
+            </section>
+
+            <!-- Section 2: Eligibility -->
+            <section id="eligibility" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">2</span>
+                    <h2>Eligibility</h2>
+                </div>
+                <div class="section-content">
+                    <p>By using our Services, you represent and warrant that:</p>
+                    <ul>
+                        <li>You are at least 13 years of age (or the age of digital consent in your jurisdiction).</li>
+                        <li>You have the full power and authority to enter into these Terms.</li>
+                        <li>You are not located in a country subject to U.S. trade sanctions.</li>
+                        <li>You have not been previously suspended or removed from our Services.</li>
+                    </ul>
+
+                    <p>If you are using our Services on behalf of an organization, you represent that you have authority to bind that organization to these Terms.</p>
+                </div>
+            </section>
+
+            <!-- Section 3: Account Registration -->
+            <section id="account" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">3</span>
+                    <h2>Account Registration</h2>
+                </div>
+                <div class="section-content">
+                    <p>To access certain features, you may need to create an account. You agree to:</p>
+                    <ul>
+                        <li>Provide accurate, current, and complete information.</li>
+                        <li>Maintain and promptly update your account information.</li>
+                        <li>Keep your password secure and confidential.</li>
+                        <li>Notify us immediately of any unauthorized access.</li>
+                        <li>Accept responsibility for all activities under your account.</li>
+                    </ul>
+
+                    <div class="caution-box">
+                        <h4>⚠️ Account Security</h4>
+                        <p>You are solely responsible for maintaining the security of your account. We cannot and will not be liable for any loss or damage arising from your failure to comply with this security obligation.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: User Content -->
+            <section id="content" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">4</span>
+                    <h2>User Content</h2>
+                </div>
+                <div class="section-content">
+                    <p>Our Services allow you to post, link, store, share, and otherwise make available certain information, text, graphics, videos, or other material ("User Content").</p>
+
+                    <h3>4.1 Ownership</h3>
+                    <p>You retain all ownership rights to your User Content. We do not claim ownership over your content.</p>
+
+                    <h3>4.2 License Grant</h3>
+                    <p>By posting User Content, you grant DevBlog a non-exclusive, worldwide, royalty-free license to:</p>
+                    <ul>
+                        <li>Host, store, and display your content</li>
+                        <li>Distribute your content through our Services</li>
+                        <li>Modify for technical purposes (e.g., formatting)</li>
+                        <li>Promote your content within our Services</li>
+                    </ul>
+
+                    <h3>4.3 Content Representations</h3>
+                    <p>You represent and warrant that:</p>
+                    <ul>
+                        <li>You own your User Content or have the necessary licenses.</li>
+                        <li>Your content does not violate any third-party rights.</li>
+                        <li>Your content complies with these Terms and applicable laws.</li>
+                    </ul>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Content Type</th>
+                                <th>License Duration</th>
+                                <th>Revocability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Comments</td>
+                                <td>Perpetual</td>
+                                <td>Content remains if you delete account</td>
+                            </tr>
+                            <tr>
+                                <td>Posts</td>
+                                <td>Perpetual</td>
+                                <td>Can delete, but may be cached</td>
+                            </tr>
+                            <tr>
+                                <td>Profile info</td>
+                                <td>While account active</td>
+                                <td>Deleted with account</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 5: Acceptable Use -->
+            <section id="conduct" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">5</span>
+                    <h2>Acceptable Use</h2>
+                </div>
+                <div class="section-content">
+                    <p>You agree not to misuse our Services or help anyone else do so. Specifically, you agree not to:</p>
+
+                    <h3>5.1 Prohibited Content</h3>
+                    <ul>
+                        <li>Content that is illegal, unlawful, or promotes illegal activities.</li>
+                        <li>Content that is defamatory, libelous, or threatening.</li>
+                        <li>Content that is pornographic or sexually explicit.</li>
+                        <li>Content that promotes violence or discrimination.</li>
+                        <li>Content that infringes intellectual property rights.</li>
+                        <li>Spam, phishing, or misleading content.</li>
+                        <li>Malware, viruses, or harmful code.</li>
+                    </ul>
+
+                    <h3>5.2 Prohibited Activities</h3>
+                    <ul>
+                        <li>Interfering with or disrupting our Services.</li>
+                        <li>Attempting to bypass security measures.</li>
+                        <li>Scraping or crawling without permission.</li>
+                        <li>Impersonating any person or entity.</li>
+                        <li>Engaging in unauthorized advertising.</li>
+                        <li>Manipulating identifiers to disguise origin.</li>
+                    </ul>
+
+                    <div class="caution-box">
+                        <h4>🚫 Zero Tolerance</h4>
+                        <p>We reserve the right to remove any content and terminate accounts for violations of these acceptable use policies without prior notice.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Intellectual Property -->
+            <section id="intellectual-property" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">6</span>
+                    <h2>Intellectual Property</h2>
+                </div>
+                <div class="section-content">
+                    <h3>6.1 Our IP</h3>
+                    <p>The Services, including their design, layout, graphics, and underlying code, are owned by DevBlog and protected by copyright, trademark, and other intellectual property laws. You may not:</p>
+                    <ul>
+                        <li>Copy, modify, or create derivative works.</li>
+                        <li>Reverse engineer or decompile.</li>
+                        <li>Remove any copyright notices.</li>
+                        <li>Use our trademarks without permission.</li>
+                    </ul>
+
+                    <h3>6.2 Copyright Infringement</h3>
+                    <p>We respect intellectual property rights and comply with the Digital Millennium Copyright Act (DMCA). If you believe your work has been copied in a way that constitutes infringement, please contact our Designated Agent:</p>
+
+                    <div class="contact-card" style="margin-top: var(--space-md);">
+                        <div class="contact-icon">⚖️</div>
+                        <div class="contact-details">
+                            <h4>DMCA Agent</h4>
+                            <p>Email: <a href="mailto:copyright@devblog.com">copyright@devblog.com</a></p>
+                            <p>Address: 123 Tech Street, San Francisco, CA 94105</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Third-Party Links -->
+            <section id="third-party" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">7</span>
+                    <h2>Third-Party Links</h2>
+                </div>
+                <div class="section-content">
+                    <p>Our Services may contain links to third-party websites or services that are not owned or controlled by DevBlog. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that DevBlog shall not be liable for any damage or loss caused by your use of such websites.</p>
+
+                    <p>We encourage you to read the terms and privacy policies of any third-party websites you visit.</p>
+                </div>
+            </section>
+
+            <!-- Section 8: Termination -->
+            <section id="termination" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">8</span>
+                    <h2>Termination</h2>
+                </div>
+                <div class="section-content">
+                    <p>We may terminate or suspend your account and bar access to the Services immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever, including without limitation a breach of these Terms.</p>
+
+                    <h3>8.1 Termination by You</h3>
+                    <p>You may terminate your account at any time by:</p>
+                    <ul>
+                        <li>Deleting your account through account settings</li>
+                        <li>Contacting support to request deletion</li>
+                    </ul>
+
+                    <h3>8.2 Effect of Termination</h3>
+                    <p>Upon termination:</p>
+                    <ul>
+                        <li>Your right to use the Services will immediately cease.</li>
+                        <li>We may delete your account and content.</li>
+                        <li>Certain provisions (like disclaimers) survive termination.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 9: Disclaimers -->
+            <section id="disclaimers" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">9</span>
+                    <h2>Disclaimers</h2>
+                </div>
+                <div class="section-content">
+                    <p>THE SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED.</p>
+
+                    <div class="highlight-box">
+                        <p>⚖️ TO THE FULLEST EXTENT PERMITTED BY LAW, DEVBLOG DISCLAIMS ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                    </div>
+
+                    <p>We do not warrant that:</p>
+                    <ul>
+                        <li>The Services will function uninterrupted, secure, or error-free.</li>
+                        <li>Defects will be corrected.</li>
+                        <li>The Services are free of viruses or harmful components.</li>
+                        <li>Any information obtained is accurate or reliable.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 10: Limitation of Liability -->
+            <section id="limitation" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">10</span>
+                    <h2>Limitation of Liability</h2>
+                </div>
+                <div class="section-content">
+                    <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL DEVBLOG BE LIABLE FOR ANY INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE SERVICES.</p>
+
+                    <p>Our total liability for any claims arising under these Terms shall not exceed the greater of:</p>
+                    <ul>
+                        <li>$100 USD, or</li>
+                        <li>The amount you paid us in the last 12 months.</li>
+                    </ul>
+
+                    <p>Some jurisdictions do not allow the exclusion of certain warranties or limitation of liability. In such jurisdictions, our liability shall be limited to the greatest extent permitted by law.</p>
+                </div>
+            </section>
+
+            <!-- Section 11: Indemnification -->
+            <section id="indemnification" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">11</span>
+                    <h2>Indemnification</h2>
+                </div>
+                <div class="section-content">
+                    <p>You agree to defend, indemnify, and hold harmless DevBlog and its employees, contractors, and agents from and against any claims, liabilities, damages, losses, and expenses, including reasonable legal fees, arising out of or in any way connected with:</p>
+                    <ul>
+                        <li>Your access to or use of the Services.</li>
+                        <li>Your User Content.</li>
+                        <li>Your violation of these Terms.</li>
+                        <li>Your violation of any third-party rights.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 12: Governing Law -->
+            <section id="governing-law" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">12</span>
+                    <h2>Governing Law</h2>
+                </div>
+                <div class="section-content">
+                    <p>These Terms shall be governed by the laws of the State of California, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.</p>
+
+                    <h3>12.1 Dispute Resolution</h3>
+                    <p>Any disputes arising under these Terms shall be resolved through binding arbitration in San Francisco County, California, in accordance with the American Arbitration Association's rules. Each party shall bear its own costs.</p>
+
+                    <h3>12.2 Class Action Waiver</h3>
+                    <p>You agree to resolve disputes with us on an individual basis and waive any right to participate in class actions.</p>
+                </div>
+            </section>
+
+            <!-- Section 13: Changes to Terms -->
+            <section id="changes" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">13</span>
+                    <h2>Changes to Terms</h2>
+                </div>
+                <div class="section-content">
+                    <p>We reserve the right to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p>
+
+                    <p>By continuing to access or use our Services after any revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, please stop using the Services.</p>
+                </div>
+            </section>
+
+            <!-- Section 14: Contact Information -->
+            <section id="contact" class="policy-section">
+                <div class="section-header">
+                    <span class="section-number">14</span>
+                    <h2>Contact Information</h2>
+                </div>
+                <div class="section-content">
+                    <p>If you have any questions about these Terms, please contact us:</p>
+
+                    <div class="contact-card">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-details">
+                            <h4>General Inquiries</h4>
+                            <p><a href="mailto:legal@devblog.com">legal@devblog.com</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon">📬</div>
+                        <div class="contact-details">
+                            <h4>Legal Notice Address</h4>
+                            <p>DevBlog Legal Department<br>123 Tech Street, Suite 400<br>San Francisco, CA 94105<br>United States</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-details">
+                            <h4>Phone (Legal matters only)</h4>
+                            <p>+1 (555) 123-4567</p>
+                            <p style="font-size: 0.8rem;">Mon-Fri, 9am-5pm PT</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agreement Box -->
+            <div class="agreement-box">
+                <h3 style="margin-bottom: var(--space-sm);">Agreement to Terms</h3>
+                <p style="margin-bottom: var(--space-md);">By clicking "I Agree" or continuing to use our Services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</p>
+                <div class="agreement-buttons">
+                    <button class="btn primary" onclick="alert('Thank you for agreeing to our Terms of Service. This is a demo - no action taken.')">I Agree</button>
+                    <button class="btn outline" onclick="alert('You must agree to the Terms to use our Services.')">Decline</button>
+                </div>
+                <p style="margin-top: var(--space-md); font-size: 0.8rem; color: var(--text-secondary);">Last agreed version: December 21, 2024</p>
+            </div>
+        </div>
+
+        <!-- Legal Footer -->
+        <footer class="legal-footer">
+            <div class="legal-footer-links">
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/cookie-policy">Cookie Policy</a>
+                <a href="/gdpr">GDPR Compliance</a>
+                <a href="/ccpa">CCPA Notice</a>
+            </div>
+            <div class="legal-footer-copyright">
+                © 2024 DevBlog. All rights reserved.
+            </div>
+        </footer>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="/" class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="/latest" class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </a>
+        <a href="/categories" class="mobile-nav-item">
+            <span>📑</span>
+            <span>Categories</span>
+        </a>
+        <a href="/search" class="mobile-nav-item">
+            <span>🔍</span>
+            <span>Search</span>
+        </a>
+        <a href="/profile" class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('.toc-item').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                document.querySelector(targetId).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

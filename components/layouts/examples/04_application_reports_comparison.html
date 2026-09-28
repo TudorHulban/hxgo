@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Compare Reports Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+
+            /* Chart colors - Left chart */
+            --chart-left-1: #3b82f6;
+            --chart-left-2: #10b981;
+            --chart-left-3: #f59e0b;
+            --chart-left-4: #ef4444;
+            --chart-left-5: #8b5cf6;
+
+            /* Chart colors - Right chart */
+            --chart-right-1: #ec4899;
+            --chart-right-2: #14b8a6;
+            --chart-right-3: #f97316;
+            --chart-right-4: #a855f7;
+            --chart-right-5: #06b6d4;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Compare Content */
+        .compare-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .content-header h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+        }
+
+        /* Comparison Column */
+        .comparison-column {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .column-header {
+            padding: var(--space-lg);
+            background: linear-gradient(to right, var(--bg-secondary), white);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .column-header__title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .column-header__title h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .column-header__badge {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .column-header__meta {
+            display: flex;
+            gap: var(--space-lg);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Report Selector */
+        .report-selector {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .selector-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .selector-dropdown {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .selector-params {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+
+        .param-tag {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .param-tag__remove {
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .target-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+            padding: var(--space-xs) var(--space-sm);
+            background: white;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .target-db {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .target-db.mysql { color: #00758f; }
+        .target-status {
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            padding: var(--space-lg);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .chart-header h3 {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .chart-type-btn {
+            padding: 2px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .chart-type-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 250px;
+            margin-bottom: var(--space-lg);
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50px;
+        }
+
+        .bar {
+            width: 35px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s;
+            margin-bottom: var(--space-xs);
+        }
+
+        .bar.left-1 { background: var(--chart-left-1); }
+        .bar.left-2 { background: var(--chart-left-2); }
+        .bar.left-3 { background: var(--chart-left-3); }
+        .bar.left-4 { background: var(--chart-left-4); }
+        .bar.left-5 { background: var(--chart-left-5); }
+
+        .bar.right-1 { background: var(--chart-right-1); }
+        .bar.right-2 { background: var(--chart-right-2); }
+        .bar.right-3 { background: var(--chart-right-3); }
+        .bar.right-4 { background: var(--chart-right-4); }
+        .bar.right-5 { background: var(--chart-right-5); }
+
+        .bar-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .bar-value {
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+
+        /* Chart Legend */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-top: var(--space-md);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.75rem;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            background: var(--bg-secondary);
+            padding: var(--space-sm);
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-trend {
+            font-size: 0.65rem;
+            color: var(--success);
+        }
+
+        /* Comparison Footer */
+        .comparison-footer {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-xl);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .comparison-notes {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .note-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .note-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .note-dot.left { background: var(--chart-left-1); }
+        .note-dot.right { background: var(--chart-right-1); }
+
+        .comparison-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Bottom Navigation - Hidden on desktop */
+        .app-layout__mobile-nav {
+            display: none;
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .compare-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .comparison-column { background: rgba(75, 192, 192, 0.05); }
+
+        /* Component debug */
+        .debug-layout .report-selector {
+            border: 1px dashed #36a2eb;
+            position: relative;
+        }
+
+        .debug-layout .report-selector::before {
+            content: "report-selector";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .bar {
+            opacity: 0.8;
+            border: 1px dashed currentColor;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#" class="active">Reports</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">COMPARE</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">🔄</span>
+                    <span>Side by Side</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Overlay</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Trends</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">SAVED COMPARISONS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Q3 vs Q4 Progress</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team A vs Team B</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">💰</span>
+                    <span>Budget vs Actual</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Compare Content -->
+        <main class="compare-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <h1>Compare Reports</h1>
+                <p>Select two reports to compare side by side</p>
+            </div>
+
+            <!-- Comparison Grid -->
+            <div class="comparison-grid">
+                <!-- Left Column -->
+                <div class="comparison-column">
+                    <div class="column-header">
+                        <div class="column-header__title">
+                            <h2>Report A</h2>
+                            <span class="column-header__badge">Primary</span>
+                        </div>
+                        <div class="column-header__meta">
+                            <span>📅 Last 30 days</span>
+                            <span>⏱️ Updated 2min ago</span>
+                        </div>
+                    </div>
+
+                    <!-- Report Selector -->
+                    <div class="report-selector">
+                        <div class="selector-label">Select Report</div>
+                        <select class="selector-dropdown">
+                            <option value="" disabled>Choose a report...</option>
+                            <option value="progress" selected>📊 Project Progress Report</option>
+                            <option value="team">👥 Team Performance Report</option>
+                            <option value="budget">💰 Budget vs Actual Report</option>
+                            <option value="time">⏱️ Time Tracking Report</option>
+                        </select>
+
+                        <div class="selector-params">
+                            <span class="param-tag">
+                                Q4 2024
+                                <span class="param-tag__remove">✕</span>
+                            </span>
+                            <span class="param-tag">
+                                All Projects
+                                <span class="param-tag__remove">✕</span>
+                            </span>
+                        </div>
+
+                        <div class="target-info">
+                            <span class="target-db mysql">🐬 MySQL</span>
+                            <span>•</span>
+                            <span>production-db-01</span>
+                            <span class="target-status">🟢 Online</span>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Project Progress - Last 30 Days</h3>
+                            <div class="chart-actions">
+                                <span class="chart-type-btn active">📊 Bar</span>
+                                <span class="chart-type-btn">📈 Line</span>
+                                <span class="chart-type-btn">🥧 Pie</span>
+                            </div>
+                        </div>
+
+                        <!-- Bar Chart -->
+                        <div class="bar-chart">
+                            <div class="bar-group">
+                                <div class="bar left-1" style="height: 180px;"></div>
+                                <span class="bar-label">Mobile</span>
+                                <span class="bar-value">45</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar left-2" style="height: 240px;"></div>
+                                <span class="bar-label">Website</span>
+                                <span class="bar-value">62</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar left-3" style="height: 120px;"></div>
+                                <span class="bar-label">API</span>
+                                <span class="bar-value">28</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar left-4" style="height: 200px;"></div>
+                                <span class="bar-label">DB</span>
+                                <span class="bar-value">51</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar left-5" style="height: 160px;"></div>
+                                <span class="bar-label">Frontend</span>
+                                <span class="bar-value">39</span>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-left-1);"></span>
+                                <span>Completed: 45</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-left-2);"></span>
+                                <span>In Progress: 32</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-left-3);"></span>
+                                <span>Pending: 12</span>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">Total Tasks</div>
+                                <div class="stat-value">225</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Completion</div>
+                                <div class="stat-value">68%</div>
+                                <span class="stat-trend">↑ 12%</span>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Avg Time</div>
+                                <div class="stat-value">4.2d</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">On Track</div>
+                                <div class="stat-value">5/6</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="comparison-column">
+                    <div class="column-header">
+                        <div class="column-header__title">
+                            <h2>Report B</h2>
+                            <span class="column-header__badge">Comparison</span>
+                        </div>
+                        <div class="column-header__meta">
+                            <span>📅 Last 30 days</span>
+                            <span>⏱️ Updated 1 hour ago</span>
+                        </div>
+                    </div>
+
+                    <!-- Report Selector -->
+                    <div class="report-selector">
+                        <div class="selector-label">Select Report</div>
+                        <select class="selector-dropdown">
+                            <option value="" disabled>Choose a report...</option>
+                            <option value="progress">📊 Project Progress Report</option>
+                            <option value="team" selected>👥 Team Performance Report</option>
+                            <option value="budget">💰 Budget vs Actual Report</option>
+                            <option value="time">⏱️ Time Tracking Report</option>
+                        </select>
+
+                        <div class="selector-params">
+                            <span class="param-tag">
+                                Q4 2024
+                                <span class="param-tag__remove">✕</span>
+                            </span>
+                            <span class="param-tag">
+                                Engineering
+                                <span class="param-tag__remove">✕</span>
+                            </span>
+                        </div>
+
+                        <div class="target-info">
+                            <span class="target-db mysql">🐬 MySQL</span>
+                            <span>•</span>
+                            <span>analytics-db-02</span>
+                            <span class="target-status">🟢 Online</span>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Team Performance - Last 30 Days</h3>
+                            <div class="chart-actions">
+                                <span class="chart-type-btn active">📊 Bar</span>
+                                <span class="chart-type-btn">📈 Line</span>
+                                <span class="chart-type-btn">🥧 Pie</span>
+                            </div>
+                        </div>
+
+                        <!-- Bar Chart -->
+                        <div class="bar-chart">
+                            <div class="bar-group">
+                                <div class="bar right-1" style="height: 190px;"></div>
+                                <span class="bar-label">Sarah</span>
+                                <span class="bar-value">48</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar right-2" style="height: 220px;"></div>
+                                <span class="bar-label">Mike</span>
+                                <span class="bar-value">56</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar right-3" style="height: 165px;"></div>
+                                <span class="bar-label">Alex</span>
+                                <span class="bar-value">42</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar right-4" style="height: 135px;"></div>
+                                <span class="bar-label">Emma</span>
+                                <span class="bar-value">34</span>
+                            </div>
+                            <div class="bar-group">
+                                <div class="bar right-5" style="height: 180px;"></div>
+                                <span class="bar-label">Tom</span>
+                                <span class="bar-value">46</span>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-right-1);"></span>
+                                <span>Tasks Completed: 226</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: var(--chart-right-2);"></span>
+                                <span>Avg per member: 45.2</span>
+                            </div>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">Total Tasks</div>
+                                <div class="stat-value">226</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Productivity</div>
+                                <div class="stat-value">89%</div>
+                                <span class="stat-trend">↑ 5%</span>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Top Performer</div>
+                                <div class="stat-value">Mike</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Velocity</div>
+                                <div class="stat-value">38 pts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Footer (spans both columns) -->
+                <div class="comparison-footer">
+                    <div class="comparison-notes">
+                        <div class="note-item">
+                            <span class="note-dot left"></span>
+                            <span>Report A: Project-based view</span>
+                        </div>
+                        <div class="note-item">
+                            <span class="note-dot right"></span>
+                            <span>Report B: Team-based view</span>
+                        </div>
+                    </div>
+                    <div class="comparison-actions">
+                        <button class="btn small">↔️ Swap</button>
+                        <button class="btn small">📊 Export Comparison</button>
+                        <button class="btn small primary">💾 Save Comparison</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Debug info - No mobile navigation for desktop-only page -->
+</body>
+
+</html>

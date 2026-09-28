@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Admin Dashboard Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 280px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Risk levels */
+            --risk-high: #ef4444;
+            --risk-medium: #f59e0b;
+            --risk-low: #10b981;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.total { background: #dbeafe; color: var(--accent); }
+        .stat-icon.authors { background: #d1fae5; color: var(--success); }
+        .stat-icon.comments { background: #fce7f3; color: var(--pink); }
+        .stat-icon.flagged { background: #fee2e2; color: var(--danger); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Admin Dashboard Layout */
+        .admin-dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xl);
+        }
+
+        /* Authors Table */
+        .authors-table-container,
+        .comments-table-container {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .table-search {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .table-search input {
+            padding: var(--space-sm);
+            border: none;
+            width: 250px;
+        }
+
+        .table-search button {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-primary);
+            border: none;
+            border-left: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .authors-table,
+        .comments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .authors-table th,
+        .comments-table th {
+            text-align: left;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .authors-table td,
+        .comments-table td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .authors-table tr:hover,
+        .comments-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Author Info */
+        .author-info-cell {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .author-details {
+            line-height: 1.3;
+        }
+
+        .author-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .author-email {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Role Badges */
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .role-admin { background: #fee2e2; color: var(--danger); }
+        .role-editor { background: #dbeafe; color: var(--accent); }
+        .role-author { background: #d1fae5; color: var(--success); }
+        .role-contributor { background: #f3f4f6; color: var(--text-secondary); }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-active { background: #d1fae5; color: var(--success); }
+        .status-inactive { background: #f3f4f6; color: var(--text-secondary); }
+        .status-suspended { background: #fee2e2; color: var(--danger); }
+
+        /* Risk Indicators */
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .risk-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .risk-dot.high { background: var(--risk-high); }
+        .risk-dot.medium { background: var(--risk-medium); }
+        .risk-dot.low { background: var(--risk-low); }
+
+        .risk-label {
+            font-size: 0.8rem;
+        }
+
+        .risk-score {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .risk-score.high { color: var(--risk-high); }
+        .risk-score.medium { color: var(--risk-medium); }
+        .risk-score.low { color: var(--risk-low); }
+
+        /* Comment with Risk */
+        .comment-risk {
+            border-left: 3px solid transparent;
+        }
+
+        .comment-risk.high { border-left-color: var(--risk-high); background: #fee2e2; }
+        .comment-risk.medium { border-left-color: var(--risk-medium); background: #fff3cd; }
+        .comment-risk.low { border-left-color: var(--risk-low); }
+
+        .comment-content-cell {
+            max-width: 300px;
+        }
+
+        .comment-text {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .comment-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .comment-post {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .action-btn.approve:hover {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .action-btn.reject:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .action-btn.warn:hover {
+            background: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .pagination-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .pagination-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .sidebar-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .sidebar-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .sidebar-card__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        /* Alert Card */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .alert-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .alert-risk {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--danger);
+        }
+
+        /* Top Risky Comments */
+        .risky-comment-item {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .risky-comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .risky-comment-content {
+            flex: 1;
+        }
+
+        .risky-comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .risky-comment-author {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .risky-comment-risk {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .risky-comment-risk.high { color: var(--risk-high); }
+        .risky-comment-risk.medium { color: var(--risk-medium); }
+        .risky-comment-risk.low { color: var(--risk-low); }
+
+        .risky-comment-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .risky-comment-post {
+            font-size: 0.7rem;
+            color: var(--accent);
+        }
+
+        /* Quick Actions */
+        .quick-action-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            cursor: pointer;
+        }
+
+        .quick-action-item:hover {
+            opacity: 0.8;
+        }
+
+        .quick-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-action-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .quick-action-badge {
+            background: var(--danger);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        /* Author Stats */
+        .author-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .author-stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .author-stat-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .author-stat-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .author-stat-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .author-stat-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .admin-dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .right-sidebar {
+                order: -1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-controls {
+                flex-direction: column;
+            }
+
+            .table-search {
+                width: 100%;
+            }
+
+            .table-search input {
+                width: 100%;
+            }
+
+            .authors-table,
+            .comments-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .stats-grid { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .authors-table-container { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .comments-table-container { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .right-sidebar { background: rgba(153, 102, 255, 0.05); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .authors-table tr,
+        .debug-layout .comments-table tr {
+            border-bottom: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .sidebar-card {
+            border: 1px dashed #9966ff;
+        }
+
+        .debug-layout .comment-risk.high {
+            background: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog Admin</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Posts</a>
+                <a href="#">Authors</a>
+                <a href="#" class="active">Admin</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Admin Dashboard</h1>
+                <p>Manage authors, monitor content, and review risky comments</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">📊 Generate Report</button>
+                <button class="btn primary">⚙️ Settings</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total">📝</div>
+                <div class="stat-content">
+                    <h3>Total Posts</h3>
+                    <div class="value">342</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon authors">👥</div>
+                <div class="stat-content">
+                    <h3>Active Authors</h3>
+                    <div class="value">24</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon comments">💬</div>
+                <div class="stat-content">
+                    <h3>Total Comments</h3>
+                    <div class="value">1,284</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon flagged">🚩</div>
+                <div class="stat-content">
+                    <h3>Flagged Content</h3>
+                    <div class="value">18</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Layout -->
+        <div class="admin-dashboard-layout">
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Authors Table -->
+                <div class="authors-table-container">
+                    <div class="table-header">
+                        <h3>
+                            <span>✍️ Authors</span>
+                            <span class="status-badge status-active">24 active</span>
+                        </h3>
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" placeholder="Search authors...">
+                                <button>🔍</button>
+                            </div>
+                            <select class="btn small">
+                                <option>All Roles</option>
+                                <option>Admins</option>
+                                <option>Editors</option>
+                                <option>Authors</option>
+                                <option>Contributors</option>
+                            </select>
+                            <button class="btn small">+ Add Author</button>
+                        </div>
+                    </div>
+
+                    <table class="authors-table">
+                        <thead>
+                            <tr>
+                                <th>Author</th>
+                                <th>Role</th>
+                                <th>Posts</th>
+                                <th>Comments</th>
+                                <th>Risk Score</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="author-info-cell">
+                                        <div class="author-avatar">SC</div>
+                                        <div class="author-details">
+                                            <div class="author-name">Sarah Chen</div>
+                                            <div class="author-email">sarah.c@blog.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="role-badge role-editor">Editor</span></td>
+                                <td>24</td>
+                                <td>342</td>
+                                <td>
+                                    <div class="risk-indicator">
+                                        <span class="risk-dot low"></span>
+                                        <span class="risk-score low">12</span>
+                                    </div>
+                                </td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>Mar 2022</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">View</button>
+                                        <button class="action-btn">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="author-info-cell">
+                                        <div class="author-avatar">MJ</div>
+                                        <div class="author-details">
+                                            <div class="author-name">Mike Johnson</div>
+                                            <div class="author-email">mike.j@blog.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="role-badge role-author">Author</span></td>
+                                <td>18</td>
+                                <td>156</td>
+                                <td>
+                                    <div class="risk-indicator">
+                                        <span class="risk-dot medium"></span>
+                                        <span class="risk-score medium">45</span>
+                                    </div>
+                                </td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>Jun 2023</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">View</button>
+                                        <button class="action-btn">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="author-info-cell">
+                                        <div class="author-avatar">AR</div>
+                                        <div class="author-details">
+                                            <div class="author-name">Alex Rivera</div>
+                                            <div class="author-email">alex.r@blog.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="role-badge role-author">Author</span></td>
+                                <td>15</td>
+                                <td>98</td>
+                                <td>
+                                    <div class="risk-indicator">
+                                        <span class="risk-dot low"></span>
+                                        <span class="risk-score low">8</span>
+                                    </div>
+                                </td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>Jan 2024</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">View</button>
+                                        <button class="action-btn">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="author-info-cell">
+                                        <div class="author-avatar">EW</div>
+                                        <div class="author-details">
+                                            <div class="author-name">Emma Watson</div>
+                                            <div class="author-email">emma.w@blog.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="role-badge role-contributor">Contributor</span></td>
+                                <td>8</td>
+                                <td>45</td>
+                                <td>
+                                    <div class="risk-indicator">
+                                        <span class="risk-dot low"></span>
+                                        <span class="risk-score low">5</span>
+                                    </div>
+                                </td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>Sep 2024</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">View</button>
+                                        <button class="action-btn">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="author-info-cell">
+                                        <div class="author-avatar">TP</div>
+                                        <div class="author-details">
+                                            <div class="author-name">Tom Parker</div>
+                                            <div class="author-email">tom.p@blog.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="role-badge role-author">Author</span></td>
+                                <td>22</td>
+                                <td>267</td>
+                                <td>
+                                    <div class="risk-indicator">
+                                        <span class="risk-dot high"></span>
+                                        <span class="risk-score high">78</span>
+                                    </div>
+                                </td>
+                                <td><span class="status-badge status-warning">Under Review</span></td>
+                                <td>Feb 2023</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn">View</button>
+                                        <button class="action-btn">Review</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        <div class="pagination-info">Showing 1-5 of 24 authors</div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>←</button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn">4</button>
+                            <button class="pagination-btn">5</button>
+                            <button class="pagination-btn">→</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risky Comments Table -->
+                <div class="comments-table-container">
+                    <div class="table-header">
+                        <h3>
+                            <span>⚠️ Comments Requiring Review</span>
+                            <span class="status-badge" style="background: #fee2e2; color: var(--danger);">12 flagged</span>
+                        </h3>
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" placeholder="Search comments...">
+                                <button>🔍</button>
+                            </div>
+                            <select class="btn small">
+                                <option>All Risk Levels</option>
+                                <option>High Risk</option>
+                                <option>Medium Risk</option>
+                                <option>Low Risk</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <table class="comments-table">
+                        <thead>
+                            <tr>
+                                <th>Comment</th>
+                                <th>Author</th>
+                                <th>Post</th>
+                                <th>Risk Level</th>
+                                <th>Flags</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="comment-risk high">
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">This is absolutely terrible advice. Anyone who follows this will break their production site. The author clearly doesn't know what they're talking about...</div>
+                                    <div class="comment-meta">Reported 3 times</div>
+                                </td>
+                                <td>Anonymous User</td>
+                                <td class="comment-post">Understanding CSS Grid</td>
+                                <td><span class="risk-score high">High</span></td>
+                                <td>3</td>
+                                <td>2h ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve">✓</button>
+                                        <button class="action-btn reject">✗</button>
+                                        <button class="action-btn warn">⚠️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="comment-risk high">
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">Spam link: check out my blog at totally-not-spam.com for cheap products...</div>
+                                    <div class="comment-meta">Reported 5 times</div>
+                                </td>
+                                <td>spam_user123</td>
+                                <td class="comment-post">React Hooks Deep Dive</td>
+                                <td><span class="risk-score high">High</span></td>
+                                <td>5</td>
+                                <td>5h ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve">✓</button>
+                                        <button class="action-btn reject">✗</button>
+                                        <button class="action-btn warn">⚠️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="comment-risk medium">
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">I disagree with some points. While the article is well-written, the section about performance could use more benchmarks...</div>
+                                    <div class="comment-meta">Reported 1 time</div>
+                                </td>
+                                <td>John Smith</td>
+                                <td class="comment-post">TypeScript Best Practices</td>
+                                <td><span class="risk-score medium">Medium</span></td>
+                                <td>1</td>
+                                <td>1d ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve">✓</button>
+                                        <button class="action-btn reject">✗</button>
+                                        <button class="action-btn warn">⚠️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="comment-risk medium">
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">This contains profanity and personal attacks against the author. Not appropriate for a professional blog...</div>
+                                    <div class="comment-meta">Reported 2 times</div>
+                                </td>
+                                <td>AngryUser</td>
+                                <td class="comment-post">Getting Started with Next.js</td>
+                                <td><span class="risk-score medium">Medium</span></td>
+                                <td>2</td>
+                                <td>2d ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve">✓</button>
+                                        <button class="action-btn reject">✗</button>
+                                        <button class="action-btn warn">⚠️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="comment-risk low">
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">Great article! One typo in the second paragraph: "thier" should be "their". Otherwise excellent content!</div>
+                                    <div class="comment-meta">No reports</div>
+                                </td>
+                                <td>GrammarNazi</td>
+                                <td class="comment-post">CSS Flexbox Guide</td>
+                                <td><span class="risk-score low">Low</span></td>
+                                <td>0</td>
+                                <td>3d ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve">✓</button>
+                                        <button class="action-btn reject">✗</button>
+                                        <button class="action-btn warn">⚠️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        <div class="pagination-info">Showing 1-5 of 18 flagged comments</div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>←</button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn">4</button>
+                            <button class="pagination-btn">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="right-sidebar">
+                <!-- Alerts & Notifications -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>
+                            <span>🚨 Alerts</span>
+                            <span class="quick-action-badge">5</span>
+                        </h3>
+                    </div>
+                    
+                    <div class="alert-item">
+                        <div class="alert-icon">⚠️</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Multiple reports on comment</div>
+                            <div class="alert-meta">Understanding CSS Grid · 2h ago</div>
+                        </div>
+                        <span class="alert-risk">High</span>
+                    </div>
+
+                    <div class="alert-item">
+                        <div class="alert-icon">🚫</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Author risk score increased</div>
+                            <div class="alert-meta">Tom Parker · 1d ago</div>
+                        </div>
+                        <span class="alert-risk">Medium</span>
+                    </div>
+
+                    <div class="alert-item">
+                        <div class="alert-icon">🔞</div>
+                        <div class="alert-content">
+                            <div class="alert-title">Inappropriate content flagged</div>
+                            <div class="alert-meta">React Hooks Deep Dive · 2d ago</div>
+                        </div>
+                        <span class="alert-risk">High</span>
+                    </div>
+                </div>
+
+                <!-- Top Risky Comments -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>🔥 Highest Risk Comments</h3>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="risky-comment-item">
+                        <div class="risky-comment-content">
+                            <div class="risky-comment-header">
+                                <span class="risky-comment-author">Anonymous</span>
+                                <span class="risky-comment-risk high">95</span>
+                            </div>
+                            <div class="risky-comment-text">Spam link: check out my blog...</div>
+                            <div class="risky-comment-post">on React Hooks</div>
+                        </div>
+                    </div>
+
+                    <div class="risky-comment-item">
+                        <div class="risky-comment-content">
+                            <div class="risky-comment-header">
+                                <span class="risky-comment-author">AngryUser</span>
+                                <span class="risky-comment-risk high">87</span>
+                            </div>
+                            <div class="risky-comment-text">This is terrible advice...</div>
+                            <div class="risky-comment-post">on CSS Grid</div>
+                        </div>
+                    </div>
+
+                    <div class="risky-comment-item">
+                        <div class="risky-comment-content">
+                            <div class="risky-comment-header">
+                                <span class="risky-comment-author">John Smith</span>
+                                <span class="risky-comment-risk medium">62</span>
+                            </div>
+                            <div class="risky-comment-text">I disagree with some points...</div>
+                            <div class="risky-comment-post">on TypeScript</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>⚡ Quick Actions</h3>
+                    </div>
+                    
+                    <div class="quick-action-item">
+                        <div class="quick-action-icon">🔍</div>
+                        <div class="quick-action-text">Review all flagged comments</div>
+                        <span class="quick-action-badge">12</span>
+                    </div>
+
+                    <div class="quick-action-item">
+                        <div class="quick-action-icon">📊</div>
+                        <div class="quick-action-text">Generate author report</div>
+                    </div>
+
+                    <div class="quick-action-item">
+                        <div class="quick-action-icon">👥</div>
+                        <div class="quick-action-text">Review high-risk authors</div>
+                        <span class="quick-action-badge">3</span>
+                    </div>
+
+                    <div class="quick-action-item">
+                        <div class="quick-action-icon">⚙️</div>
+                        <div class="quick-action-text">Moderation settings</div>
+                    </div>
+                </div>
+
+                <!-- Top Authors by Activity -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>📈 Most Active Authors</h3>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="author-stat-item">
+                        <div class="author-stat-info">
+                            <div class="author-stat-avatar">SC</div>
+                            <span class="author-stat-name">Sarah Chen</span>
+                        </div>
+                        <span class="author-stat-value">24 posts</span>
+                    </div>
+
+                    <div class="author-stat-item">
+                        <div class="author-stat-info">
+                            <div class="author-stat-avatar">TP</div>
+                            <span class="author-stat-name">Tom Parker</span>
+                        </div>
+                        <span class="author-stat-value">22 posts</span>
+                    </div>
+
+                    <div class="author-stat-item">
+                        <div class="author-stat-info">
+                            <div class="author-stat-avatar">MJ</div>
+                            <span class="author-stat-name">Mike Johnson</span>
+                        </div>
+                        <span class="author-stat-value">18 posts</span>
+                    </div>
+
+                    <div class="author-stat-item">
+                        <div class="author-stat-info">
+                            <div class="author-stat-avatar">AR</div>
+                            <span class="author-stat-name">Alex Rivera</span>
+                        </div>
+                        <span class="author-stat-value">15 posts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Posts</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>👥</span>
+            <span>Authors</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🚩</span>
+            <span>Flagged</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Admin</span>
+        </div>
+    </nav>
+</body>
+
+</html>

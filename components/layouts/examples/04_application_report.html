@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Define Report Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 320px;
+            --nav-height: 60px;
+            --form-width: 800px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* SQL colors */
+            --sql-keyword: #3b82f6;
+            --sql-function: #8b5cf6;
+            --sql-string: #10b981;
+            --sql-number: #f59e0b;
+            --sql-comment: #9ca3af;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Define Report Content */
+        .define-report-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Define Report Form */
+        .define-report-form {
+            max-width: var(--form-width);
+            width: 100%;
+        }
+
+        /* Two Column Layout for Report Definition */
+        .report-definition-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            align-items: start;
+        }
+
+        /* Left Column - Report Configuration */
+        .report-config {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        /* Right Column - SQL Editor */
+        .sql-editor-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-xs);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        /* Predefined Reports */
+        .predefined-reports {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .predefined-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .predefined-card:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .predefined-card.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .predefined-card__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-sm);
+        }
+
+        .predefined-card__title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .predefined-card__desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* SQL Editor */
+        .sql-editor {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: var(--space-md);
+        }
+
+        .sql-editor__header {
+            background: var(--bg-secondary);
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sql-editor__title {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sql-editor__actions {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .sql-editor__content {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            padding: var(--space-md);
+            min-height: 300px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .sql-keyword { color: #93c5fd; }
+        .sql-function { color: #c4b5fd; }
+        .sql-string { color: #6ee7b7; }
+        .sql-number { color: #fcd34d; }
+        .sql-comment { color: #94a3b8; }
+
+        .sql-preview {
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        /* Schedule Options */
+        .schedule-options {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-lg);
+        }
+
+        .schedule-toggle {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .schedule-btn {
+            flex: 1;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .schedule-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Schedule Types */
+        .schedule-type {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .schedule-type:hover {
+            background: var(--bg-secondary);
+        }
+
+        .schedule-type.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .schedule-type__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .schedule-type__info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .schedule-type__info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Recipients */
+        .recipients-list {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-sm);
+        }
+
+        .recipient-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recipient-item:last-child {
+            border-bottom: none;
+        }
+
+        .recipient-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .recipient-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .recipient-email {
+            font-size: 0.85rem;
+        }
+
+        .recipient-remove {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .add-recipient {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: var(--space-sm);
+        }
+
+        .add-recipient input {
+            flex: 1;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .template-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .template-item:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .template-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .template-desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .db-schema-item {
+            font-family: monospace;
+            font-size: 0.85rem;
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            margin-bottom: 2px;
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .report-definition-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .define-report-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .predefined-reports {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .define-report-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .report-config { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .sql-editor-section { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(255, 159, 64, 0.1); }
+
+        /* Component debug */
+        .debug-layout .form-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .debug-layout .form-section::before {
+            content: "form-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .predefined-card.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .schedule-type.selected {
+            background: rgba(75, 192, 192, 0.3);
+            border: 2px dashed #4bc0c0;
+        }
+
+        .debug-layout .sql-editor__content {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px dashed #ff6384;
+        }
+
+        .debug-layout .template-item {
+            background: rgba(255, 99, 132, 0.1);
+            border: 1px dashed #ff6384;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#" class="active">Reports</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">3</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">REPORT ACTIONS</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">➕</span>
+                    <span>Define New Report</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Saved Reports</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📅</span>
+                    <span>Scheduled</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Define Report Content -->
+        <main class="define-report-content">
+            <div class="define-report-form">
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Define New Report</h1>
+                    <p>Create a custom report using predefined templates or custom SQL</p>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="report-definition-grid">
+                    <!-- Left Column - Report Configuration -->
+                    <div class="report-config">
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <div class="form-section-title">Basic Information</div>
+                            
+                            <div class="form-row">
+                                <label class="form-label">Report Name <span>*</span></label>
+                                <input type="text" class="form-input" placeholder="e.g., Monthly Project Progress" value="Q4 Project Performance">
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-textarea" placeholder="Describe what this report shows...">Comprehensive overview of project progress, task completion, and team performance for Q4 2024.</textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Category</label>
+                                <select class="form-select">
+                                    <option>Project Reports</option>
+                                    <option>Team Performance</option>
+                                    <option>Financial Reports</option>
+                                    <option>Time Tracking</option>
+                                    <option selected>Custom Reports</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Predefined Reports -->
+                        <div class="form-section">
+                            <div class="form-section-title">Predefined Templates</div>
+                            
+                            <div class="predefined-reports">
+                                <div class="predefined-card selected">
+                                    <div class="predefined-card__icon">📊</div>
+                                    <div class="predefined-card__title">Project Progress</div>
+                                    <div class="predefined-card__desc">Tasks, milestones, completion</div>
+                                </div>
+                                <div class="predefined-card">
+                                    <div class="predefined-card__icon">👥</div>
+                                    <div class="predefined-card__title">Team Performance</div>
+                                    <div class="predefined-card__desc">Productivity, velocity, allocation</div>
+                                </div>
+                                <div class="predefined-card">
+                                    <div class="predefined-card__icon">💰</div>
+                                    <div class="predefined-card__title">Budget Report</div>
+                                    <div class="predefined-card__desc">Spending, forecasts, variance</div>
+                                </div>
+                                <div class="predefined-card">
+                                    <div class="predefined-card__icon">⏱️</div>
+                                    <div class="predefined-card__title">Time Tracking</div>
+                                    <div class="predefined-card__desc">Hours logged, estimates</div>
+                                </div>
+                            </div>
+
+                            <div class="form-hint">Select a template to pre-fill the SQL query</div>
+                        </div>
+
+                        <!-- Schedule Options -->
+                        <div class="form-section">
+                            <div class="form-section-title">Scheduling</div>
+                            
+                            <div class="schedule-toggle">
+                                <button class="schedule-btn active">Run Once</button>
+                                <button class="schedule-btn">Schedule</button>
+                                <button class="schedule-btn">Recurring</button>
+                            </div>
+
+                            <div class="schedule-options">
+                                <div class="schedule-grid">
+                                    <div class="schedule-type selected">
+                                        <div class="schedule-type__icon">📅</div>
+                                        <div class="schedule-type__info">
+                                            <h4>Daily</h4>
+                                            <p>Every day at 9:00 AM</p>
+                                        </div>
+                                    </div>
+                                    <div class="schedule-type">
+                                        <div class="schedule-type__icon">📆</div>
+                                        <div class="schedule-type__info">
+                                            <h4>Weekly</h4>
+                                            <p>Every Monday</p>
+                                        </div>
+                                    </div>
+                                    <div class="schedule-type">
+                                        <div class="schedule-type__icon">📊</div>
+                                        <div class="schedule-type__info">
+                                            <h4>Monthly</h4>
+                                            <p>1st of each month</p>
+                                        </div>
+                                    </div>
+                                    <div class="schedule-type">
+                                        <div class="schedule-type__icon">📈</div>
+                                        <div class="schedule-type__info">
+                                            <h4>Quarterly</h4>
+                                            <p>Jan, Apr, Jul, Oct</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: var(--space-md);">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" class="form-input" value="2025-01-01">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recipients -->
+                        <div class="form-section">
+                            <div class="form-section-title">Email Recipients</div>
+                            
+                            <div class="recipients-list">
+                                <div class="recipient-item">
+                                    <div class="recipient-info">
+                                        <div class="recipient-avatar">SC</div>
+                                        <span class="recipient-email">sarah.chen@company.com</span>
+                                    </div>
+                                    <span class="recipient-remove">✕</span>
+                                </div>
+                                <div class="recipient-item">
+                                    <div class="recipient-info">
+                                        <div class="recipient-avatar">MJ</div>
+                                        <span class="recipient-email">mike.johnson@company.com</span>
+                                    </div>
+                                    <span class="recipient-remove">✕</span>
+                                </div>
+                                <div class="recipient-item">
+                                    <div class="recipient-info">
+                                        <div class="recipient-avatar">EW</div>
+                                        <span class="recipient-email">emma.watson@company.com</span>
+                                    </div>
+                                    <span class="recipient-remove">✕</span>
+                                </div>
+                            </div>
+
+                            <div class="add-recipient">
+                                <input type="email" placeholder="Enter email address">
+                                <button class="btn small">Add</button>
+                            </div>
+
+                            <div style="margin-top: var(--space-sm);">
+                                <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                    <input type="checkbox" checked> Include CSV attachment
+                                </label>
+                                <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                    <input type="checkbox"> Include chart images
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - SQL Editor -->
+                    <div class="sql-editor-section">
+                        <div class="form-section-title">SQL Query</div>
+                        
+                        <!-- SQL Editor -->
+                        <div class="sql-editor">
+                            <div class="sql-editor__header">
+                                <span class="sql-editor__title">Query Editor</span>
+                                <div class="sql-editor__actions">
+                                    <button class="btn small">Format</button>
+                                    <button class="btn small">Validate</button>
+                                    <button class="btn small primary">Run</button>
+                                </div>
+                            </div>
+                            <div class="sql-editor__content">
+                                <span class="sql-keyword">SELECT</span><br>
+                                &nbsp;&nbsp;p.project_name,<br>
+                                &nbsp;&nbsp;COUNT(t.id) <span class="sql-keyword">AS</span> total_tasks,<br>
+                                &nbsp;&nbsp;<span class="sql-function">SUM</span>(<span class="sql-keyword">CASE WHEN</span> t.status = 'completed' <span class="sql-keyword">THEN</span> 1 <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) <span class="sql-keyword">AS</span> completed_tasks,<br>
+                                &nbsp;&nbsp;<span class="sql-function">ROUND</span>(<span class="sql-function">AVG</span>(t.story_points), 2) <span class="sql-keyword">AS</span> avg_story_points,<br>
+                                &nbsp;&nbsp;p.budget,<br>
+                                &nbsp;&nbsp;<span class="sql-function">SUM</span>(t.actual_hours) <span class="sql-keyword">AS</span> hours_logged,<br>
+                                &nbsp;&nbsp;p.start_date,<br>
+                                &nbsp;&nbsp;p.end_date,<br>
+                                &nbsp;&nbsp;<span class="sql-function">DATEDIFF</span>(day, p.start_date, p.end_date) <span class="sql-keyword">AS</span> total_days<br>
+                                <span class="sql-keyword">FROM</span> projects p<br>
+                                <span class="sql-keyword">LEFT JOIN</span> tasks t <span class="sql-keyword">ON</span> p.id = t.project_id<br>
+                                <span class="sql-keyword">WHERE</span> p.status = 'active'<br>
+                                &nbsp;&nbsp;<span class="sql-keyword">AND</span> p.start_date >= <span class="sql-string">'2024-10-01'</span><br>
+                                &nbsp;&nbsp;<span class="sql-keyword">AND</span> p.end_date &lt;= <span class="sql-string">'2024-12-31'</span><br>
+                                <span class="sql-keyword">GROUP BY</span> p.id, p.project_name, p.budget, p.start_date, p.end_date<br>
+                                <span class="sql-keyword">ORDER BY</span> completed_tasks <span class="sql-keyword">DESC</span>;
+                            </div>
+                        </div>
+
+                        <!-- Query Preview -->
+                        <div class="sql-preview">
+                            <span>🔍</span>
+                            <span>Estimated rows: 24 | Execution time: ~1.2s</span>
+                        </div>
+
+                        <!-- Parameters -->
+                        <div style="margin-top: var(--space-lg);">
+                            <div class="form-section-title">Query Parameters</div>
+                            
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: var(--space-sm);">
+                                <div>
+                                    <label class="form-label">Date Range</label>
+                                    <select class="form-select">
+                                        <option>Last 30 days</option>
+                                        <option>Last quarter</option>
+                                        <option selected>Custom range</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Project</label>
+                                    <select class="form-select">
+                                        <option>All projects</option>
+                                        <option>Mobile App</option>
+                                        <option>Website Redesign</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Saved Queries -->
+                        <div style="margin-top: var(--space-lg);">
+                            <div class="form-section-title">Saved Queries</div>
+                            
+                            <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap;">
+                                <span class="report-tag" style="cursor: pointer;">Project Summary</span>
+                                <span class="report-tag" style="cursor: pointer;">Team Velocity</span>
+                                <span class="report-tag" style="cursor: pointer;">Budget vs Actual</span>
+                                <span class="report-tag" style="cursor: pointer;">Task Completion</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button class="btn outline">Cancel</button>
+                    <button class="btn outline">Test Query</button>
+                    <button class="btn">Save as Draft</button>
+                    <button class="btn primary">Create Report</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Report Templates</h3>
+                    <a href="#">Browse</a>
+                </div>
+                
+                <div class="template-item">
+                    <div class="template-icon">📊</div>
+                    <div class="template-info">
+                        <div class="template-name">Project Dashboard</div>
+                        <div class="template-desc">Overview of all projects</div>
+                    </div>
+                </div>
+
+                <div class="template-item">
+                    <div class="template-icon">👥</div>
+                    <div class="template-info">
+                        <div class="template-name">Team Performance</div>
+                        <div class="template-desc">Member productivity</div>
+                    </div>
+                </div>
+
+                <div class="template-item">
+                    <div class="template-icon">💰</div>
+                    <div class="template-info">
+                        <div class="template-name">Financial Summary</div>
+                        <div class="template-desc">Budget tracking</div>
+                    </div>
+                </div>
+
+                <div class="template-item">
+                    <div class="template-icon">⏱️</div>
+                    <div class="template-info">
+                        <div class="template-name">Time Analytics</div>
+                        <div class="template-desc">Hours and estimates</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Database Schema</h3>
+                </div>
+                
+                <div class="db-schema-item">📁 projects (id, name, status)</div>
+                <div class="db-schema-item">📁 tasks (id, project_id, title)</div>
+                <div class="db-schema-item">📁 users (id, name, email, role)</div>
+                <div class="db-schema-item">📁 time_entries (id, task_id)</div>
+                <div class="db-schema-item">📁 budgets (project_id, amount)</div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Query Examples</h3>
+                </div>
+                
+                <div style="font-family: monospace; font-size: 0.75rem; background: var(--bg-secondary); padding: var(--space-sm); border-radius: 6px;">
+                    <div style="color: var(--sql-keyword);">SELECT</div>
+                    <div style="margin-left: var(--space-sm);">COUNT(*) as total,</div>
+                    <div style="margin-left: var(--space-sm);">status</div>
+                    <div style="color: var(--sql-keyword);">FROM</div>
+                    <div style="margin-left: var(--space-sm);">tasks</div>
+                    <div style="color: var(--sql-keyword);">GROUP BY</div>
+                    <div style="margin-left: var(--space-sm);">status;</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📑</span>
+            <span>Reports</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>📋</span>
+            <span>Templates</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

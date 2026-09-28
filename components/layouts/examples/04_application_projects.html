@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Projects Page Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 300px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Projects List */
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .project-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .project-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .project-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .project-color.blue { background: var(--accent); }
+        .project-color.purple { background: var(--purple); }
+        .project-color.pink { background: var(--pink); }
+        .project-color.green { background: var(--success); }
+        .project-color.orange { background: var(--orange); }
+        .project-color.teal { background: var(--teal); }
+
+        /* Main Content */
+        .app-layout__content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: var(--space-xs);
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            background: var(--bg-primary);
+            padding: var(--space-xs);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-tab {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .filter-select {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Project Card */
+        .project-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .project-card__header {
+            height: 80px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            padding: var(--space-md);
+        }
+
+        .project-card__color-blue { background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%); }
+        .project-card__color-purple { background: linear-gradient(135deg, var(--purple) 0%, #7c3aed 100%); }
+        .project-card__color-pink { background: linear-gradient(135deg, var(--pink) 0%, #db2777 100%); }
+        .project-card__color-green { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); }
+        .project-card__color-orange { background: linear-gradient(135deg, var(--orange) 0%, #ea580c 100%); }
+        .project-card__color-teal { background: linear-gradient(135deg, var(--teal) 0%, #0d9488 100%); }
+
+        .project-card__favorite {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        .project-card__favorite:hover {
+            opacity: 1;
+        }
+
+        .project-card__content {
+            padding: var(--space-lg);
+        }
+
+        .project-card__title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .project-card__description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+            line-height: 1.5;
+        }
+
+        .project-card__meta {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .project-card__meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .project-card__progress {
+            margin-bottom: var(--space-md);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .progress-fill.blue { background: var(--accent); }
+        .progress-fill.purple { background: var(--purple); }
+        .progress-fill.pink { background: var(--pink); }
+        .progress-fill.green { background: var(--success); }
+
+        .project-card__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .project-team {
+            display: flex;
+            align-items: center;
+        }
+
+        .team-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 2px solid white;
+            margin-right: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .team-avatar:first-child {
+            margin-right: 0;
+        }
+
+        .project-deadline {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .deadline-urgent {
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .panel-section__header a {
+            color: var(--accent);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        /* Recent Projects */
+        .recent-project-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            cursor: pointer;
+        }
+
+        .recent-project-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .recent-project-info {
+            flex: 1;
+        }
+
+        .recent-project-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .recent-project-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .recent-project-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Activity Item */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .activity-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content p {
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+
+        .activity-content .project-name {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .activity-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Team Member */
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .member-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .member-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .member-status.busy {
+            background: var(--warning);
+        }
+
+        .member-status.offline {
+            background: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-layout__content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filter-actions {
+                width: 100%;
+            }
+
+            .filter-select {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .filter-tabs {
+                overflow-x: auto;
+                padding: var(--space-xs);
+            }
+
+            .filter-tab {
+                white-space: nowrap;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .app-layout__content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(75, 192, 192, 0.1); }
+        .debug-layout .app-layout__mobile-nav { background: rgba(153, 102, 255, 0.2); }
+
+        /* Component debug */
+        .debug-layout .project-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .project-card::before {
+            content: "project-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            z-index: 100;
+        }
+
+        .debug-layout .filter-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            position: relative;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#" class="active">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Reports</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search projects...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">3</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                    <span class="nav-item__badge">12</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                    <span class="nav-item__badge">5</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">PROJECTS</div>
+                <div class="project-item active">
+                    <span class="project-color blue"></span>
+                    <span>All Projects</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color purple"></span>
+                    <span>Mobile App</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color pink"></span>
+                    <span>Website Redesign</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color green"></span>
+                    <span>API Integration</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color orange"></span>
+                    <span>Marketing Site</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color teal"></span>
+                    <span>Database Migration</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">TEAM</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Members</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">💬</span>
+                    <span>Messages</span>
+                    <span class="nav-item__badge">3</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-layout__content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Projects</h1>
+                    <p>Manage and track all your ongoing projects</p>
+                </div>
+                <div class="content-header__actions">
+                    <button class="btn">📤 Import</button>
+                    <button class="btn primary">+ New Project</button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <span class="filter-tab active">All Projects</span>
+                    <span class="filter-tab">Active</span>
+                    <span class="filter-tab">On Hold</span>
+                    <span class="filter-tab">Completed</span>
+                    <span class="filter-tab">Archived</span>
+                </div>
+                <div class="filter-actions">
+                    <select class="filter-select">
+                        <option>Sort by: Recent</option>
+                        <option>Sort by: Name</option>
+                        <option>Sort by: Progress</option>
+                        <option>Sort by: Deadline</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>Filter by: All</option>
+                        <option>Filter by: My Projects</option>
+                        <option>Filter by: Team</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card">
+                    <div class="project-card__header project-card__color-blue">
+                        <span class="project-card__favorite">☆</span>
+                    </div>
+                    <div class="project-card__content">
+                        <h3 class="project-card__title">Mobile App Development</h3>
+                        <p class="project-card__description">Build cross-platform mobile app for iOS and Android using React Native</p>
+                        
+                        <div class="project-card__meta">
+                            <span class="project-card__meta-item">📅 Due Dec 15</span>
+                            <span class="project-card__meta-item">👥 6 members</span>
+                        </div>
+
+                        <div class="project-card__progress">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill blue" style="width: 75%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="project-card__footer">
+                            <div class="project-team">
+                                <div class="team-avatar" style="background: #dbeafe; color: var(--accent);">SC</div>
+                                <div class="team-avatar" style="background: #fce7f3; color: var(--pink);">AR</div>
+                                <div class="team-avatar" style="background: #d1fae5; color: var(--success);">MJ</div>
+                                <div class="team-avatar" style="background: #fed7aa; color: var(--orange);">+3</div>
+                            </div>
+                            <div class="project-deadline">
+                                <span>⏱️</span>
+                                <span class="deadline-urgent">12 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card">
+                    <div class="project-card__header project-card__color-purple">
+                        <span class="project-card__favorite">★</span>
+                    </div>
+                    <div class="project-card__content">
+                        <h3 class="project-card__title">Website Redesign</h3>
+                        <p class="project-card__description">Redesign company website with modern UI/UX and improved performance</p>
+                        
+                        <div class="project-card__meta">
+                            <span class="project-card__meta-item">📅 Due Jan 20</span>
+                            <span class="project-card__meta-item">👥 4 members</span>
+                        </div>
+
+                        <div class="project-card__progress">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span>45%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill purple" style="width: 45%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="project-card__footer">
+                            <div class="project-team">
+                                <div class="team-avatar" style="background: #fce7f3; color: var(--pink);">EW</div>
+                                <div class="team-avatar" style="background: #d1fae5; color: var(--success);">MJ</div>
+                                <div class="team-avatar" style="background: #dbeafe; color: var(--accent);">+2</div>
+                            </div>
+                            <div class="project-deadline">
+                                <span>⏱️</span>
+                                <span>28 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card">
+                    <div class="project-card__header project-card__color-pink">
+                        <span class="project-card__favorite">☆</span>
+                    </div>
+                    <div class="project-card__content">
+                        <h3 class="project-card__title">API Integration</h3>
+                        <p class="project-card__description">Integrate third-party APIs for payment, mapping, and analytics</p>
+                        
+                        <div class="project-card__meta">
+                            <span class="project-card__meta-item">📅 Due Dec 5</span>
+                            <span class="project-card__meta-item">👥 3 members</span>
+                        </div>
+
+                        <div class="project-card__progress">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill pink" style="width: 90%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="project-card__footer">
+                            <div class="project-team">
+                                <div class="team-avatar" style="background: #d1fae5; color: var(--success);">AR</div>
+                                <div class="team-avatar" style="background: #fed7aa; color: var(--orange);">MJ</div>
+                                <div class="team-avatar" style="background: #fce7f3; color: var(--pink);">+1</div>
+                            </div>
+                            <div class="project-deadline">
+                                <span>⏱️</span>
+                                <span class="deadline-urgent">3 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card">
+                    <div class="project-card__header project-card__color-green">
+                        <span class="project-card__favorite">☆</span>
+                    </div>
+                    <div class="project-card__content">
+                        <h3 class="project-card__title">Database Migration</h3>
+                        <p class="project-card__description">Migrate legacy database to new PostgreSQL cluster with zero downtime</p>
+                        
+                        <div class="project-card__meta">
+                            <span class="project-card__meta-item">📅 Due Feb 10</span>
+                            <span class="project-card__meta-item">👥 4 members</span>
+                        </div>
+
+                        <div class="project-card__progress">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span>30%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill green" style="width: 30%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="project-card__footer">
+                            <div class="project-team">
+                                <div class="team-avatar" style="background: #dbeafe; color: var(--accent);">MJ</div>
+                                <div class="team-avatar" style="background: #d1fae5; color: var(--success);">SC</div>
+                                <div class="team-avatar" style="background: #fce7f3; color: var(--pink);">+2</div>
+                            </div>
+                            <div class="project-deadline">
+                                <span>⏱️</span>
+                                <span>45 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="project-card">
+                    <div class="project-card__header project-card__color-orange">
+                        <span class="project-card__favorite">★</span>
+                    </div>
+                    <div class="project-card__content">
+                        <h3 class="project-card__title">Marketing Campaign</h3>
+                        <p class="project-card__description">Q1 marketing campaign including social media, email, and content</p>
+                        
+                        <div class="project-card__meta">
+                            <span class="project-card__meta-item">📅 Due Jan 5</span>
+                            <span class="project-card__meta-item">👥 5 members</span>
+                        </div>
+
+                        <div class="project-card__progress">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill orange" style="width: 60%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="project-card__footer">
+                            <div class="project-team">
+                                <div class="team-avatar" style="background: #fed7aa; color: var(--orange);">EW</div>
+                                <div class="team-avatar" style="background: #fce7f3; color: var(--pink);">AR</div>
+                                <div class="team-avatar" style="background: #d1fae5; color: var(--success);">+3</div>
+                            </div>
+                            <div class="project-deadline">
+                                <span>⏱️</span>
+                                <span>12 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <div class="project-card">
+                    <div class="project-card__header project-card__color-teal">
+                        <span class="project-card__favorite">☆</span>
+                    </div>
+                    <div class="project-card__content">
+                        <h3 class="project-card__title">Security Audit</h3>
+                        <p class="project-card__description">Comprehensive security audit and penetration testing</p>
+                        
+                        <div class="project-card__meta">
+                            <span class="project-card__meta-item">📅 Due Dec 20</span>
+                            <span class="project-card__meta-item">👥 3 members</span>
+                        </div>
+
+                        <div class="project-card__progress">
+                            <div class="progress-header">
+                                <span>Progress</span>
+                                <span>15%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill teal" style="width: 15%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="project-card__footer">
+                            <div class="project-team">
+                                <div class="team-avatar" style="background: #dbeafe; color: var(--accent);">SC</div>
+                                <div class="team-avatar" style="background: #d1fae5; color: var(--success);">AR</div>
+                                <div class="team-avatar" style="background: #fce7f3; color: var(--pink);">+1</div>
+                            </div>
+                            <div class="project-deadline">
+                                <span>⏱️</span>
+                                <span>24 days left</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Recent Projects</h3>
+                    <a href="#">View All</a>
+                </div>
+                
+                <div class="recent-project-item">
+                    <span class="recent-project-color blue"></span>
+                    <div class="recent-project-info">
+                        <h4>Mobile App Development</h4>
+                        <p>Updated 2 hours ago</p>
+                    </div>
+                    <span class="recent-project-time">75%</span>
+                </div>
+
+                <div class="recent-project-item">
+                    <span class="recent-project-color purple"></span>
+                    <div class="recent-project-info">
+                        <h4>Website Redesign</h4>
+                        <p>Updated yesterday</p>
+                    </div>
+                    <span class="recent-project-time">45%</span>
+                </div>
+
+                <div class="recent-project-item">
+                    <span class="recent-project-color pink"></span>
+                    <div class="recent-project-info">
+                        <h4>API Integration</h4>
+                        <p>Updated 3 days ago</p>
+                    </div>
+                    <span class="recent-project-time">90%</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Recent Activity</h3>
+                    <a href="#">View All</a>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-avatar">SC</div>
+                    <div class="activity-content">
+                        <p><span class="project-name">Mobile App:</span> Completed UI design</p>
+                        <span class="activity-time">2 hours ago</span>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">AR</div>
+                    <div class="activity-content">
+                        <p><span class="project-name">API Integration:</span> Deployed to staging</p>
+                        <span class="activity-time">5 hours ago</span>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">MJ</div>
+                    <div class="activity-content">
+                        <p><span class="project-name">Database:</span> Created new schema</p>
+                        <span class="activity-time">1 day ago</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Team Members</h3>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-avatar" style="background: #dbeafe;">SC</div>
+                    <div class="member-info">
+                        <h4>Sarah Chen</h4>
+                        <p>Design Lead · 3 projects</p>
+                    </div>
+                    <span class="member-status"></span>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar" style="background: #fce7f3;">AR</div>
+                    <div class="member-info">
+                        <h4>Alex Rivera</h4>
+                        <p>Frontend Dev · 4 projects</p>
+                    </div>
+                    <span class="member-status"></span>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar" style="background: #d1fae5;">MJ</div>
+                    <div class="member-info">
+                        <h4>Mike Johnson</h4>
+                        <p>Backend Dev · 3 projects</p>
+                    </div>
+                    <span class="member-status busy"></span>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar" style="background: #fed7aa;">EW</div>
+                    <div class="member-info">
+                        <h4>Emma Watson</h4>
+                        <p>Product Manager · 5 projects</p>
+                    </div>
+                    <span class="member-status offline"></span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>👥</span>
+            <span>Team</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🔔</span>
+            <span>Alerts</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

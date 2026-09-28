@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Stats - Understanding React Hooks | DevBlog</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 300px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Chart colors */
+            --chart-views: #3b82f6;
+            --chart-readers: #10b981;
+            --chart-comments: #f59e0b;
+            --chart-likes: #ec4899;
+            --chart-shares: #8b5cf6;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a:hover {
+            color: var(--accent);
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        /* Post Header */
+        .post-header {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .post-category {
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--text-secondary);
+        }
+
+        .post-author-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .post-date {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .post-cover-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.views { background: #dbeafe; color: var(--chart-views); }
+        .stat-icon.readers { background: #d1fae5; color: var(--chart-readers); }
+        .stat-icon.comments { background: #fed7aa; color: var(--chart-comments); }
+        .stat-icon.engagement { background: #fce7f3; color: var(--chart-likes); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-trend {
+            font-size: 0.7rem;
+            margin-left: var(--space-xs);
+        }
+
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .chart-header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .legend-color.views { background: var(--chart-views); }
+        .legend-color.readers { background: var(--chart-readers); }
+        .legend-color.comments { background: var(--chart-comments); }
+
+        /* Line Chart */
+        .line-chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        .line-chart {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+
+        .chart-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 2px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .chart-bar {
+            width: 8px;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .chart-bar.views { background: var(--chart-views); }
+        .chart-bar.readers { background: var(--chart-readers); }
+
+        .chart-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Pie Chart */
+        .pie-chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xl);
+            height: 200px;
+        }
+
+        .pie-chart {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--chart-views) 0% 70%, var(--chart-readers) 70% 85%, var(--chart-comments) 85% 100%);
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .pie-legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            font-size: 0.8rem;
+        }
+
+        .pie-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Demographics Section */
+        .demographics-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .demographic-group h4 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .demographic-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+
+        .demographic-label {
+            width: 80px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .demographic-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .demographic-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .demographic-value {
+            width: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Traffic Sources */
+        .sources-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .sources-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .source-name {
+            width: 100px;
+            font-size: 0.9rem;
+        }
+
+        .source-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .source-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--chart-views);
+        }
+
+        .source-value {
+            width: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Comments Table */
+        .comments-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .comments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comments-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-lg);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comments-table td {
+            padding: var(--space-sm) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .comment-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .comment-status {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-approved { background: #d1fae5; color: var(--success); }
+        .status-pending { background: #fed7aa; color: var(--warning); }
+        .status-spam { background: #fee2e2; color: var(--danger); }
+
+        /* Export Options */
+        .export-options {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: flex-end;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .demographics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .post-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .post-meta {
+                justify-content: center;
+            }
+
+            .post-author {
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comments-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .export-options {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .pie-chart-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .post-header { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .stats-grid { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .charts-row { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .demographics-section { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .chart-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .chart-bar {
+            border: 1px dashed currentColor;
+        }
+
+        .debug-layout .pie-chart {
+            border: 2px dashed #4bc0c0;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <a href="#" class="blog-layout__logo">📝 DevBlog</a>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Analytics</a>
+                <a href="#" class="active">Stats</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">SC</div>
+                <span>Sarah Chen ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Post Statistics</h1>
+                <p>Detailed analytics for "Understanding React Hooks: A Deep Dive"</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">📅 Last 30 days</button>
+                <button class="btn outline">📊 Export</button>
+            </div>
+        </div>
+
+        <!-- Post Header -->
+        <div class="post-header">
+            <div class="post-info">
+                <div class="post-meta">
+                    <span class="post-category">React</span>
+                    <span>Published: Dec 15, 2024</span>
+                    <span>Updated: 2 days ago</span>
+                </div>
+                <h2 class="post-title">Understanding React Hooks: A Deep Dive</h2>
+                <div class="post-author">
+                    <div class="post-author-avatar">SC</div>
+                    <span>Sarah Chen</span>
+                    <span class="post-date">📅 12 min read</span>
+                </div>
+            </div>
+            <div class="post-cover-image">⚛️</div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon views">👁️</div>
+                <div class="stat-content">
+                    <h3>Total Views</h3>
+                    <div>
+                        <span class="value">12,345</span>
+                        <span class="stat-trend up">↑ 12.3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon readers">👥</div>
+                <div class="stat-content">
+                    <h3>Unique Readers</h3>
+                    <div>
+                        <span class="value">8,901</span>
+                        <span class="stat-trend up">↑ 8.1%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon comments">💬</div>
+                <div class="stat-content">
+                    <h3>Comments</h3>
+                    <div>
+                        <span class="value">45</span>
+                        <span class="stat-trend down">↓ 3.2%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon engagement">❤️</div>
+                <div class="stat-content">
+                    <h3>Engagement Rate</h3>
+                    <div>
+                        <span class="value">8.2%</span>
+                        <span class="stat-trend up">↑ 1.2%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <!-- Views Over Time -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Views Over Time</h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color views"></span>
+                            <span>Views</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color readers"></span>
+                            <span>Readers</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="line-chart-container">
+                    <div class="line-chart">
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 40px;"></div>
+                                <div class="chart-bar readers" style="height: 30px;"></div>
+                            </div>
+                            <span class="chart-label">Mon</span>
+                        </div>
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 60px;"></div>
+                                <div class="chart-bar readers" style="height: 45px;"></div>
+                            </div>
+                            <span class="chart-label">Tue</span>
+                        </div>
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 80px;"></div>
+                                <div class="chart-bar readers" style="height: 60px;"></div>
+                            </div>
+                            <span class="chart-label">Wed</span>
+                        </div>
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 100px;"></div>
+                                <div class="chart-bar readers" style="height: 75px;"></div>
+                            </div>
+                            <span class="chart-label">Thu</span>
+                        </div>
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 120px;"></div>
+                                <div class="chart-bar readers" style="height: 90px;"></div>
+                            </div>
+                            <span class="chart-label">Fri</span>
+                        </div>
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 90px;"></div>
+                                <div class="chart-bar readers" style="height: 70px;"></div>
+                            </div>
+                            <span class="chart-label">Sat</span>
+                        </div>
+                        <div class="chart-column">
+                            <div class="chart-bars">
+                                <div class="chart-bar views" style="height: 70px;"></div>
+                                <div class="chart-bar readers" style="height: 55px;"></div>
+                            </div>
+                            <span class="chart-label">Sun</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Engagement Breakdown -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Engagement Breakdown</h3>
+                </div>
+                <div class="pie-chart-container">
+                    <div class="pie-chart"></div>
+                    <div class="pie-legend">
+                        <div class="pie-legend-item">
+                            <span class="pie-color" style="background: var(--chart-views);"></span>
+                            <span>Views: 12.3K (70%)</span>
+                        </div>
+                        <div class="pie-legend-item">
+                            <span class="pie-color" style="background: var(--chart-readers);"></span>
+                            <span>Readers: 8.9K (15%)</span>
+                        </div>
+                        <div class="pie-legend-item">
+                            <span class="pie-color" style="background: var(--chart-comments);"></span>
+                            <span>Comments: 45 (15%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demographics Section -->
+        <div class="demographics-section">
+            <div class="chart-header">
+                <h3>Reader Demographics</h3>
+            </div>
+            <div class="demographics-grid">
+                <!-- By Location -->
+                <div class="demographic-group">
+                    <h4>By Location</h4>
+                    <div class="demographic-item">
+                        <span class="demographic-label">United States</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 45%; background: var(--chart-views);"></div>
+                        </div>
+                        <span class="demographic-value">45%</span>
+                    </div>
+                    <div class="demographic-item">
+                        <span class="demographic-label">Europe</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 30%; background: var(--chart-readers);"></div>
+                        </div>
+                        <span class="demographic-value">30%</span>
+                    </div>
+                    <div class="demographic-item">
+                        <span class="demographic-label">Asia</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 15%; background: var(--chart-comments);"></div>
+                        </div>
+                        <span class="demographic-value">15%</span>
+                    </div>
+                    <div class="demographic-item">
+                        <span class="demographic-label">Other</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 10%; background: var(--chart-likes);"></div>
+                        </div>
+                        <span class="demographic-value">10%</span>
+                    </div>
+                </div>
+
+                <!-- By Device -->
+                <div class="demographic-group">
+                    <h4>By Device</h4>
+                    <div class="demographic-item">
+                        <span class="demographic-label">Desktop</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 55%; background: var(--chart-views);"></div>
+                        </div>
+                        <span class="demographic-value">55%</span>
+                    </div>
+                    <div class="demographic-item">
+                        <span class="demographic-label">Mobile</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 35%; background: var(--chart-readers);"></div>
+                        </div>
+                        <span class="demographic-value">35%</span>
+                    </div>
+                    <div class="demographic-item">
+                        <span class="demographic-label">Tablet</span>
+                        <div class="demographic-bar">
+                            <div class="demographic-fill" style="width: 10%; background: var(--chart-comments);"></div>
+                        </div>
+                        <span class="demographic-value">10%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Traffic Sources -->
+        <div class="sources-section">
+            <div class="chart-header">
+                <h3>Traffic Sources</h3>
+            </div>
+            <div class="sources-list">
+                <div class="source-item">
+                    <span class="source-name">Direct</span>
+                    <div class="source-bar">
+                        <div class="source-fill" style="width: 40%;"></div>
+                    </div>
+                    <span class="source-value">40%</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-name">Search</span>
+                    <div class="source-bar">
+                        <div class="source-fill" style="width: 35%; background: var(--chart-readers);"></div>
+                    </div>
+                    <span class="source-value">35%</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-name">Social</span>
+                    <div class="source-bar">
+                        <div class="source-fill" style="width: 15%; background: var(--chart-comments);"></div>
+                    </div>
+                    <span class="source-value">15%</span>
+                </div>
+                <div class="source-item">
+                    <span class="source-name">Referral</span>
+                    <div class="source-bar">
+                        <div class="source-fill" style="width: 10%; background: var(--chart-likes);"></div>
+                    </div>
+                    <span class="source-value">10%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments Table -->
+        <div class="comments-section">
+            <div class="section-header">
+                <h3>Recent Comments</h3>
+                <button class="btn small outline">View All</button>
+            </div>
+
+            <table class="comments-table">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th>Comment</th>
+                        <th>Date</th>
+                        <th>Likes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="comment-author">
+                                <div class="comment-avatar">MJ</div>
+                                <span>Mike Johnson</span>
+                            </div>
+                        </td>
+                        <td>Great explanation! This really helped me understand hooks better.</td>
+                        <td>2h ago</td>
+                        <td>12</td>
+                        <td><span class="comment-status status-approved">Approved</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="comment-author">
+                                <div class="comment-avatar">AR</div>
+                                <span>Alex Rivera</span>
+                            </div>
+                        </td>
+                        <td>Could you do a follow-up on custom hooks?</td>
+                        <td>5h ago</td>
+                        <td>8</td>
+                        <td><span class="comment-status status-approved">Approved</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="comment-author">
+                                <div class="comment-avatar">EW</div>
+                                <span>Emma Watson</span>
+                            </div>
+                        </td>
+                        <td>This is exactly what I needed for my project. Thanks!</td>
+                        <td>1d ago</td>
+                        <td>24</td>
+                        <td><span class="comment-status status-approved">Approved</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="comment-author">
+                                <div class="comment-avatar">??</div>
+                                <span>John Doe</span>
+                            </div>
+                        </td>
+                        <td>Check out my website for cheap products...</td>
+                        <td>2d ago</td>
+                        <td>0</td>
+                        <td><span class="comment-status status-spam">Spam</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Export Options -->
+        <div class="export-options">
+            <button class="btn outline">📊 Export as PDF</button>
+            <button class="btn outline">📈 Export as CSV</button>
+            <button class="btn primary">📧 Email Report</button>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </a>
+        <a href="#" class="mobile-nav-item active">
+            <span>📈</span>
+            <span>Stats</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </a>
+    </nav>
+</body>
+
+</html>

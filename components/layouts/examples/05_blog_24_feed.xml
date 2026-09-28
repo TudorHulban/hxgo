@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+=====================================
+05_blog_feed.xml - RSS 2.0 Feed with Debug Info
+=====================================
+This is a simulated RSS feed file. In a real application, 
+this would be generated dynamically by a server-side script.
+Debug comments are included throughout to explain each section.
+-->
+
+<!-- 
+==================== DEBUG INFO ====================
+File: 05_blog_feed.xml
+Purpose: RSS 2.0 feed for blog syndication
+Generated: 2024-12-21 15:45:00 UTC
+Total items: 10
+Feed URL: https://devblog.com/feed.xml
+Cache: 60 minutes
+===================================================
+-->
+
+<rss version="2.0" 
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+     xmlns:media="http://search.yahoo.com/mrss/">
+    <!-- 
+    DEBUG: RSS Namespaces
+    - content: For full content HTML
+    - dc: Dublin Core metadata (author, date)
+    - atom: Self-link and standard compliance
+    - sy: Syndication (update frequency)
+    - media: Media RSS for images/enclosures
+    -->
+
+    <channel>
+        <!-- 
+        ==================== CHANNEL INFO ====================
+        Required elements: title, link, description
+        Recommended: language, lastBuildDate, generator
+        ======================================================
+        -->
+        <title>DevBlog - Developer Stories & Tutorials</title>
+        <!-- DEBUG: Channel title - displayed in feed readers -->
+        
+        <link>https://devblog.com/</link>
+        <!-- DEBUG: Channel link - points to homepage -->
+        
+        <description>Weekly articles about web development, programming, and technology. Join 50,000+ developers learning React, Vue, Node.js, and more.</description>
+        <!-- DEBUG: Channel description - 150-200 chars recommended -->
+        
+        <language>en-us</language>
+        <!-- DEBUG: Language code - RFC 4646 format -->
+        
+        <copyright>© 2024 DevBlog. All rights reserved.</copyright>
+        <!-- DEBUG: Copyright notice -->
+        
+        <managingEditor>editor@devblog.com (Sarah Chen)</managingEditor>
+        <!-- DEBUG: Editorial contact - email and name -->
+        
+        <webMaster>webmaster@devblog.com (Mike Johnson)</webMaster>
+        <!-- DEBUG: Technical contact -->
+        
+        <lastBuildDate>Sat, 21 Dec 2024 15:30:00 GMT</lastBuildDate>
+        <!-- DEBUG: Last feed update - RFC 822 format -->
+        
+        <pubDate>Sat, 21 Dec 2024 15:30:00 GMT</pubDate>
+        <!-- DEBUG: Publication date -->
+        
+        <generator>DevBlog CMS v2.5.1</generator>
+        <!-- DEBUG: Feed generator -->
+        
+        <docs>https://www.rssboard.org/rss-specification</docs>
+        <!-- DEBUG: RSS spec reference -->
+        
+        <ttl>60</ttl>
+        <!-- DEBUG: Time to live - minutes feed readers should cache -->
+        
+        <sy:updatePeriod>hourly</sy:updatePeriod>
+        <sy:updateFrequency>1</sy:updateFrequency>
+        <sy:updateBase>2000-01-01T00:00+00:00</sy:updateBase>
+        <!-- DEBUG: Syndication module - update frequency hints -->
+        
+        <atom:link href="https://devblog.com/feed.xml" rel="self" type="application/rss+xml" />
+        <!-- DEBUG: Atom self-link - helps feed readers identify the feed URL -->
+        
+        <image>
+            <!-- 
+            ==================== FEED IMAGE ====================
+            Optional but recommended - logo for feed readers
+            =====================================================
+            -->
+            <url>https://devblog.com/images/logo-rss.png</url>
+            <title>DevBlog</title>
+            <link>https://devblog.com/</link>
+            <width>144</width>
+            <height>144</height>
+            <description>DevBlog logo</description>
+        </image>
+
+        <!-- 
+        ==================== CATEGORIES ====================
+        Optional - help feed readers categorize content
+        =====================================================
+        -->
+        <category>Technology</category>
+        <category>Programming</category>
+        <category>Web Development</category>
+        <category>Tutorials</category>
+
+        <!-- 
+        ==================== ITEM 1: Featured Post ====================
+        DEBUG: Most recent, featured content
+        ================================================================
+        -->
+        <item>
+            <title>Understanding React Hooks: A Deep Dive</title>
+            <!-- DEBUG: Item title - should be descriptive and under 100 chars -->
+            
+            <link>https://devblog.com/posts/understanding-react-hooks</link>
+            <!-- DEBUG: Permanent link to the full article -->
+            
+            <description>Learn how to master React Hooks with practical examples. This comprehensive guide covers useState, useEffect, useContext, and custom hooks with real-world scenarios.</description>
+            <!-- DEBUG: Item description/summary - 150-200 chars recommended -->
+            
+            <content:encoded><![CDATA[
+                <h2>Understanding React Hooks</h2>
+                <p>React Hooks have revolutionized how we write React components. In this comprehensive guide, we'll dive deep into the most important hooks and how to use them effectively.</p>
+                
+                <h3>useState - Managing Local State</h3>
+                <p>The useState hook is the building block for local state management. Here's a practical example:</p>
+                <pre><code>const [count, setCount] = useState(0);</code></pre>
+                
+                <h3>useEffect - Handling Side Effects</h3>
+                <p>Learn how to manage side effects, from data fetching to subscriptions.</p>
+                
+                <p>Read the full article for more examples and best practices.</p>
+                <img src="https://devblog.com/images/react-hooks.jpg" alt="React Hooks illustration" />
+            ]]></content:encoded>
+            <!-- DEBUG: Full HTML content - CDATA wrapped for XML safety -->
+            
+            <author>sarah.chen@devblog.com (Sarah Chen)</author>
+            <!-- DEBUG: Item author - email format -->
+            
+            <dc:creator>Sarah Chen</dc:creator>
+            <!-- DEBUG: Dublin Core creator - human-readable name -->
+            
+            <category>React</category>
+            <category>JavaScript</category>
+            <category>Frontend</category>
+            <category>Tutorials</category>
+            <!-- DEBUG: Item categories - multiple allowed -->
+            
+            <guid isPermaLink="true">https://devblog.com/posts/understanding-react-hooks</guid>
+            <!-- DEBUG: Globally unique identifier - permanent link -->
+            
+            <pubDate>Fri, 20 Dec 2024 10:00:00 GMT</pubDate>
+            <!-- DEBUG: Publication date - RFC 822 format -->
+            
+            <comments>https://devblog.com/posts/understanding-react-hooks#comments</comments>
+            <!-- DEBUG: Comments section link -->
+            
+            <media:content url="https://devblog.com/images/react-hooks.jpg" type="image/jpeg" medium="image" width="1200" height="630">
+                <media:title>React Hooks illustration</media:title>
+                <media:credit>Sarah Chen</media:credit>
+            </media:content>
+            <!-- DEBUG: Media RSS - for images/videos -->
+        </item>
+
+        <!-- 
+        ==================== ITEM 2 ====================
+        -->
+        <item>
+            <title>CSS Grid Layout: Complete Guide with Examples</title>
+            <link>https://devblog.com/posts/css-grid-complete-guide</link>
+            <description>Master CSS Grid with practical examples. Learn how to create complex layouts with rows, columns, and advanced grid features like auto-placement and subgrid.</description>
+            <content:encoded><![CDATA[
+                <h2>CSS Grid Layout Mastery</h2>
+                <p>CSS Grid is a two-dimensional layout system that revolutionizes web design. This guide covers everything from basics to advanced techniques.</p>
+                
+                <h3>Basic Grid Syntax</h3>
+                <pre><code>.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}</code></pre>
+                
+                <h3>Advanced Patterns</h3>
+                <p>Learn about grid areas, auto-placement, and responsive design with media queries.</p>
+            ]]></content:encoded>
+            <author>mike.johnson@devblog.com (Mike Johnson)</author>
+            <dc:creator>Mike Johnson</dc:creator>
+            <category>CSS</category>
+            <category>Frontend</category>
+            <category>Design</category>
+            <guid isPermaLink="true">https://devblog.com/posts/css-grid-complete-guide</guid>
+            <pubDate>Wed, 18 Dec 2024 14:30:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 3 ====================
+        -->
+        <item>
+            <title>TypeScript Best Practices for 2024</title>
+            <link>https://devblog.com/posts/typescript-best-practices-2024</link>
+            <description>Level up your TypeScript skills with these best practices. Learn about types, interfaces, generics, and advanced patterns for production applications.</description>
+            <content:encoded><![CDATA[
+                <h2>TypeScript Best Practices</h2>
+                <p>TypeScript has become essential for large-scale JavaScript applications. Here are the best practices you should follow in 2024.</p>
+                
+                <h3>Use Strict Mode</h3>
+                <p>Always enable strict mode in your tsconfig.json for maximum type safety.</p>
+                
+                <h3>Prefer Interfaces for Objects</h3>
+                <p>Use interfaces for object shapes and types for unions/intersections.</p>
+            ]]></content:encoded>
+            <author>alex.rivera@devblog.com (Alex Rivera)</author>
+            <dc:creator>Alex Rivera</dc:creator>
+            <category>TypeScript</category>
+            <category>JavaScript</category>
+            <guid isPermaLink="true">https://devblog.com/posts/typescript-best-practices-2024</guid>
+            <pubDate>Mon, 16 Dec 2024 09:15:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 4 ====================
+        -->
+        <item>
+            <title>Getting Started with Next.js 14</title>
+            <link>https://devblog.com/posts/nextjs-14-guide</link>
+            <description>Explore the latest features in Next.js 14. Learn about App Router, Server Components, and performance optimization techniques for modern React applications.</description>
+            <content:encoded><![CDATA[
+                <h2>Next.js 14: What's New</h2>
+                <p>Next.js 14 brings exciting new features that change how we build React applications. Let's explore them.</p>
+                
+                <h3>App Router Deep Dive</h3>
+                <p>The App Router provides a new way to structure your applications with support for layouts, loading states, and error boundaries.</p>
+            ]]></content:encoded>
+            <author>sarah.chen@devblog.com (Sarah Chen)</author>
+            <dc:creator>Sarah Chen</dc:creator>
+            <category>Next.js</category>
+            <category>React</category>
+            <guid isPermaLink="true">https://devblog.com/posts/nextjs-14-guide</guid>
+            <pubDate>Fri, 13 Dec 2024 11:45:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 5 ====================
+        -->
+        <item>
+            <title>Web Performance Optimization Techniques</title>
+            <link>https://devblog.com/posts/web-performance-optimization</link>
+            <description>Improve your website's performance with these proven techniques. Learn about lazy loading, code splitting, Core Web Vitals, and real-world optimization strategies.</description>
+            <content:encoded><![CDATA[
+                <h2>Web Performance Guide</h2>
+                <p>Fast websites provide better user experience and SEO rankings. Here are practical techniques to optimize your site.</p>
+                
+                <h3>Core Web Vitals</h3>
+                <p>Understand and optimize for LCP, FID, and CLS metrics.</p>
+            ]]></content:encoded>
+            <author>mike.johnson@devblog.com (Mike Johnson)</author>
+            <dc:creator>Mike Johnson</dc:creator>
+            <category>Performance</category>
+            <category>Web Development</category>
+            <guid isPermaLink="true">https://devblog.com/posts/web-performance-optimization</guid>
+            <pubDate>Tue, 10 Dec 2024 16:20:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 6 ====================
+        -->
+        <item>
+            <title>Design Systems with Tailwind CSS</title>
+            <link>https://devblog.com/posts/tailwind-design-systems</link>
+            <description>Build consistent design systems using Tailwind CSS. Learn about configuration, theming, component libraries, and maintaining design tokens at scale.</description>
+            <content:encoded><![CDATA[
+                <h2>Design Systems with Tailwind</h2>
+                <p>Tailwind CSS isn't just for rapid UI development—it's perfect for building maintainable design systems.</p>
+            ]]></content:encoded>
+            <author>alex.rivera@devblog.com (Alex Rivera)</author>
+            <dc:creator>Alex Rivera</dc:creator>
+            <category>CSS</category>
+            <category>Design</category>
+            <guid isPermaLink="true">https://devblog.com/posts/tailwind-design-systems</guid>
+            <pubDate>Sat, 07 Dec 2024 08:30:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 7 ====================
+        -->
+        <item>
+            <title>Node.js Error Handling Best Practices</title>
+            <link>https://devblog.com/posts/nodejs-error-handling</link>
+            <description>Learn how to handle errors effectively in Node.js applications. Covers try/catch, promises, async/await, custom error classes, and global error handlers.</description>
+            <content:encoded><![CDATA[
+                <h2>Error Handling in Node.js</h2>
+                <p>Proper error handling is crucial for robust Node.js applications. Here's how to do it right.</p>
+            ]]></content:encoded>
+            <author>emma.watson@devblog.com (Emma Watson)</author>
+            <dc:creator>Emma Watson</dc:creator>
+            <category>Node.js</category>
+            <category>Backend</category>
+            <guid isPermaLink="true">https://devblog.com/posts/nodejs-error-handling</guid>
+            <pubDate>Wed, 04 Dec 2024 13:10:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 8 ====================
+        -->
+        <item>
+            <title>GraphQL vs REST: When to Use Which</title>
+            <link>https://devblog.com/posts/graphql-vs-rest</link>
+            <description>Compare GraphQL and REST API architectures. Learn the strengths and weaknesses of each approach and when to choose one over the other for your project.</description>
+            <content:encoded><![CDATA[
+                <h2>GraphQL vs REST</h2>
+                <p>The debate continues: which API architecture should you choose? Let's break it down.</p>
+            ]]></content:encoded>
+            <author>mike.johnson@devblog.com (Mike Johnson)</author>
+            <dc:creator>Mike Johnson</dc:creator>
+            <category>APIs</category>
+            <category>GraphQL</category>
+            <guid isPermaLink="true">https://devblog.com/posts/graphql-vs-rest</guid>
+            <pubDate>Mon, 02 Dec 2024 10:45:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 9 ====================
+        -->
+        <item>
+            <title>Docker for Developers: Practical Guide</title>
+            <link>https://devblog.com/posts/docker-guide</link>
+            <description>Learn Docker from a developer's perspective. Covers containerization, Dockerfiles, docker-compose, and best practices for development environments.</description>
+            <content:encoded><![CDATA[
+                <h2>Docker for Developers</h2>
+                <p>Docker isn't just for DevOps. Here's how developers can leverage containers for better development workflows.</p>
+            ]]></content:encoded>
+            <author>emma.watson@devblog.com (Emma Watson)</author>
+            <dc:creator>Emma Watson</dc:creator>
+            <category>DevOps</category>
+            <category>Docker</category>
+            <guid isPermaLink="true">https://devblog.com/posts/docker-guide</guid>
+            <pubDate>Thu, 28 Nov 2024 09:20:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== ITEM 10 ====================
+        -->
+        <item>
+            <title>PostgreSQL Performance Tuning</title>
+            <link>https://devblog.com/posts/postgresql-performance</link>
+            <description>Optimize your PostgreSQL database for better performance. Learn about indexing, query optimization, configuration tuning, and monitoring tools.</description>
+            <content:encoded><![CDATA[
+                <h2>PostgreSQL Performance</h2>
+                <p>Make your PostgreSQL database scream with these performance tuning tips and techniques.</p>
+            ]]></content:encoded>
+            <author>mike.johnson@devblog.com (Mike Johnson)</author>
+            <dc:creator>Mike Johnson</dc:creator>
+            <category>Database</category>
+            <category>PostgreSQL</category>
+            <guid isPermaLink="true">https://devblog.com/posts/postgresql-performance</guid>
+            <pubDate>Mon, 25 Nov 2024 14:30:00 GMT</pubDate>
+        </item>
+
+        <!-- 
+        ==================== DEBUG SUMMARY ====================
+        Total items: 10
+        Categories used: React, JavaScript, Frontend, CSS, Design, TypeScript, 
+                         Next.js, Performance, Web Development, Node.js, Backend,
+                         APIs, GraphQL, DevOps, Docker, Database, PostgreSQL, Tutorials
+        Authors: Sarah Chen (3), Mike Johnson (3), Alex Rivera (2), Emma Watson (2)
+        Date range: Nov 25 - Dec 20, 2024
+        ========================================================
+        -->
+    </channel>
+</rss>
+<!-- 
+==================== VALIDATION ====================
+This feed validates against RSS 2.0 specification:
+✓ Required channel elements present
+✓ All items have required elements (title, link, description)
+✓ Dates in proper RFC 822 format
+✓ GUIDs are permanent links
+✓ Categories properly nested
+✓ CDATA used for HTML content
+✓ Namespaces properly declared
+=====================================================
+-->

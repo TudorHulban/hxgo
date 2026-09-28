@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | DevBlog</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a:hover {
+            color: var(--accent);
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 404 Container */
+        .not-found-container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* Error Code */
+        .error-code {
+            font-size: 12rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--accent);
+            text-shadow: 4px 4px 0 var(--accent-light), 8px 8px 0 rgba(0,0,0,0.05);
+            margin-bottom: var(--space-md);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Error Title */
+        .error-title {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        /* Error Message */
+        .error-message {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2xl);
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Search Form */
+        .search-form {
+            display: flex;
+            gap: var(--space-sm);
+            max-width: 500px;
+            margin: 0 auto var(--space-2xl);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: var(--space-md) var(--space-lg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .search-button {
+            padding: var(--space-md) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: background 0.2s;
+        }
+
+        .search-button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Quick Links */
+        .quick-links {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .quick-links h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+        }
+
+        .quick-link-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .quick-link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+            border-color: var(--accent);
+        }
+
+        .quick-link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .quick-link-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quick-link-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Popular Posts */
+        .popular-posts {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .popular-posts h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .post-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            text-decoration: none;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+            border-color: var(--accent);
+        }
+
+        .post-category {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-bottom: var(--space-sm);
+        }
+
+        .post-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.4;
+        }
+
+        .post-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Fun Facts */
+        .fun-facts {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .fun-facts h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .fact-item {
+            text-align: center;
+        }
+
+        .fact-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: var(--space-xs);
+        }
+
+        .fact-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .not-found-footer {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-top: var(--space-2xl);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+
+        .mobile-nav-item:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .links-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .posts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .facts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .error-code {
+                font-size: 8rem;
+            }
+
+            .error-title {
+                font-size: 2rem;
+            }
+
+            .error-message {
+                font-size: 1rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .facts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .error-code {
+                font-size: 6rem;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .not-found-container { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .quick-links { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .popular-posts { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .fun-facts { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .quick-link-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .post-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .fact-item {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .error-code {
+            color: #ff6384;
+            text-shadow: 4px 4px 0 #ffb0b0;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <a href="#" class="blog-layout__logo">📝 DevBlog</a>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <div class="not-found-container">
+            <!-- Error Code with Animation -->
+            <div class="error-code">404</div>
+
+            <!-- Error Title -->
+            <h1 class="error-title">Page Not Found</h1>
+
+            <!-- Error Message -->
+            <p class="error-message">
+                Oops! The page you're looking for seems to have wandered off into the digital wilderness. 
+                It might have been moved, deleted, or never existed in the first place.
+            </p>
+
+            <!-- Search Form -->
+            <div class="search-form">
+                <input type="text" class="search-input" placeholder="Search for something else..." value="react hooks">
+                <button class="search-button">
+                    <span>🔍</span>
+                    <span>Search</span>
+                </button>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="quick-links">
+                <h3>Quick Links</h3>
+                <div class="links-grid">
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">🏠</div>
+                        <div class="quick-link-title">Home</div>
+                        <div class="quick-link-desc">Back to the homepage</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">📋</div>
+                        <div class="quick-link-title">Latest Posts</div>
+                        <div class="quick-link-desc">See what's new</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">📑</div>
+                        <div class="quick-link-title">Categories</div>
+                        <div class="quick-link-desc">Browse by topic</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">🔍</div>
+                        <div class="quick-link-title">Search</div>
+                        <div class="quick-link-desc">Find what you need</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">📚</div>
+                        <div class="quick-link-title">Archive</div>
+                        <div class="quick-link-desc">All articles by date</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">🏷️</div>
+                        <div class="quick-link-title">Tags</div>
+                        <div class="quick-link-desc">Popular topics</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">📄</div>
+                        <div class="quick-link-title">About</div>
+                        <div class="quick-link-desc">Learn about us</div>
+                    </a>
+
+                    <a href="#" class="quick-link-card">
+                        <div class="quick-link-icon">📧</div>
+                        <div class="quick-link-title">Contact</div>
+                        <div class="quick-link-desc">Get in touch</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Popular Posts -->
+            <div class="popular-posts">
+                <h3>Popular Posts You Might Like</h3>
+                <div class="posts-grid">
+                    <a href="#" class="post-card">
+                        <span class="post-category">React</span>
+                        <h4 class="post-title">Understanding React Hooks: A Deep Dive</h4>
+                        <div class="post-meta">
+                            <span>👁️ 3.2K views</span>
+                            <span>💬 24 comments</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="post-card">
+                        <span class="post-category">CSS</span>
+                        <h4 class="post-title">CSS Grid Layout: Complete Guide</h4>
+                        <div class="post-meta">
+                            <span>👁️ 4.5K views</span>
+                            <span>💬 32 comments</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="post-card">
+                        <span class="post-category">TypeScript</span>
+                        <h4 class="post-title">TypeScript Best Practices 2024</h4>
+                        <div class="post-meta">
+                            <span>👁️ 2.8K views</span>
+                            <span>💬 18 comments</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="post-card">
+                        <span class="post-category">Next.js</span>
+                        <h4 class="post-title">Getting Started with Next.js 14</h4>
+                        <div class="post-meta">
+                            <span>👁️ 1.9K views</span>
+                            <span>💬 12 comments</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="post-card">
+                        <span class="post-category">Performance</span>
+                        <h4 class="post-title">Web Performance Optimization Techniques</h4>
+                        <div class="post-meta">
+                            <span>👁️ 3.1K views</span>
+                            <span>💬 21 comments</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="post-card">
+                        <span class="post-category">Design</span>
+                        <h4 class="post-title">Design Systems with Tailwind CSS</h4>
+                        <div class="post-meta">
+                            <span>👁️ 1.5K views</span>
+                            <span>💬 8 comments</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="#" class="btn btn-primary">
+                    <span>🏠</span>
+                    <span>Go to Homepage</span>
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <span>📋</span>
+                    <span>Browse Latest Posts</span>
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <span>📧</span>
+                    <span>Contact Support</span>
+                </a>
+            </div>
+
+            <!-- Fun Facts -->
+            <div class="fun-facts">
+                <h3>While you're here, did you know?</h3>
+                <div class="facts-grid">
+                    <div class="fact-item">
+                        <div class="fact-number">342</div>
+                        <div class="fact-label">Total articles</div>
+                    </div>
+                    <div class="fact-item">
+                        <div class="fact-number">15</div>
+                        <div class="fact-label">Contributors</div>
+                    </div>
+                    <div class="fact-item">
+                        <div class="fact-number">24h</div>
+                        <div class="fact-label">Response time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="not-found-footer">
+                <div class="footer-links">
+                    <a href="#">Home</a>
+                    <a href="#">About</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Sitemap</a>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>📑</span>
+            <span>Categories</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>🔍</span>
+            <span>Search</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </a>
+    </nav>
+</body>
+
+</html>

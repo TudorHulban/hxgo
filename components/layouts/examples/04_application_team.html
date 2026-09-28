@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Team Members Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 320px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Role colors */
+            --role-admin: #ef4444;
+            --role-manager: #f59e0b;
+            --role-lead: #8b5cf6;
+            --role-dev: #3b82f6;
+            --role-design: #ec4899;
+            --role-qa: #10b981;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Team Content */
+        .team-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: var(--space-xs);
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            background: white;
+            padding: var(--space-md);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .filter-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .filter-select {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        /* Team Stats */
+        .team-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-card__icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .stat-card__content h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-card__content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Team Member Card */
+        .member-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .member-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .member-card__header {
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            position: relative;
+        }
+
+        .member-card__avatar {
+            position: absolute;
+            bottom: -40px;
+            left: var(--space-lg);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .member-card__content {
+            padding: 50px var(--space-lg) var(--space-lg);
+        }
+
+        .member-card__name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .member-card__role {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+        }
+
+        .member-card__meta {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .member-card__meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .member-card__skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+
+        .skill-tag {
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .member-card__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .member-projects {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .member-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.online { background: var(--success); }
+        .status-dot.away { background: var(--warning); }
+        .status-dot.offline { background: var(--text-secondary); }
+        .status-dot.busy { background: var(--danger); }
+
+        /* Role Badges */
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .role-admin { background: #fee2e2; color: var(--danger); }
+        .role-manager { background: #fed7aa; color: var(--warning); }
+        .role-lead { background: #ede9fe; color: var(--purple); }
+        .role-dev { background: #dbeafe; color: var(--accent); }
+        .role-design { background: #fce7f3; color: var(--pink); }
+        .role-qa { background: #d1fae5; color: var(--success); }
+
+        /* Team List View */
+        .team-list {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .list-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .list-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .list-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .list-item__role {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .list-item__projects {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .project-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .project-dot.blue { background: var(--project-blue); }
+        .project-dot.purple { background: var(--project-purple); }
+        .project-dot.pink { background: var(--project-pink); }
+        .project-dot.green { background: var(--project-green); }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .online-member {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .online-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .online-indicator.online { background: var(--success); }
+        .online-indicator.away { background: var(--warning); }
+        .online-indicator.busy { background: var(--danger); }
+
+        .online-info {
+            flex: 1;
+        }
+
+        .online-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .online-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .upcoming-birthday {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .birthday-date {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-light);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .birthday-date .day {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .birthday-date .month {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+        }
+
+        .birthday-info {
+            flex: 1;
+        }
+
+        .birthday-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .birthday-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .team-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .team-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .list-header {
+                display: none;
+            }
+
+            .list-item {
+                grid-template-columns: 1fr;
+                gap: var(--space-sm);
+            }
+
+            .list-item__user {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .team-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .member-card__header {
+                height: 60px;
+            }
+
+            .member-card__avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+                bottom: -30px;
+            }
+
+            .member-card__content {
+                padding: 40px var(--space-md) var(--space-md);
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .team-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(75, 192, 192, 0.1); }
+
+        /* Component debug */
+        .debug-layout .member-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .member-card::before {
+            content: "member-card";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .stat-card {
+            background: rgba(54, 162, 235, 0.1);
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .list-item {
+            background: rgba(153, 102, 255, 0.1);
+            border-bottom: 1px dashed #9966ff;
+        }
+
+        .debug-layout .online-member {
+            background: rgba(255, 159, 64, 0.1);
+            border: 1px dashed #ff9f40;
+            margin-bottom: var(--space-xs);
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#" class="active">Team</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search team members...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">5</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                    <span class="nav-item__badge">12</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">DEPARTMENTS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">💻</span>
+                    <span>Engineering</span>
+                    <span class="nav-item__badge">6</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🎨</span>
+                    <span>Design</span>
+                    <span class="nav-item__badge">3</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Product</span>
+                    <span class="nav-item__badge">2</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔧</span>
+                    <span>Operations</span>
+                    <span class="nav-item__badge">1</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">TEAM</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">⭐</span>
+                    <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🕒</span>
+                    <span>Recently Active</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🎂</span>
+                    <span>Birthdays</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Team Content -->
+        <main class="team-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Team Members</h1>
+                    <p>Manage your team and their roles</p>
+                </div>
+                <div class="content-header__actions">
+                    <button class="btn">📊 Grid View</button>
+                    <button class="btn">📋 List View</button>
+                    <button class="btn primary">+ Invite Member</button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <span class="filter-tab active">All Members</span>
+                    <span class="filter-tab">Online</span>
+                    <span class="filter-tab">Engineering</span>
+                    <span class="filter-tab">Design</span>
+                    <span class="filter-tab">Product</span>
+                    <span class="filter-tab">Admin</span>
+                </div>
+                <div class="filter-actions">
+                    <select class="filter-select">
+                        <option>Sort by: Name</option>
+                        <option>Sort by: Role</option>
+                        <option>Sort by: Projects</option>
+                        <option>Sort by: Recently Active</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Departments</option>
+                        <option>Engineering</option>
+                        <option>Design</option>
+                        <option>Product</option>
+                        <option>Operations</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Team Stats -->
+            <div class="team-stats">
+                <div class="stat-card">
+                    <div class="stat-card__icon">👥</div>
+                    <div class="stat-card__content">
+                        <h3>Total Members</h3>
+                        <div class="value">12</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card__icon">🟢</div>
+                    <div class="stat-card__content">
+                        <h3>Online Now</h3>
+                        <div class="value">7</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card__icon">📁</div>
+                    <div class="stat-card__content">
+                        <h3>Active Projects</h3>
+                        <div class="value">24</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card__icon">🎂</div>
+                    <div class="stat-card__content">
+                        <h3>Birthdays This Month</h3>
+                        <div class="value">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Grid -->
+            <div class="team-grid">
+                <!-- Member 1 -->
+                <div class="member-card">
+                    <div class="member-card__header"></div>
+                    <div class="member-card__avatar">SC</div>
+                    <div class="member-card__content">
+                        <div class="member-card__name">Sarah Chen</div>
+                        <div class="member-card__role">
+                            <span class="role-badge role-lead">Design Lead</span>
+                        </div>
+                        <div class="member-card__meta">
+                            <span class="member-card__meta-item">📁 3 projects</span>
+                            <span class="member-card__meta-item">⏱️ 2 years</span>
+                        </div>
+                        <div class="member-card__skills">
+                            <span class="skill-tag">UI/UX</span>
+                            <span class="skill-tag">Figma</span>
+                            <span class="skill-tag">Prototyping</span>
+                            <span class="skill-tag">Design Systems</span>
+                        </div>
+                        <div class="member-card__footer">
+                            <div class="member-projects">
+                                <span class="project-dot blue"></span>
+                                <span class="project-dot pink"></span>
+                                <span class="project-dot purple"></span>
+                                <span>+1</span>
+                            </div>
+                            <div class="member-status">
+                                <span class="status-dot online"></span>
+                                <span>Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 2 -->
+                <div class="member-card">
+                    <div class="member-card__header"></div>
+                    <div class="member-card__avatar">MJ</div>
+                    <div class="member-card__content">
+                        <div class="member-card__name">Mike Johnson</div>
+                        <div class="member-card__role">
+                            <span class="role-badge role-dev">Senior Developer</span>
+                        </div>
+                        <div class="member-card__meta">
+                            <span class="member-card__meta-item">📁 4 projects</span>
+                            <span class="member-card__meta-item">⏱️ 3 years</span>
+                        </div>
+                        <div class="member-card__skills">
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">TypeScript</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                        </div>
+                        <div class="member-card__footer">
+                            <div class="member-projects">
+                                <span class="project-dot blue"></span>
+                                <span class="project-dot green"></span>
+                                <span class="project-dot purple"></span>
+                                <span>+2</span>
+                            </div>
+                            <div class="member-status">
+                                <span class="status-dot busy"></span>
+                                <span>Busy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 3 -->
+                <div class="member-card">
+                    <div class="member-card__header"></div>
+                    <div class="member-card__avatar">AR</div>
+                    <div class="member-card__content">
+                        <div class="member-card__name">Alex Rivera</div>
+                        <div class="member-card__role">
+                            <span class="role-badge role-dev">Frontend Dev</span>
+                        </div>
+                        <div class="member-card__meta">
+                            <span class="member-card__meta-item">📁 3 projects</span>
+                            <span class="member-card__meta-item">⏱️ 1 year</span>
+                        </div>
+                        <div class="member-card__skills">
+                            <span class="skill-tag">Vue.js</span>
+                            <span class="skill-tag">Tailwind</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">Webpack</span>
+                        </div>
+                        <div class="member-card__footer">
+                            <div class="member-projects">
+                                <span class="project-dot blue"></span>
+                                <span class="project-dot pink"></span>
+                                <span>+1</span>
+                            </div>
+                            <div class="member-status">
+                                <span class="status-dot online"></span>
+                                <span>Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 4 -->
+                <div class="member-card">
+                    <div class="member-card__header"></div>
+                    <div class="member-card__avatar">EW</div>
+                    <div class="member-card__content">
+                        <div class="member-card__name">Emma Watson</div>
+                        <div class="member-card__role">
+                            <span class="role-badge role-manager">Product Manager</span>
+                        </div>
+                        <div class="member-card__meta">
+                            <span class="member-card__meta-item">📁 5 projects</span>
+                            <span class="member-card__meta-item">⏱️ 4 years</span>
+                        </div>
+                        <div class="member-card__skills">
+                            <span class="skill-tag">Strategy</span>
+                            <span class="skill-tag">Agile</span>
+                            <span class="skill-tag">Roadmapping</span>
+                            <span class="skill-tag">Analytics</span>
+                        </div>
+                        <div class="member-card__footer">
+                            <div class="member-projects">
+                                <span class="project-dot blue"></span>
+                                <span class="project-dot purple"></span>
+                                <span class="project-dot green"></span>
+                                <span>+2</span>
+                            </div>
+                            <div class="member-status">
+                                <span class="status-dot away"></span>
+                                <span>Away</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 5 -->
+                <div class="member-card">
+                    <div class="member-card__header"></div>
+                    <div class="member-card__avatar">TP</div>
+                    <div class="member-card__content">
+                        <div class="member-card__name">Tom Parker</div>
+                        <div class="member-card__role">
+                            <span class="role-badge role-qa">QA Engineer</span>
+                        </div>
+                        <div class="member-card__meta">
+                            <span class="member-card__meta-item">📁 2 projects</span>
+                            <span class="member-card__meta-item">⏱️ 1 year</span>
+                        </div>
+                        <div class="member-card__skills">
+                            <span class="skill-tag">Testing</span>
+                            <span class="skill-tag">Cypress</span>
+                            <span class="skill-tag">Jest</span>
+                            <span class="skill-tag">Automation</span>
+                        </div>
+                        <div class="member-card__footer">
+                            <div class="member-projects">
+                                <span class="project-dot blue"></span>
+                                <span class="project-dot green"></span>
+                            </div>
+                            <div class="member-status">
+                                <span class="status-dot offline"></span>
+                                <span>Offline</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Member 6 -->
+                <div class="member-card">
+                    <div class="member-card__header"></div>
+                    <div class="member-card__avatar">LN</div>
+                    <div class="member-card__content">
+                        <div class="member-card__name">Lisa Nguyen</div>
+                        <div class="member-card__role">
+                            <span class="role-badge role-dev">DevOps</span>
+                        </div>
+                        <div class="member-card__meta">
+                            <span class="member-card__meta-item">📁 3 projects</span>
+                            <span class="member-card__meta-item">⏱️ 2 years</span>
+                        </div>
+                        <div class="member-card__skills">
+                            <span class="skill-tag">AWS</span>
+                            <span class="skill-tag">Docker</span>
+                            <span class="skill-tag">Kubernetes</span>
+                            <span class="skill-tag">CI/CD</span>
+                        </div>
+                        <div class="member-card__footer">
+                            <div class="member-projects">
+                                <span class="project-dot purple"></span>
+                                <span class="project-dot green"></span>
+                                <span>+1</span>
+                            </div>
+                            <div class="member-status">
+                                <span class="status-dot online"></span>
+                                <span>Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team List View (Alternative view) -->
+            <div class="team-list">
+                <div class="list-header">
+                    <span>Team Member</span>
+                    <span>Role</span>
+                    <span>Department</span>
+                    <span>Projects</span>
+                    <span>Status</span>
+                </div>
+                
+                <div class="list-item">
+                    <div class="list-item__user">
+                        <div class="list-avatar">SC</div>
+                        <div>
+                            <div style="font-weight: 500;">Sarah Chen</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">sarah.chen@company.com</div>
+                        </div>
+                    </div>
+                    <div class="list-item__role">
+                        <span class="role-badge role-lead">Design Lead</span>
+                    </div>
+                    <div>Design</div>
+                    <div class="list-item__projects">
+                        <span class="project-dot blue"></span>
+                        <span class="project-dot pink"></span>
+                        <span class="project-dot purple"></span>
+                        <span style="margin-left: 4px;">3</span>
+                    </div>
+                    <div><span class="status-dot online"></span> Online</div>
+                </div>
+
+                <div class="list-item">
+                    <div class="list-item__user">
+                        <div class="list-avatar">MJ</div>
+                        <div>
+                            <div style="font-weight: 500;">Mike Johnson</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">mike.j@company.com</div>
+                        </div>
+                    </div>
+                    <div class="list-item__role">
+                        <span class="role-badge role-dev">Senior Dev</span>
+                    </div>
+                    <div>Engineering</div>
+                    <div class="list-item__projects">
+                        <span class="project-dot blue"></span>
+                        <span class="project-dot green"></span>
+                        <span class="project-dot purple"></span>
+                        <span style="margin-left: 4px;">4</span>
+                    </div>
+                    <div><span class="status-dot busy"></span> Busy</div>
+                </div>
+
+                <div class="list-item">
+                    <div class="list-item__user">
+                        <div class="list-avatar">AR</div>
+                        <div>
+                            <div style="font-weight: 500;">Alex Rivera</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">alex.r@company.com</div>
+                        </div>
+                    </div>
+                    <div class="list-item__role">
+                        <span class="role-badge role-dev">Frontend Dev</span>
+                    </div>
+                    <div>Engineering</div>
+                    <div class="list-item__projects">
+                        <span class="project-dot blue"></span>
+                        <span class="project-dot pink"></span>
+                        <span style="margin-left: 4px;">2</span>
+                    </div>
+                    <div><span class="status-dot online"></span> Online</div>
+                </div>
+
+                <div class="list-item">
+                    <div class="list-item__user">
+                        <div class="list-avatar">EW</div>
+                        <div>
+                            <div style="font-weight: 500;">Emma Watson</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">emma.w@company.com</div>
+                        </div>
+                    </div>
+                    <div class="list-item__role">
+                        <span class="role-badge role-manager">Product Manager</span>
+                    </div>
+                    <div>Product</div>
+                    <div class="list-item__projects">
+                        <span class="project-dot blue"></span>
+                        <span class="project-dot purple"></span>
+                        <span class="project-dot green"></span>
+                        <span style="margin-left: 4px;">5</span>
+                    </div>
+                    <div><span class="status-dot away"></span> Away</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Online Now</h3>
+                    <a href="#">View All</a>
+                </div>
+                
+                <div class="online-member">
+                    <div class="online-avatar">
+                        SC
+                        <span class="online-indicator online"></span>
+                    </div>
+                    <div class="online-info">
+                        <h4>Sarah Chen</h4>
+                        <p>Design Lead · 3 projects</p>
+                    </div>
+                </div>
+
+                <div class="online-member">
+                    <div class="online-avatar">
+                        AR
+                        <span class="online-indicator online"></span>
+                    </div>
+                    <div class="online-info">
+                        <h4>Alex Rivera</h4>
+                        <p>Frontend Dev · 2 projects</p>
+                    </div>
+                </div>
+
+                <div class="online-member">
+                    <div class="online-avatar">
+                        LN
+                        <span class="online-indicator online"></span>
+                    </div>
+                    <div class="online-info">
+                        <h4>Lisa Nguyen</h4>
+                        <p>DevOps · 3 projects</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Upcoming Birthdays</h3>
+                </div>
+                
+                <div class="upcoming-birthday">
+                    <div class="birthday-date">
+                        <span class="day">15</span>
+                        <span class="month">DEC</span>
+                    </div>
+                    <div class="birthday-info">
+                        <h4>Mike Johnson</h4>
+                        <p>Turns 32 · 3 days left</p>
+                    </div>
+                </div>
+
+                <div class="upcoming-birthday">
+                    <div class="birthday-date">
+                        <span class="day">18</span>
+                        <span class="month">DEC</span>
+                    </div>
+                    <div class="birthday-info">
+                        <h4>Emma Watson</h4>
+                        <p>Turns 29 · 6 days left</p>
+                    </div>
+                </div>
+
+                <div class="upcoming-birthday">
+                    <div class="birthday-date">
+                        <span class="day">22</span>
+                        <span class="month">DEC</span>
+                    </div>
+                    <div class="birthday-info">
+                        <h4>Tom Parker</h4>
+                        <p>Turns 27 · 10 days left</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Department Distribution</h3>
+                </div>
+                
+                <div style="margin-bottom: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                        <span>Engineering</span>
+                        <span>6 members</span>
+                    </div>
+                    <div style="height: 6px; background: var(--bg-tertiary); border-radius: 3px;">
+                        <div style="width: 50%; height: 100%; background: var(--accent); border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                        <span>Design</span>
+                        <span>3 members</span>
+                    </div>
+                    <div style="height: 6px; background: var(--bg-tertiary); border-radius: 3px;">
+                        <div style="width: 25%; height: 100%; background: var(--pink); border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: var(--space-sm);">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                        <span>Product</span>
+                        <span>2 members</span>
+                    </div>
+                    <div style="height: 6px; background: var(--bg-tertiary); border-radius: 3px;">
+                        <div style="width: 17%; height: 100%; background: var(--purple); border-radius: 3px;"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📈</span>
+            <span>Analytics</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>👥</span>
+            <span>Team</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>📊</span>
+            <span>Stats</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,28 @@
+<!doctype html><html lang=""><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TestSlots</title><link rel="stylesheet" href="generated.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"><link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css"></head><body><div class="hours-grid"><script>
+			function handletimeclick(data){
+			const elems = document.querySelectorAll('.time-slot');
+			elems.forEach(element => {
+			if (element && element.classList) {element.classList.remove('selected');
+    		}
+			});
+
+			const parts = data.split('/');
+  			const resourceID = parseInt(parts[1], 10);
+  			const slotID = parseInt(parts[2], 10);
+			const slotCSSID = "slot"+resourceID+"-"+slotID
+
+			const slotElement = document.getElementById(slotCSSID);
+			if (slotElement) {slotElement.classList.add('selected');
+
+			const submitElement = document.getElementById('submit')
+			if (submitElement) {
+			submitElement.disabled = false;
+			submitElement.setAttribute('hx-post', '/'+resourceID+'/'+slotID);
+			};
+
+			console.log('time slot clicked:', data);
+  			} else {
+			console.log(slotCSSID, resourceID, slotID);
+			}
+			};
+			</script><div class="hours-row"><button class=time-slot id="slot1-1000" type="button" onclick="handletimeclick('xxx/1/1000')">10 00 - dr. John Smith</button></div><div class="hours-row"><button class=time-slot id="slot2-1030" type="button" onclick="handletimeclick('xxx/2/1030')">10 30 - dr. Martha Doe</button></div><div class="hours-row"><button class=time-slot id="slot1-1100" type="button" onclick="handletimeclick('xxx/1/1100')">11 00 - dr. John Smith</button></div><div class="hours-row"><button class=time-slot id="slot2-1100" type="button" onclick="handletimeclick('xxx/2/1100')">11 00 - dr. Martha Doe</button></div></div></body></html>

@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Tag Management Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 280px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Tag sizes for cloud */
+            --tag-size-xs: 0.75rem;
+            --tag-size-sm: 0.85rem;
+            --tag-size-md: 1rem;
+            --tag-size-lg: 1.2rem;
+            --tag-size-xl: 1.4rem;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.tags { background: #dbeafe; color: var(--accent); }
+        .stat-icon.used { background: #d1fae5; color: var(--success); }
+        .stat-icon.unused { background: #fee2e2; color: var(--danger); }
+        .stat-icon.popular { background: #fce7f3; color: var(--pink); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Tags Layout */
+        .tags-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Left Column - Tag Cloud & Popular Tags */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        /* Tag Cloud */
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .cloud-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .cloud-tag:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .cloud-tag.size-xs { font-size: var(--tag-size-xs); }
+        .cloud-tag.size-sm { font-size: var(--tag-size-sm); }
+        .cloud-tag.size-md { font-size: var(--tag-size-md); }
+        .cloud-tag.size-lg { font-size: var(--tag-size-lg); }
+        .cloud-tag.size-xl { font-size: var(--tag-size-xl); }
+
+        /* Popular Tags List */
+        .popular-tag-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .popular-tag-item:last-child {
+            border-bottom: none;
+        }
+
+        .popular-tag-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .popular-tag-rank.top-1 { background: gold; color: #854d0e; }
+        .popular-tag-rank.top-2 { background: silver; color: #4b5563; }
+        .popular-tag-rank.top-3 { background: #cd7f32; color: #7b341e; }
+
+        .popular-tag-info {
+            flex: 1;
+        }
+
+        .popular-tag-name {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .popular-tag-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .popular-tag-stats {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Right Column - Tag Management */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        /* Add/Edit Tag Form */
+        .tag-form-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .form-header .cancel-edit {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .form-header.editing .cancel-edit {
+            display: block;
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Slug Preview */
+        .slug-preview {
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-xs);
+        }
+
+        .slug-preview span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+
+        /* Tags Table */
+        .tags-table-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .table-search {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .table-search input {
+            padding: var(--space-sm);
+            border: none;
+            width: 200px;
+        }
+
+        .table-search button {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-primary);
+            border: none;
+            border-left: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .tags-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tags-table th {
+            text-align: left;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tags-table td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .tags-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .tag-name {
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .tag-slug {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .posts-count {
+            font-weight: 600;
+        }
+
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .action-btn.edit:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .action-btn.view:hover {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .action-btn.merge {
+            background: var(--purple);
+            color: white;
+            border-color: var(--purple);
+        }
+
+        /* Bulk Actions */
+        .bulk-actions {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .bulk-actions select {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .pagination-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .pagination-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Merge Modal (simplified) */
+        .merge-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: var(--space-xl);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .modal-body {
+            margin-bottom: var(--space-lg);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .tags-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .table-search {
+                width: 100%;
+            }
+
+            .table-search input {
+                width: 100%;
+            }
+
+            .tags-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .bulk-actions {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .stats-grid { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .left-column { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .right-column { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .card { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .cloud-tag {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .tags-table tr {
+            border-bottom: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .popular-tag-item {
+            border-bottom: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog Admin</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Authors</a>
+                <a href="#">Categories</a>
+                <a href="#" class="active">Tags</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Tag Management</h1>
+                <p>Manage, merge, and organize your blog tags</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">📊 Analytics</button>
+                <button class="btn primary">+ New Tag</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon tags">🏷️</div>
+                <div class="stat-content">
+                    <h3>Total Tags</h3>
+                    <div class="value">86</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon used">✅</div>
+                <div class="stat-content">
+                    <h3>Used Tags</h3>
+                    <div class="value">72</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon unused">⚠️</div>
+                <div class="stat-content">
+                    <h3>Unused Tags</h3>
+                    <div class="value">14</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon popular">🔥</div>
+                <div class="stat-content">
+                    <h3>Most Used</h3>
+                    <div class="value">"react"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tags Layout -->
+        <div class="tags-layout">
+            <!-- Left Column - Tag Cloud & Popular Tags -->
+            <div class="left-column">
+                <!-- Tag Cloud Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Tag Cloud</h2>
+                        <span class="btn small outline">Refresh</span>
+                    </div>
+                    
+                    <div class="tag-cloud">
+                        <a href="#" class="cloud-tag size-xl">react</a>
+                        <a href="#" class="cloud-tag size-lg">javascript</a>
+                        <a href="#" class="cloud-tag size-xl">typescript</a>
+                        <a href="#" class="cloud-tag size-md">css</a>
+                        <a href="#" class="cloud-tag size-lg">node.js</a>
+                        <a href="#" class="cloud-tag size-sm">html</a>
+                        <a href="#" class="cloud-tag size-md">vue</a>
+                        <a href="#" class="cloud-tag size-xs">angular</a>
+                        <a href="#" class="cloud-tag size-lg">next.js</a>
+                        <a href="#" class="cloud-tag size-md">graphql</a>
+                        <a href="#" class="cloud-tag size-sm">rest</a>
+                        <a href="#" class="cloud-tag size-md">database</a>
+                        <a href="#" class="cloud-tag size-lg">python</a>
+                        <a href="#" class="cloud-tag size-md">django</a>
+                        <a href="#" class="cloud-tag size-sm">flask</a>
+                        <a href="#" class="cloud-tag size-xs">go</a>
+                        <a href="#" class="cloud-tag size-md">rust</a>
+                        <a href="#" class="cloud-tag size-lg">devops</a>
+                        <a href="#" class="cloud-tag size-md">aws</a>
+                        <a href="#" class="cloud-tag size-sm">docker</a>
+                        <a href="#" class="cloud-tag size-lg">kubernetes</a>
+                        <a href="#" class="cloud-tag size-md">ci/cd</a>
+                        <a href="#" class="cloud-tag size-sm">testing</a>
+                        <a href="#" class="cloud-tag size-md">jest</a>
+                        <a href="#" class="cloud-tag size-sm">cypress</a>
+                    </div>
+                </div>
+
+                <!-- Popular Tags Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🔥 Most Popular Tags</h2>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="popular-tag-item">
+                        <div class="popular-tag-rank top-1">1</div>
+                        <div class="popular-tag-info">
+                            <div class="popular-tag-name">react</div>
+                            <div class="popular-tag-meta">42 posts · 128.5K views</div>
+                        </div>
+                        <div class="popular-tag-stats">#1</div>
+                    </div>
+
+                    <div class="popular-tag-item">
+                        <div class="popular-tag-rank top-2">2</div>
+                        <div class="popular-tag-info">
+                            <div class="popular-tag-name">typescript</div>
+                            <div class="popular-tag-meta">38 posts · 112.3K views</div>
+                        </div>
+                        <div class="popular-tag-stats">↑2</div>
+                    </div>
+
+                    <div class="popular-tag-item">
+                        <div class="popular-tag-rank top-3">3</div>
+                        <div class="popular-tag-info">
+                            <div class="popular-tag-name">javascript</div>
+                            <div class="popular-tag-meta">35 posts · 98.7K views</div>
+                        </div>
+                        <div class="popular-tag-stats">↓1</div>
+                    </div>
+
+                    <div class="popular-tag-item">
+                        <div class="popular-tag-rank">4</div>
+                        <div class="popular-tag-info">
+                            <div class="popular-tag-name">node.js</div>
+                            <div class="popular-tag-meta">28 posts · 76.2K views</div>
+                        </div>
+                        <div class="popular-tag-stats">↑1</div>
+                    </div>
+
+                    <div class="popular-tag-item">
+                        <div class="popular-tag-rank">5</div>
+                        <div class="popular-tag-info">
+                            <div class="popular-tag-name">python</div>
+                            <div class="popular-tag-meta">24 posts · 65.4K views</div>
+                        </div>
+                        <div class="popular-tag-stats">→0</div>
+                    </div>
+
+                    <div class="popular-tag-item">
+                        <div class="popular-tag-rank">6</div>
+                        <div class="popular-tag-info">
+                            <div class="popular-tag-name">next.js</div>
+                            <div class="popular-tag-meta">22 posts · 58.9K views</div>
+                        </div>
+                        <div class="popular-tag-stats">↑3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Tag Management -->
+            <div class="right-column">
+                <!-- Add/Edit Tag Form -->
+                <div class="tag-form-card">
+                    <div class="form-header">
+                        <h2>Add New Tag</h2>
+                        <span class="cancel-edit">✕ Cancel</span>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Tag Name <span>*</span></label>
+                        <input type="text" class="form-input" placeholder="e.g., react-hooks" value="server-components">
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Slug</label>
+                        <input type="text" class="form-input" value="server-components">
+                        <div class="slug-preview">
+                            <span>🔗</span>
+                            https://devblog.com/tag/<strong>server-components</strong>
+                        </div>
+                        <div class="form-hint">Leave empty to auto-generate from name</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" placeholder="Describe this tag...">Articles about React Server Components, their architecture, and implementation patterns.</textarea>
+                        <div class="form-hint">Appears on the tag archive page</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">SEO Title</label>
+                        <input type="text" class="form-input" value="Server Components - Articles and Tutorials">
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Meta Description</label>
+                        <textarea class="form-textarea" rows="2">Learn about React Server Components with in-depth articles, tutorials, and best practices.</textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn outline">Clear</button>
+                        <button class="btn primary">Save Tag</button>
+                    </div>
+                </div>
+
+                <!-- Tags Table -->
+                <div class="tags-table-card">
+                    <div class="table-header">
+                        <h2>All Tags</h2>
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" placeholder="Search tags...">
+                                <button>🔍</button>
+                            </div>
+                            <select class="btn small">
+                                <option>All Tags</option>
+                                <option>Used Tags</option>
+                                <option>Unused Tags</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <table class="tags-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>Tag</th>
+                                <th>Slug</th>
+                                <th>Posts</th>
+                                <th>Views</th>
+                                <th>Trend</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">react</span></td>
+                                <td><span class="tag-slug">react</span></td>
+                                <td><span class="posts-count">42</span></td>
+                                <td>128.5K</td>
+                                <td><span class="trend-up">↑ 12%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">typescript</span></td>
+                                <td><span class="tag-slug">typescript</span></td>
+                                <td><span class="posts-count">38</span></td>
+                                <td>112.3K</td>
+                                <td><span class="trend-up">↑ 8%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">javascript</span></td>
+                                <td><span class="tag-slug">javascript</span></td>
+                                <td><span class="posts-count">35</span></td>
+                                <td>98.7K</td>
+                                <td><span class="trend-up">↑ 5%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">node.js</span></td>
+                                <td><span class="tag-slug">nodejs</span></td>
+                                <td><span class="posts-count">28</span></td>
+                                <td>76.2K</td>
+                                <td><span class="trend-up">↑ 7%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">python</span></td>
+                                <td><span class="tag-slug">python</span></td>
+                                <td><span class="posts-count">24</span></td>
+                                <td>65.4K</td>
+                                <td><span class="trend-down">↓ 2%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">next.js</span></td>
+                                <td><span class="tag-slug">nextjs</span></td>
+                                <td><span class="posts-count">22</span></td>
+                                <td>58.9K</td>
+                                <td><span class="trend-up">↑ 15%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">css</span></td>
+                                <td><span class="tag-slug">css</span></td>
+                                <td><span class="posts-count">18</span></td>
+                                <td>42.1K</td>
+                                <td><span class="trend-neutral">→ 0%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">graphql</span></td>
+                                <td><span class="tag-slug">graphql</span></td>
+                                <td><span class="posts-count">15</span></td>
+                                <td>36.8K</td>
+                                <td><span class="trend-up">↑ 3%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">docker</span></td>
+                                <td><span class="tag-slug">docker</span></td>
+                                <td><span class="posts-count">12</span></td>
+                                <td>28.3K</td>
+                                <td><span class="trend-up">↑ 4%</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn view">👁️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td><span class="tag-name">unused-tag</span></td>
+                                <td><span class="tag-slug">unused-tag</span></td>
+                                <td><span class="posts-count">0</span></td>
+                                <td>0</td>
+                                <td>-</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit">✏️</button>
+                                        <button class="action-btn merge">🔄</button>
+                                        <button class="action-btn delete">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions">
+                        <span style="color: var(--text-secondary);">Bulk actions:</span>
+                        <select>
+                            <option>Select action</option>
+                            <option>Delete selected</option>
+                            <option>Merge selected</option>
+                            <option>Export selected</option>
+                        </select>
+                        <button class="btn small">Apply</button>
+                        <span style="margin-left: auto; color: var(--text-secondary); font-size: 0.8rem;">
+                            3 selected
+                        </span>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <div class="pagination-info">Showing 1-10 of 86 tags</div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>←</button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn">4</button>
+                            <button class="pagination-btn">5</button>
+                            <button class="pagination-btn">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Merge Modal (hidden by default) -->
+    <div class="merge-modal" id="mergeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Merge Tags</h3>
+                <span class="modal-close">✕</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: var(--space-md);">Merge multiple tags into one. All posts will be reassigned to the destination tag.</p>
+                
+                <div class="form-row">
+                    <label class="form-label">Source Tags</label>
+                    <div style="background: var(--bg-secondary); padding: var(--space-sm); border-radius: 6px;">
+                        <span class="cloud-tag size-sm" style="margin-right: var(--space-xs);">react-hooks</span>
+                        <span class="cloud-tag size-sm" style="margin-right: var(--space-xs);">react-state</span>
+                        <span class="cloud-tag size-sm">react-effects</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Destination Tag</label>
+                    <select class="form-select">
+                        <option>react</option>
+                        <option>react-hooks</option>
+                        <option>create new tag</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">After Merging</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="merge-action" checked> Delete source tags
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="merge-action"> Keep source tags as redirects
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn outline">Cancel</button>
+                <button class="btn primary">Merge Tags</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>🏷️</span>
+            <span>Tags</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📑</span>
+            <span>Categories</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </div>
+    </nav>
+
+    <script>
+        // Simple modal toggle for demo
+        document.querySelector('.action-btn.merge').addEventListener('click', function() {
+            document.getElementById('mergeModal').style.display = 'flex';
+        });
+
+        document.querySelector('.modal-close').addEventListener('click', function() {
+            document.getElementById('mergeModal').style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>

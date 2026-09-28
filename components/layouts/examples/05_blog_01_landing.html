@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBlog - Where Developers Learn & Share</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            --space-4xl: 6rem;
+
+            /* Layout */
+            --nav-height: 70px;
+            --container-width: 1200px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Category colors */
+            --cat-tech: #3b82f6;
+            --cat-design: #ec4899;
+            --cat-dev: #10b981;
+            --cat-tutorial: #f59e0b;
+            --cat-news: #8b5cf6;
+            --cat-career: #f97316;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-secondary);
+        }
+
+        /* Blog Landing Layout */
+        .blog-landing {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .blog-landing__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .blog-landing__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-landing__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .blog-landing__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-landing__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .blog-landing__nav a:hover {
+            color: var(--accent);
+        }
+
+        .blog-landing__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-landing__btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 30px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .blog-landing__btn--outline {
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .blog-landing__btn--outline:hover {
+            background: var(--bg-secondary);
+        }
+
+        .blog-landing__btn--primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .blog-landing__btn--primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: var(--space-4xl) var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .hero-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2xl);
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: var(--space-lg);
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: var(--space-xl);
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .hero-cta .btn {
+            padding: var(--space-md) var(--space-xl);
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .hero-cta .btn-primary {
+            background: white;
+            color: var(--accent);
+        }
+
+        .hero-cta .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+        }
+
+        .hero-cta .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .hero-cta .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: var(--space-2xl);
+            margin-top: var(--space-xl);
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .hero-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        /* Featured Posts Section */
+        .featured-section {
+            padding: var(--space-4xl) var(--space-xl);
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .featured-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .featured-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+
+        .featured-image {
+            height: 200px;
+            background: var(--bg-tertiary);
+            position: relative;
+        }
+
+        .featured-category {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .featured-content {
+            padding: var(--space-xl);
+        }
+
+        .featured-meta {
+            display: flex;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .featured-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+            line-height: 1.4;
+        }
+
+        .featured-excerpt {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .featured-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .featured-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .author-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .featured-stats {
+            display: flex;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Categories Section */
+        .categories-section {
+            background: white;
+            padding: var(--space-4xl) var(--space-xl);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .categories-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+
+        .category-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .category-card:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .category-card:hover .category-name,
+        .category-card:hover .category-count {
+            color: white;
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .category-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .category-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Newsletter Section */
+        .newsletter-section {
+            padding: var(--space-4xl) var(--space-xl);
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .newsletter-section h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .newsletter-section p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: var(--space-xl);
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: var(--space-sm);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 1rem;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .newsletter-button {
+            padding: var(--space-md) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .newsletter-button:hover {
+            background: var(--accent-hover);
+        }
+
+        .newsletter-note {
+            margin-top: var(--space-sm);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Popular Posts Section */
+        .popular-section {
+            padding: var(--space-4xl) var(--space-xl);
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .popular-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .popular-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .popular-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .popular-rank {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+
+        .popular-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.4;
+        }
+
+        .popular-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Authors Section */
+        .authors-section {
+            background: var(--bg-secondary);
+            padding: var(--space-4xl) var(--space-xl);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .authors-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+        }
+
+        .authors-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+
+        .author-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .author-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .author-avatar-large {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 0 auto var(--space-lg);
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .author-name-large {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .author-role {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .author-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-sm);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .author-bio {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .author-social {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .author-social-link {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .author-social-link:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            color: white;
+            padding: var(--space-4xl) var(--space-xl);
+            text-align: center;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: var(--space-xl);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+        }
+
+        .cta-button {
+            padding: var(--space-md) var(--space-2xl);
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .cta-button-primary {
+            background: white;
+            color: var(--accent);
+        }
+
+        .cta-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+        }
+
+        .cta-button-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .cta-button-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .blog-landing__footer {
+            background: #1f2937;
+            color: white;
+            padding: var(--space-2xl) var(--space-xl);
+        }
+
+        .footer-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--space-xl);
+        }
+
+        .footer-about p {
+            color: #9ca3af;
+            margin: var(--space-md) 0;
+            line-height: 1.6;
+        }
+
+        .footer-links h4 {
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: var(--space-sm);
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: var(--container-width);
+            margin: var(--space-xl) auto 0;
+            padding-top: var(--space-xl);
+            border-top: 1px solid #374151;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-cta {
+                justify-content: center;
+            }
+
+            .hero-image {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .featured-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .popular-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .authors-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-landing__nav {
+                display: none;
+            }
+
+            .blog-landing__header-right .blog-landing__btn {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                flex-wrap: wrap;
+            }
+
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .popular-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .authors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-landing__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-landing__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .debug-layout section {
+            position: relative;
+        }
+
+        .debug-layout section::after {
+            content: attr(class);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 99, 132, 0.8);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 100;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-landing__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .hero-section { background: linear-gradient(135deg, #ff6384 0%, #9966ff 100%); }
+        .debug-layout .featured-section { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .categories-section { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .newsletter-section { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .popular-section { background: rgba(255, 159, 64, 0.05); }
+        .debug-layout .authors-section { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .cta-section { background: linear-gradient(135deg, #ff6384 0%, #9966ff 100%); }
+
+        /* Component debug */
+        .debug-layout .featured-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .category-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .popular-card {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .author-card {
+            border: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="blog-landing debug-layout">
+    <!-- Header -->
+    <header class="blog-landing__header">
+        <div class="blog-landing__header-left">
+            <a href="#" class="blog-landing__logo">📝 DevBlog</a>
+            <nav class="blog-landing__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+        <div class="blog-landing__header-right">
+            <a href="#" class="blog-landing__btn blog-landing__btn--outline">Sign In</a>
+            <a href="#" class="blog-landing__btn blog-landing__btn--primary">Subscribe</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Where Developers Learn & Share</h1>
+                <p>Join a community of 50,000+ developers learning React, Vue, Node.js, and more through practical tutorials and real-world examples.</p>
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-primary">Start Learning →</a>
+                    <a href="#" class="btn btn-secondary">Browse Articles</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">50K+</div>
+                        <div class="hero-stat-label">Developers</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">342</div>
+                        <div class="hero-stat-label">Articles</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">15</div>
+                        <div class="hero-stat-label">Contributors</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://via.placeholder.com/600x400" alt="Developers coding">
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Posts Section -->
+    <section class="featured-section">
+        <div class="section-header">
+            <h2>Featured Articles</h2>
+            <p>Hand-picked articles to help you level up your development skills</p>
+        </div>
+
+        <div class="featured-grid">
+            <!-- Featured Post 1 -->
+            <a href="#" class="featured-card">
+                <div class="featured-image">
+                    <span class="featured-category">React</span>
+                </div>
+                <div class="featured-content">
+                    <div class="featured-meta">
+                        <span>By Sarah Chen</span>
+                        <span>•</span>
+                        <span>Dec 15, 2024</span>
+                    </div>
+                    <h3 class="featured-title">Understanding React Hooks: A Deep Dive</h3>
+                    <p class="featured-excerpt">Learn how to master React Hooks with practical examples. This comprehensive guide covers useState, useEffect, useContext, and custom hooks...</p>
+                    <div class="featured-footer">
+                        <div class="featured-author">
+                            <div class="author-avatar">SC</div>
+                            <span class="author-name">Sarah Chen</span>
+                        </div>
+                        <div class="featured-stats">
+                            <span>👁️ 3.2K</span>
+                            <span>💬 24</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Featured Post 2 -->
+            <a href="#" class="featured-card">
+                <div class="featured-image">
+                    <span class="featured-category">CSS</span>
+                </div>
+                <div class="featured-content">
+                    <div class="featured-meta">
+                        <span>By Mike Johnson</span>
+                        <span>•</span>
+                        <span>Dec 12, 2024</span>
+                    </div>
+                    <h3 class="featured-title">CSS Grid Layout: Complete Guide</h3>
+                    <p class="featured-excerpt">Master CSS Grid with practical examples. Learn how to create complex layouts with rows, columns, and advanced grid features...</p>
+                    <div class="featured-footer">
+                        <div class="featured-author">
+                            <div class="author-avatar">MJ</div>
+                            <span class="author-name">Mike Johnson</span>
+                        </div>
+                        <div class="featured-stats">
+                            <span>👁️ 4.5K</span>
+                            <span>💬 32</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Featured Post 3 -->
+            <a href="#" class="featured-card">
+                <div class="featured-image">
+                    <span class="featured-category">TypeScript</span>
+                </div>
+                <div class="featured-content">
+                    <div class="featured-meta">
+                        <span>By Alex Rivera</span>
+                        <span>•</span>
+                        <span>Dec 10, 2024</span>
+                    </div>
+                    <h3 class="featured-title">TypeScript Best Practices 2024</h3>
+                    <p class="featured-excerpt">Level up your TypeScript skills with these best practices. Learn about types, interfaces, generics, and advanced patterns...</p>
+                    <div class="featured-footer">
+                        <div class="featured-author">
+                            <div class="author-avatar">AR</div>
+                            <span class="author-name">Alex Rivera</span>
+                        </div>
+                        <div class="featured-stats">
+                            <span>👁️ 2.8K</span>
+                            <span>💬 18</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <div class="categories-container">
+            <div class="section-header">
+                <h2>Browse by Category</h2>
+                <p>Find exactly what you're looking for</p>
+            </div>
+
+            <div class="categories-grid">
+                <a href="#" class="category-card">
+                    <div class="category-icon">⚛️</div>
+                    <div class="category-name">React</div>
+                    <div class="category-count">86 posts</div>
+                </a>
+
+                <a href="#" class="category-card">
+                    <div class="category-icon">🔷</div>
+                    <div class="category-name">TypeScript</div>
+                    <div class="category-count">54 posts</div>
+                </a>
+
+                <a href="#" class="category-card">
+                    <div class="category-icon">🎨</div>
+                    <div class="category-name">CSS</div>
+                    <div class="category-count">42 posts</div>
+                </a>
+
+                <a href="#" class="category-card">
+                    <div class="category-icon">🟢</div>
+                    <div class="category-name">Node.js</div>
+                    <div class="category-count">38 posts</div>
+                </a>
+
+                <a href="#" class="category-card">
+                    <div class="category-icon">▲</div>
+                    <div class="category-name">Vue.js</div>
+                    <div class="category-count">32 posts</div>
+                </a>
+
+                <a href="#" class="category-card">
+                    <div class="category-icon">📱</div>
+                    <div class="category-name">Mobile</div>
+                    <div class="category-count">28 posts</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+        <h2>Stay Updated</h2>
+        <p>Get the latest articles, tutorials, and resources delivered to your inbox weekly</p>
+
+        <div class="newsletter-form">
+            <input type="email" class="newsletter-input" placeholder="Enter your email">
+            <button class="newsletter-button">Subscribe</button>
+        </div>
+        <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
+    </section>
+
+    <!-- Popular Posts Section -->
+    <section class="popular-section">
+        <div class="section-header">
+            <h2>Most Popular</h2>
+            <p>Top articles loved by our community</p>
+        </div>
+
+        <div class="popular-grid">
+            <a href="#" class="popular-card">
+                <span class="popular-rank">#1</span>
+                <h4 class="popular-title">Understanding React Hooks</h4>
+                <div class="popular-meta">
+                    <span>👁️ 12.5K</span>
+                    <span>💬 89</span>
+                </div>
+            </a>
+
+            <a href="#" class="popular-card">
+                <span class="popular-rank">#2</span>
+                <h4 class="popular-title">CSS Grid Layout Guide</h4>
+                <div class="popular-meta">
+                    <span>👁️ 10.2K</span>
+                    <span>💬 76</span>
+                </div>
+            </a>
+
+            <a href="#" class="popular-card">
+                <span class="popular-rank">#3</span>
+                <h4 class="popular-title">TypeScript Best Practices</h4>
+                <div class="popular-meta">
+                    <span>👁️ 8.9K</span>
+                    <span>💬 54</span>
+                </div>
+            </a>
+
+            <a href="#" class="popular-card">
+                <span class="popular-rank">#4</span>
+                <h4 class="popular-title">Next.js 14 Tutorial</h4>
+                <div class="popular-meta">
+                    <span>👁️ 7.8K</span>
+                    <span>💬 42</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Authors Section -->
+    <section class="authors-section">
+        <div class="authors-container">
+            <div class="section-header">
+                <h2>Meet Our Contributors</h2>
+                <p>Learn from experienced developers</p>
+            </div>
+
+            <div class="authors-grid">
+                <div class="author-card">
+                    <div class="author-avatar-large">SC</div>
+                    <h3 class="author-name-large">Sarah Chen</h3>
+                    <div class="author-role">React Specialist</div>
+                    <div class="author-stats">
+                        <span>📝 24 posts</span>
+                        <span>👁️ 45K views</span>
+                    </div>
+                    <p class="author-bio">Full-stack developer passionate about React and teaching. Google Developer Expert.</p>
+                    <div class="author-social">
+                        <a href="#" class="author-social-link">𝕏</a>
+                        <a href="#" class="author-social-link">⌨️</a>
+                        <a href="#" class="author-social-link">in</a>
+                    </div>
+                </div>
+
+                <div class="author-card">
+                    <div class="author-avatar-large">MJ</div>
+                    <h3 class="author-name-large">Mike Johnson</h3>
+                    <div class="author-role">Backend Expert</div>
+                    <div class="author-stats">
+                        <span>📝 18 posts</span>
+                        <span>👁️ 32K views</span>
+                    </div>
+                    <p class="author-bio">Node.js enthusiast and database architect. Loves teaching backend concepts.</p>
+                    <div class="author-social">
+                        <a href="#" class="author-social-link">𝕏</a>
+                        <a href="#" class="author-social-link">⌨️</a>
+                        <a href="#" class="author-social-link">in</a>
+                    </div>
+                </div>
+
+                <div class="author-card">
+                    <div class="author-avatar-large">AR</div>
+                    <h3 class="author-name-large">Alex Rivera</h3>
+                    <div class="author-role">Frontend Lead</div>
+                    <div class="author-stats">
+                        <span>📝 15 posts</span>
+                        <span>👁️ 28K views</span>
+                    </div>
+                    <p class="author-bio">UI/UX specialist and CSS wizard. Creates engaging frontend tutorials.</p>
+                    <div class="author-social">
+                        <a href="#" class="author-social-link">𝕏</a>
+                        <a href="#" class="author-social-link">⌨️</a>
+                        <a href="#" class="author-social-link">in</a>
+                    </div>
+                </div>
+
+                <div class="author-card">
+                    <div class="author-avatar-large">EW</div>
+                    <h3 class="author-name-large">Emma Watson</h3>
+                    <div class="author-role">DevOps Engineer</div>
+                    <div class="author-stats">
+                        <span>📝 12 posts</span>
+                        <span>👁️ 21K views</span>
+                    </div>
+                    <p class="author-bio">Cloud architecture and CI/CD expert. Makes DevOps accessible to all.</p>
+                    <div class="author-social">
+                        <a href="#" class="author-social-link">𝕏</a>
+                        <a href="#" class="author-social-link">⌨️</a>
+                        <a href="#" class="author-social-link">in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2>Ready to level up?</h2>
+            <p>Join thousands of developers learning and growing with DevBlog</p>
+            <div class="cta-buttons">
+                <a href="#" class="cta-button cta-button-primary">Get Started</a>
+                <a href="#" class="cta-button cta-button-secondary">Browse All Articles</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="blog-landing__footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3 style="color: white;">📝 DevBlog</h3>
+                <p>A community-driven blog for developers to learn, share, and grow together.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Content</h4>
+                <ul>
+                    <li><a href="#">Latest Posts</a></li>
+                    <li><a href="#">Popular</a></li>
+                    <li><a href="#">Categories</a></li>
+                    <li><a href="#">Tags</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Advertise</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2024 DevBlog. All rights reserved. Built with ❤️ for the developer community.</p>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>📑</span>
+            <span>Categories</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>🔍</span>
+            <span>Search</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </a>
+    </nav>
+</body>
+
+</html>

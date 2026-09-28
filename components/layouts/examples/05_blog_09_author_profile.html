@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Profile & Account Settings Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 260px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Social colors */
+            --twitter: #1DA1F2;
+            --github: #333333;
+            --linkedin: #0077B5;
+            --website: #10b981;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .content-header h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Profile Layout */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 1fr 2.5fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Profile Sidebar */
+        .profile-sidebar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            position: sticky;
+            top: calc(var(--nav-height) + var(--space-xl));
+        }
+
+        .profile-avatar-section {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--accent);
+            margin: 0 auto var(--space-md);
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .profile-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .profile-avatar-actions {
+            display: flex;
+            gap: var(--space-xs);
+            justify-content: center;
+        }
+
+        .btn-avatar {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-menu {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .profile-menu-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .profile-menu-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .profile-menu-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Profile Main */
+        .profile-main {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+        }
+
+        .profile-section {
+            margin-bottom: var(--space-2xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .section-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .section-header .edit-btn {
+            color: var(--accent);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Form Elements */
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            max-width: 100%;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            max-width: 400px;
+        }
+
+        .input-group .form-input {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .social-link-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .social-icon.twitter { background: var(--twitter); }
+        .social-icon.github { background: var(--github); }
+        .social-icon.linkedin { background: var(--linkedin); }
+        .social-icon.website { background: var(--website); }
+
+        .social-input {
+            flex: 1;
+        }
+
+        /* Toggle Switch */
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .toggle-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: .2s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Sessions List */
+        .sessions-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .session-device {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .session-device-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .session-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .session-current {
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .session-revoke {
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: var(--space-lg);
+            background: #fee2e2;
+        }
+
+        .danger-zone h3 {
+            color: var(--danger);
+            margin-bottom: var(--space-sm);
+        }
+
+        .danger-zone p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .danger-button {
+            background: white;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .danger-button:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-sidebar {
+                position: static;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .session-item {
+                flex-wrap: wrap;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .profile-sidebar { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .profile-main { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .profile-section { background: rgba(255, 159, 64, 0.02); }
+
+        /* Component debug */
+        .debug-layout .profile-menu-item.active {
+            background: rgba(54, 162, 235, 0.3);
+            border-left: 2px solid #36a2eb;
+        }
+
+        .debug-layout .session-item {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .danger-zone {
+            border: 2px dashed #ef4444;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+                <a href="#" class="active">Profile</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">SC</div>
+                <span>Sarah Chen ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <h1>Profile & Account Settings</h1>
+            <p>Manage your personal information, security, and preferences</p>
+        </div>
+
+        <!-- Profile Layout -->
+        <div class="profile-layout">
+            <!-- Profile Sidebar -->
+            <aside class="profile-sidebar">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-large">SC</div>
+                    <div class="profile-name">Sarah Chen</div>
+                    <div class="profile-email">sarah.chen@devblog.com</div>
+                    <div class="profile-avatar-actions">
+                        <button class="btn-avatar">Upload</button>
+                        <button class="btn-avatar">Remove</button>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3.2K</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">342</div>
+                        <div class="stat-label">Comments</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Years</div>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="profile-menu-item active">
+                        <span class="profile-menu-icon">👤</span>
+                        <span>Personal Information</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <span class="profile-menu-icon">🔒</span>
+                        <span>Security & Login</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <span class="profile-menu-icon">🔔</span>
+                        <span>Notifications</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <span class="profile-menu-icon">🔗</span>
+                        <span>Connected Accounts</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <span class="profile-menu-icon">📊</span>
+                        <span>Privacy & Data</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Profile Main -->
+            <div class="profile-main">
+                <!-- Personal Information Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <h2>Personal Information</h2>
+                        <span class="edit-btn">Edit</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" value="Sarah">
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" value="Chen">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-input" value="Sarah Chen">
+                        <div class="form-hint">This is how your name will appear publicly</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" value="sarah.chen@devblog.com">
+                        <div class="form-hint">Used for login and notifications. <a href="#" style="color: var(--accent);">Change email</a></div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-textarea">Senior tech writer passionate about frontend development, CSS, and React. I've been writing tutorials and sharing knowledge with the developer community for over 5 years.</textarea>
+                        <div class="form-hint">Max 500 characters. Markdown supported.</div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-input" value="San Francisco, CA">
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Timezone</label>
+                            <select class="form-select">
+                                <option>(GMT-8:00) Pacific Time</option>
+                                <option selected>(GMT-5:00) Eastern Time</option>
+                                <option>(GMT+0:00) UTC</option>
+                                <option>(GMT+1:00) Central European Time</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Website</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">https://</span>
+                            <input type="text" class="form-input" value="sarahchen.dev">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Links Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <h2>Social Links</h2>
+                        <span class="edit-btn">Edit</span>
+                    </div>
+
+                    <div class="social-links">
+                        <div class="social-link-item">
+                            <div class="social-icon twitter">𝕏</div>
+                            <div class="social-input">
+                                <input type="text" class="form-input" value="@sarahcodes">
+                            </div>
+                        </div>
+
+                        <div class="social-link-item">
+                            <div class="social-icon github">⌨️</div>
+                            <div class="social-input">
+                                <input type="text" class="form-input" value="sarahchen-dev">
+                            </div>
+                        </div>
+
+                        <div class="social-link-item">
+                            <div class="social-icon linkedin">in</div>
+                            <div class="social-input">
+                                <input type="text" class="form-input" value="sarah-chen-dev">
+                            </div>
+                        </div>
+
+                        <div class="social-link-item">
+                            <div class="social-icon website">🌐</div>
+                            <div class="social-input">
+                                <input type="text" class="form-input" value="sarahchen.dev">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Preferences Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <h2>Notification Preferences</h2>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Email notifications</h4>
+                            <p>Receive updates about your posts and comments</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Comment notifications</h4>
+                            <p>Get notified when someone comments on your posts</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Newsletter</h4>
+                            <p>Receive weekly digest of popular posts</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Marketing emails</h4>
+                            <p>Tips, resources, and product updates</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <h2>Security</h2>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Password</label>
+                        <div class="input-group" style="max-width: 300px;">
+                            <input type="password" class="form-input" value="••••••••" disabled>
+                            <button class="btn small">Change</button>
+                        </div>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div class="toggle-info">
+                            <h4>Two-factor authentication</h4>
+                            <p>Add an extra layer of security to your account</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-row" style="margin-top: var(--space-md);">
+                        <h4 style="margin-bottom: var(--space-sm);">Active Sessions</h4>
+                        <div class="sessions-list">
+                            <div class="session-item">
+                                <div class="session-device">💻</div>
+                                <div class="session-info">
+                                    <div class="session-device-name">MacBook Pro - Chrome</div>
+                                    <div class="session-meta">
+                                        <span>San Francisco, CA</span>
+                                        <span>Last active: Now</span>
+                                    </div>
+                                </div>
+                                <span class="session-current">Current</span>
+                            </div>
+
+                            <div class="session-item">
+                                <div class="session-device">📱</div>
+                                <div class="session-info">
+                                    <div class="session-device-name">iPhone 14 - Safari</div>
+                                    <div class="session-meta">
+                                        <span>San Francisco, CA</span>
+                                        <span>Last active: 2 hours ago</span>
+                                    </div>
+                                </div>
+                                <span class="session-revoke">Revoke</span>
+                            </div>
+
+                            <div class="session-item">
+                                <div class="session-device">💻</div>
+                                <div class="session-info">
+                                    <div class="session-device-name">Windows PC - Firefox</div>
+                                    <div class="session-meta">
+                                        <span>New York, NY</span>
+                                        <span>Last active: 3 days ago</span>
+                                    </div>
+                                </div>
+                                <span class="session-revoke">Revoke</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="profile-section">
+                    <div class="danger-zone">
+                        <h3>⚠️ Danger Zone</h3>
+                        <p>Once you delete your account, there is no going back. All your posts, comments, and data will be permanently removed.</p>
+                        <button class="danger-button">Delete Account</button>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button class="btn outline">Cancel</button>
+                    <button class="btn outline">Reset</button>
+                    <button class="btn primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </div>
+    </nav>
+</body>
+
+</html>

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Info - hero-banner.jpg | DevBlog</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 300px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a:hover {
+            color: var(--accent);
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Media Header */
+        .media-header {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+
+        .media-preview-large {
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .media-preview-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-title-section {
+            flex: 1;
+        }
+
+        .media-title-section h1 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .media-path {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-lg);
+            font-family: monospace;
+        }
+
+        .media-actions {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        /* Media Details Grid */
+        .media-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .info-card.full-width {
+            grid-column: span 2;
+        }
+
+        .info-card h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        /* Info Table */
+        .info-table {
+            width: 100%;
+        }
+
+        .info-table tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .info-table td {
+            padding: var(--space-sm) 0;
+            font-size: 0.9rem;
+        }
+
+        .info-table td:first-child {
+            width: 120px;
+            color: var(--text-secondary);
+        }
+
+        .info-table td:last-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .hash-value {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .hash-value span {
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn {
+            padding: 2px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Usage List */
+        .usage-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .usage-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .usage-type {
+            min-width: 60px;
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .usage-item a {
+            flex: 1;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .usage-item a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .usage-location {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* URL Groups */
+        .url-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .url-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .copy-field {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .copy-field input {
+            flex: 1;
+            padding: var(--space-sm);
+            border: none;
+            background: var(--bg-secondary);
+            font-size: 0.8rem;
+            font-family: monospace;
+        }
+
+        .copy-field button {
+            padding: var(--space-sm) var(--space-md);
+            background: white;
+            border: none;
+            border-left: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .copy-field button:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Thumbnail Grid */
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .size-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+        }
+
+        .size-info {
+            flex: 1;
+        }
+
+        .size-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .size-details {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .size-copy {
+            padding: 2px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            width: 120px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stats-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .trend {
+            font-size: 0.8rem;
+        }
+
+        .trend.up {
+            color: var(--success);
+        }
+
+        .trend.down {
+            color: var(--danger);
+        }
+
+        /* Mini Chart */
+        .mini-chart {
+            margin-top: var(--space-md);
+            height: 60px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            height: var(--height);
+            background: var(--accent-light);
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* Metadata Form */
+        .metadata-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .field label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .field input,
+        .field textarea {
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .save-metadata {
+            align-self: flex-start;
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .save-metadata:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Audit Log */
+        .audit-log {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .log-entry {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .log-time {
+            min-width: 100px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .log-action {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .log-user {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        /* Folder Path */
+        .folder-path {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+            font-size: 0.9rem;
+        }
+
+        .folder-item {
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .folder-item:hover {
+            color: var(--accent);
+        }
+
+        .folder-separator {
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .media-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-card.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .media-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .media-actions {
+                justify-content: center;
+            }
+
+            .thumbnail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .log-entry {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-xs);
+            }
+
+            .log-time {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0, 0, 0, 0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header {
+            background: rgba(255, 99, 132, 0.2);
+        }
+
+        .debug-layout .media-header {
+            background: rgba(54, 162, 235, 0.05);
+        }
+
+        .debug-layout .media-details-grid {
+            background: rgba(75, 192, 192, 0.02);
+        }
+
+        .debug-layout .info-card {
+            background: rgba(153, 102, 255, 0.02);
+        }
+
+        /* Component debug */
+        .debug-layout .info-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .usage-item {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .size-item {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .log-entry {
+            border: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <a href="#" class="blog-layout__logo">📝 DevBlog Admin</a>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Media</a>
+                <a href="#" class="active">Media Info</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Media Information</h1>
+                <p>View and manage file details, usage, and metadata</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">← Back to Library</button>
+            </div>
+        </div>
+
+        <!-- Media Header -->
+        <div class="media-header">
+            <div class="media-preview-large">
+                <img src="https://via.placeholder.com/200" alt="Preview">
+            </div>
+            <div class="media-title-section">
+                <h1>hero-banner.jpg</h1>
+                <div class="media-path">/assets/images/2024/12/hero-banner.jpg</div>
+                <div class="folder-path">
+                    <span class="folder-item">📁 assets</span>
+                    <span class="folder-separator">/</span>
+                    <span class="folder-item">📁 images</span>
+                    <span class="folder-separator">/</span>
+                    <span class="folder-item">📁 2024</span>
+                    <span class="folder-separator">/</span>
+                    <span class="folder-item">📁 12</span>
+                </div>
+                <div class="media-actions">
+                    <button class="btn small">📥 Download</button>
+                    <button class="btn small">🔄 Replace</button>
+                    <button class="btn small primary">✏️ Edit</button>
+                    <button class="btn small danger">🗑️ Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Media Details Grid -->
+        <div class="media-details-grid">
+            <!-- File Information -->
+            <div class="info-card">
+                <h3>📄 File Information</h3>
+                <table class="info-table">
+                    <tr>
+                        <td>Filename:</td>
+                        <td>hero-banner.jpg</td>
+                    </tr>
+                    <tr>
+                        <td>File Type:</td>
+                        <td>JPEG Image (image/jpeg)</td>
+                    </tr>
+                    <tr>
+                        <td>File Size:</td>
+                        <td>2.4 MB</td>
+                    </tr>
+                    <tr>
+                        <td>Dimensions:</td>
+                        <td>1920 × 1080 px</td>
+                    </tr>
+                    <tr>
+                        <td>Aspect Ratio:</td>
+                        <td>16:9</td>
+                    </tr>
+                    <tr>
+                        <td>Uploaded:</td>
+                        <td>Dec 15, 2024 at 10:30 AM</td>
+                    </tr>
+                    <tr>
+                        <td>Uploaded By:</td>
+                        <td>Sarah Chen</td>
+                    </tr>
+                    <tr>
+                        <td>Last Modified:</td>
+                        <td>Dec 16, 2024</td>
+                    </tr>
+                    <tr>
+                        <td>File Hash:</td>
+                        <td>
+                            <div class="hash-value">
+                                <span>sha256: a1b2c3d4e5f6...</span>
+                                <button class="copy-btn">📋</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Usage Information -->
+            <div class="info-card">
+                <h3>📍 Usage (3 locations)</h3>
+                <div class="usage-list">
+                    <div class="usage-item">
+                        <span class="usage-type">📝 Post</span>
+                        <a href="#">Understanding React Hooks: A Deep Dive</a>
+                        <span class="usage-location">Featured Image</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-type">📝 Post</span>
+                        <a href="#">CSS Grid Layout: Complete Guide</a>
+                        <span class="usage-location">Content (inline)</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-type">📄 Page</span>
+                        <a href="#">About Us</a>
+                        <span class="usage-location">Hero Section</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-type">👤 Author</span>
+                        <a href="#">Sarah Chen's Profile</a>
+                        <span class="usage-location">Avatar</span>
+                    </div>
+                    <div class="usage-item">
+                        <span class="usage-type">📁 Category</span>
+                        <a href="#">Technology Category</a>
+                        <span class="usage-location">Category Image</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URLs & Embed Codes -->
+            <div class="info-card">
+                <h3>🔗 URLs & Embed Codes</h3>
+                <div class="url-group">
+                    <label>Direct URL:</label>
+                    <div class="copy-field">
+                        <input type="text" value="https://devblog.com/assets/images/hero-banner.jpg" readonly>
+                        <button>📋</button>
+                    </div>
+                </div>
+                <div class="url-group">
+                    <label>HTML Embed:</label>
+                    <div class="copy-field">
+                        <input type="text" value='<img src="hero-banner.jpg" alt="Hero banner">' readonly>
+                        <button>📋</button>
+                    </div>
+                </div>
+                <div class="url-group">
+                    <label>Markdown:</label>
+                    <div class="copy-field">
+                        <input type="text" value="![Hero banner](hero-banner.jpg)" readonly>
+                        <button>📋</button>
+                    </div>
+                </div>
+                <div class="url-group">
+                    <label>Shortcode:</label>
+                    <div class="copy-field">
+                        <input type="text" value="[image id=123]" readonly>
+                        <button>📋</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Sizes -->
+            <div class="info-card">
+                <h3>🖼️ Generated Sizes</h3>
+                <div class="thumbnail-grid">
+                    <div class="size-item">
+                        <div class="size-info">
+                            <div class="size-name">thumbnail</div>
+                            <div class="size-details">150×150 · 15 KB</div>
+                        </div>
+                        <button class="size-copy">📋</button>
+                    </div>
+                    <div class="size-item">
+                        <div class="size-info">
+                            <div class="size-name">medium</div>
+                            <div class="size-details">300×169 · 45 KB</div>
+                        </div>
+                        <button class="size-copy">📋</button>
+                    </div>
+                    <div class="size-item">
+                        <div class="size-info">
+                            <div class="size-name">large</div>
+                            <div class="size-details">1024×576 · 350 KB</div>
+                        </div>
+                        <button class="size-copy">📋</button>
+                    </div>
+                    <div class="size-item">
+                        <div class="size-info">
+                            <div class="size-name">WebP version</div>
+                            <div class="size-details">1920×1080 · 180 KB</div>
+                        </div>
+                        <button class="size-copy">📋</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Statistics -->
+            <div class="info-card">
+                <h3>📊 Download Statistics</h3>
+                <div class="stats-row">
+                    <span class="stats-label">Total Downloads:</span>
+                    <span class="stats-value">342</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Last 30 days:</span>
+                    <span class="stats-value">89</span>
+                    <span class="trend up">↑ 12%</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Unique Downloaders:</span>
+                    <span class="stats-value">156</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Avg. per day:</span>
+                    <span class="stats-value">3.2</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">Last downloaded:</span>
+                    <span class="stats-value">2 hours ago</span>
+                </div>
+
+                <!-- Mini Chart (sparkline) -->
+                <div class="mini-chart">
+                    <div class="chart-bar" style="height: 30px;"></div>
+                    <div class="chart-bar" style="height: 45px;"></div>
+                    <div class="chart-bar" style="height: 25px;"></div>
+                    <div class="chart-bar" style="height: 60px;"></div>
+                    <div class="chart-bar" style="height: 40px;"></div>
+                    <div class="chart-bar" style="height: 55px;"></div>
+                    <div class="chart-bar" style="height: 35px;"></div>
+                </div>
+            </div>
+
+            <!-- Metadata & Alt Text -->
+            <div class="info-card">
+                <h3>🏷️ Metadata & Alt Text</h3>
+                <div class="metadata-form">
+                    <div class="field">
+                        <label>Alt Text (for accessibility):</label>
+                        <input type="text" value="Hero banner showing code on a laptop">
+                    </div>
+                    <div class="field">
+                        <label>Title Attribute:</label>
+                        <input type="text" value="Development workspace with code">
+                    </div>
+                    <div class="field">
+                        <label>Caption:</label>
+                        <input type="text" value="Modern development setup">
+                    </div>
+                    <div class="field">
+                        <label>Description:</label>
+                        <textarea>Hero image used across blog posts showing a developer's workspace with a laptop, code editor, and coffee mug.</textarea>
+                    </div>
+                    <div class="field">
+                        <label>Copyright:</label>
+                        <input type="text" value="© 2024 DevBlog. All rights reserved.">
+                    </div>
+                    <div class="field">
+                        <label>Credit / Attribution:</label>
+                        <input type="text" value="Photo by Sarah Chen">
+                    </div>
+                    <button class="save-metadata">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- Access Control -->
+            <div class="info-card">
+                <h3>🔒 Access Control</h3>
+                <table class="info-table">
+                    <tr>
+                        <td>Visibility:</td>
+                        <td>
+                            <span class="status-badge" style="background: #d1fae5; color: var(--success); padding: 4px 8px; border-radius: 30px;">Public</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Permissions:</td>
+                        <td>Read: Everyone | Write: Admins only</td>
+                    </tr>
+                    <tr>
+                        <td>Password Protected:</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Expiration Date:</td>
+                        <td>Never</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Related Files -->
+            <div class="info-card full-width">
+                <h3>📁 Related Files</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-sm);">
+                    <div class="usage-item" style="background: white;">
+                        <div style="width: 40px; height: 40px; background: var(--bg-tertiary); border-radius: 6px;"></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500;">logo-dark.png</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">PNG · 124 KB</div>
+                        </div>
+                    </div>
+                    <div class="usage-item" style="background: white;">
+                        <div style="width: 40px; height: 40px; background: var(--bg-tertiary); border-radius: 6px;"></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500;">featured-post.jpg</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">JPG · 345 KB</div>
+                        </div>
+                    </div>
+                    <div class="usage-item" style="background: white;">
+                        <div style="width: 40px; height: 40px; background: var(--bg-tertiary); border-radius: 6px;"></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500;">author-sarah.jpg</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">JPG · 89 KB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Log -->
+            <div class="info-card full-width">
+                <h3>📋 Audit Log</h3>
+                <div class="audit-log">
+                    <div class="log-entry">
+                        <span class="log-time">2 hours ago</span>
+                        <span class="log-action">Downloaded by</span>
+                        <span class="log-user">Mike Johnson</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">1 day ago</span>
+                        <span class="log-action">Metadata updated by</span>
+                        <span class="log-user">Sarah Chen</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">Dec 15, 2024</span>
+                        <span class="log-action">Uploaded by</span>
+                        <span class="log-user">Sarah Chen</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">Dec 14, 2024</span>
+                        <span class="log-action">Replaced with new version by</span>
+                        <span class="log-user">Sarah Chen</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">Dec 10, 2024</span>
+                        <span class="log-action">Alt text updated by</span>
+                        <span class="log-user">Mike Johnson</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </a>
+        <a href="#" class="mobile-nav-item active">
+            <span>🖼️</span>
+            <span>Media</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </a>
+    </nav>
+</body>
+
+</html>

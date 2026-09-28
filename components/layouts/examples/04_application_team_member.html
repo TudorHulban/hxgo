@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Add Team Member Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 320px;
+            --nav-height: 60px;
+            --form-width: 650px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Role colors */
+            --role-admin: #ef4444;
+            --role-manager: #f59e0b;
+            --role-lead: #8b5cf6;
+            --role-dev: #3b82f6;
+            --role-design: #ec4899;
+            --role-qa: #10b981;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Add Member Content */
+        .add-member-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Add Member Form */
+        .add-member-form {
+            max-width: var(--form-width);
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-2xl);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-xl);
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: var(--space-2xl);
+            padding-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-section-title span {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group .form-input,
+        .input-group .form-select {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        /* Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Avatar Upload */
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--accent);
+            border: 3px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .avatar-actions {
+            flex: 1;
+        }
+
+        .avatar-actions .btn {
+            margin-right: var(--space-sm);
+        }
+
+        .avatar-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* Role Selector */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+            margin-top: var(--space-xs);
+        }
+
+        .role-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .role-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .role-option__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .role-option__icon.admin { background: #fee2e2; color: var(--danger); }
+        .role-option__icon.manager { background: #fed7aa; color: var(--warning); }
+        .role-option__icon.lead { background: #ede9fe; color: var(--purple); }
+        .role-option__icon.dev { background: #dbeafe; color: var(--accent); }
+        .role-option__icon.design { background: #fce7f3; color: var(--pink); }
+        .role-option__icon.qa { background: #d1fae5; color: var(--success); }
+
+        .role-option__title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .role-option__desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Department Selector */
+        .department-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .department-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .department-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .department-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .department-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .department-info {
+            flex: 1;
+        }
+
+        .department-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .department-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Skills Input */
+        .skills-input {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-xs);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            background: white;
+        }
+
+        .skill-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .skill-tag button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1;
+            margin-left: 4px;
+        }
+
+        .skills-input input {
+            border: none;
+            outline: none;
+            padding: var(--space-xs);
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .suggested-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-top: var(--space-xs);
+        }
+
+        .suggested-skill {
+            padding: 2px 8px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .suggested-skill:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        /* Project Assignment */
+        .project-assignment {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .project-checkbox {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .project-checkbox:hover {
+            background: var(--bg-secondary);
+        }
+
+        .project-checkbox input[type="checkbox"] {
+            margin-right: var(--space-sm);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .project-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .project-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .project-color.blue { background: var(--accent); }
+        .project-color.purple { background: var(--purple); }
+        .project-color.pink { background: var(--pink); }
+        .project-color.green { background: var(--success); }
+
+        .project-name {
+            font-size: 0.9rem;
+        }
+
+        .project-role-select {
+            padding: 2px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-2xl);
+            padding-top: var(--space-xl);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .form-actions-left {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .form-actions-right {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .team-roles-preview {
+            margin-bottom: var(--space-sm);
+        }
+
+        .role-count {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .role-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            margin-bottom: var(--space-sm);
+            overflow: hidden;
+        }
+
+        .role-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .invite-tip {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            background: var(--accent-light);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--accent);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .add-member-form {
+                padding: var(--space-xl);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .add-member-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .add-member-form {
+                padding: var(--space-lg);
+            }
+
+            .form-grid,
+            .form-grid-3,
+            .role-selector,
+            .department-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .avatar-upload {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+
+            .form-actions-left,
+            .form-actions-right {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .project-checkbox {
+                flex-wrap: wrap;
+            }
+
+            .project-info {
+                width: 100%;
+                margin: var(--space-xs) 0;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .add-member-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .add-member-form { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(153, 102, 255, 0.1); }
+
+        /* Component debug */
+        .debug-layout .form-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .debug-layout .form-section::before {
+            content: "form-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .role-option.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .department-option.selected {
+            background: rgba(75, 192, 192, 0.3);
+            border: 2px dashed #4bc0c0;
+        }
+
+        .debug-layout .project-checkbox {
+            background: rgba(255, 99, 132, 0.1);
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .skill-tag {
+            background: rgba(153, 102, 255, 0.2);
+            border: 1px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#" class="active">Team</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">5</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">QUICK ACTIONS</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">➕</span>
+                    <span>Add Member</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📧</span>
+                    <span>Invite Multiple</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Import List</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Add Member Content -->
+        <main class="add-member-content">
+            <div class="add-member-form">
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Add Team Member</h1>
+                    <p>Invite a new member to join your team</p>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>1</span>
+                        Personal Information
+                    </div>
+                    
+                    <!-- Avatar Upload -->
+                    <div class="avatar-upload">
+                        <div class="avatar-preview">
+                            👤
+                        </div>
+                        <div class="avatar-actions">
+                            <button class="btn">Upload Photo</button>
+                            <button class="btn outline">Remove</button>
+                            <div class="avatar-hint">JPG, PNG or GIF. Max 2MB.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">First Name <span>*</span></label>
+                            <input type="text" class="form-input" placeholder="e.g., Sarah" value="James">
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Last Name <span>*</span></label>
+                            <input type="text" class="form-input" placeholder="e.g., Chen" value="Wilson">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Email Address <span>*</span></label>
+                            <div class="input-group">
+                                <input type="email" class="form-input" placeholder="name@company.com" value="james.wilson@company.com">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-addon">+1</span>
+                                <input type="tel" class="form-input" placeholder="(555) 123-4567" value="(555) 987-6543">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-textarea" placeholder="Brief description about the team member...">Full-stack developer with 5 years of experience in React and Node.js. Passionate about building scalable applications and mentoring junior developers.</textarea>
+                        <div class="form-hint">Max 500 characters</div>
+                    </div>
+                </div>
+
+                <!-- Role & Department Section -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>2</span>
+                        Role & Department
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Role <span>*</span></label>
+                        <div class="role-selector">
+                            <div class="role-option">
+                                <div class="role-option__icon dev">💻</div>
+                                <div class="role-option__title">Developer</div>
+                                <div class="role-option__desc">Writes code</div>
+                            </div>
+                            <div class="role-option selected">
+                                <div class="role-option__icon dev">🎨</div>
+                                <div class="role-option__title">Designer</div>
+                                <div class="role-option__desc">Creates designs</div>
+                            </div>
+                            <div class="role-option">
+                                <div class="role-option__icon lead">👑</div>
+                                <div class="role-option__title">Team Lead</div>
+                                <div class="role-option__desc">Leads team</div>
+                            </div>
+                            <div class="role-option">
+                                <div class="role-option__icon manager">📊</div>
+                                <div class="role-option__title">Manager</div>
+                                <div class="role-option__desc">Manages projects</div>
+                            </div>
+                            <div class="role-option">
+                                <div class="role-option__icon qa">🔍</div>
+                                <div class="role-option__title">QA Engineer</div>
+                                <div class="role-option__desc">Tests quality</div>
+                            </div>
+                            <div class="role-option">
+                                <div class="role-option__icon admin">⚙️</div>
+                                <div class="role-option__title">Admin</div>
+                                <div class="role-option__desc">System access</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Department</label>
+                            <div class="department-selector">
+                                <div class="department-option selected">
+                                    <div class="department-icon">💻</div>
+                                    <div class="department-info">
+                                        <div class="department-name">Engineering</div>
+                                        <div class="department-meta">6 members</div>
+                                    </div>
+                                </div>
+                                <div class="department-option">
+                                    <div class="department-icon">🎨</div>
+                                    <div class="department-info">
+                                        <div class="department-name">Design</div>
+                                        <div class="department-meta">3 members</div>
+                                    </div>
+                                </div>
+                                <div class="department-option">
+                                    <div class="department-icon">📊</div>
+                                    <div class="department-info">
+                                        <div class="department-name">Product</div>
+                                        <div class="department-meta">2 members</div>
+                                    </div>
+                                </div>
+                                <div class="department-option">
+                                    <div class="department-icon">🔧</div>
+                                    <div class="department-info">
+                                        <div class="department-name">Operations</div>
+                                        <div class="department-meta">1 member</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Reports To</label>
+                            <select class="form-select">
+                                <option value="">Select manager</option>
+                                <option value="sc" selected>Sarah Chen (Design Lead)</option>
+                                <option value="mj">Mike Johnson (Senior Dev)</option>
+                                <option value="ew">Emma Watson (Product Manager)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>3</span>
+                        Skills & Expertise
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Skills</label>
+                        <div class="skills-input">
+                            <span class="skill-tag">React <button>×</button></span>
+                            <span class="skill-tag">TypeScript <button>×</button></span>
+                            <span class="skill-tag">Node.js <button>×</button></span>
+                            <span class="skill-tag">Figma <button>×</button></span>
+                            <span class="skill-tag">UI/UX <button>×</button></span>
+                            <input type="text" placeholder="Add skill...">
+                        </div>
+                        <div class="suggested-skills">
+                            <span class="suggested-skill">+ Python</span>
+                            <span class="suggested-skill">+ Vue.js</span>
+                            <span class="suggested-skill">+ AWS</span>
+                            <span class="suggested-skill">+ Docker</span>
+                            <span class="suggested-skill">+ MongoDB</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Experience Level</label>
+                        <select class="form-select">
+                            <option value="entry">Entry Level (0-2 years)</option>
+                            <option value="mid" selected>Mid Level (3-5 years)</option>
+                            <option value="senior">Senior (6-9 years)</option>
+                            <option value="lead">Lead (10+ years)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Project Assignment Section -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>4</span>
+                        Project Assignment
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Assign to Projects</label>
+                        <div class="project-assignment">
+                            <label class="project-checkbox">
+                                <input type="checkbox" checked>
+                                <div class="project-info">
+                                    <span class="project-color blue"></span>
+                                    <span class="project-name">Mobile App Development</span>
+                                </div>
+                                <select class="project-role-select">
+                                    <option>Developer</option>
+                                    <option selected>Designer</option>
+                                    <option>QA</option>
+                                </select>
+                            </label>
+
+                            <label class="project-checkbox">
+                                <input type="checkbox" checked>
+                                <div class="project-info">
+                                    <span class="project-color purple"></span>
+                                    <span class="project-name">Website Redesign</span>
+                                </div>
+                                <select class="project-role-select">
+                                    <option>Developer</option>
+                                    <option selected>Designer</option>
+                                    <option>QA</option>
+                                </select>
+                            </label>
+
+                            <label class="project-checkbox">
+                                <input type="checkbox">
+                                <div class="project-info">
+                                    <span class="project-color pink"></span>
+                                    <span class="project-name">API Integration</span>
+                                </div>
+                                <select class="project-role-select">
+                                    <option>Developer</option>
+                                    <option>Designer</option>
+                                    <option>QA</option>
+                                </select>
+                            </label>
+
+                            <label class="project-checkbox">
+                                <input type="checkbox">
+                                <div class="project-info">
+                                    <span class="project-color green"></span>
+                                    <span class="project-name">Database Migration</span>
+                                </div>
+                                <select class="project-role-select">
+                                    <option>Developer</option>
+                                    <option>Designer</option>
+                                    <option>QA</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access & Permissions Section -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>5</span>
+                        Access & Permissions
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Access Level</label>
+                            <select class="form-select">
+                                <option value="user" selected>Standard User</option>
+                                <option value="admin">Administrator</option>
+                                <option value="manager">Project Manager</option>
+                                <option value="viewer">Read Only</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Start Date</label>
+                            <div class="input-group">
+                                <input type="date" class="form-input" value="2024-12-15">
+                                <span class="input-group-addon">📅</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div style="display: flex; gap: var(--space-lg); flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                <input type="checkbox" checked> Send welcome email
+                            </label>
+                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                <input type="checkbox"> Grant admin privileges
+                            </label>
+                            <label style="display: flex; align-items: center; gap: var(--space-xs);">
+                                <input type="checkbox"> Add to Slack channel
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <div class="form-actions-left">
+                        <button class="btn outline">Cancel</button>
+                        <button class="btn outline">Save as Draft</button>
+                    </div>
+                    <div class="form-actions-right">
+                        <button class="btn">Send Invite</button>
+                        <button class="btn primary">Add Member</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Team Composition</h3>
+                </div>
+                
+                <div class="team-roles-preview">
+                    <div class="role-count">
+                        <span>Developers</span>
+                        <span>6 / 12</span>
+                    </div>
+                    <div class="role-bar">
+                        <div class="role-bar-fill" style="width: 50%; background: var(--accent);"></div>
+                    </div>
+
+                    <div class="role-count">
+                        <span>Designers</span>
+                        <span>3 / 12</span>
+                    </div>
+                    <div class="role-bar">
+                        <div class="role-bar-fill" style="width: 25%; background: var(--pink);"></div>
+                    </div>
+
+                    <div class="role-count">
+                        <span>Managers</span>
+                        <span>2 / 12</span>
+                    </div>
+                    <div class="role-bar">
+                        <div class="role-bar-fill" style="width: 17%; background: var(--warning);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Invitation Tips</h3>
+                </div>
+                
+                <div class="invite-tip">
+                    <span>💡</span>
+                    <span>New members will receive an email with setup instructions</span>
+                </div>
+
+                <div style="margin-top: var(--space-md);">
+                    <div style="font-size: 0.85rem; margin-bottom: var(--space-xs);">• Roles determine permissions</div>
+                    <div style="font-size: 0.85rem; margin-bottom: var(--space-xs);">• Assign to relevant projects</div>
+                    <div style="font-size: 0.85rem;">• Set skills for better matching</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>👥</span>
+            <span>Team</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>➕</span>
+            <span>Add</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

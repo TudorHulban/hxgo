@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Contact Page Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Social colors */
+            --twitter: #1DA1F2;
+            --github: #333333;
+            --linkedin: #0077B5;
+            --youtube: #FF0000;
+            --rss: #f97316;
+            --discord: #5865F2;
+            --slack: #4A154B;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .contact-hero {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            border-radius: 24px;
+            padding: var(--space-3xl) var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .contact-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .contact-hero h1 {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        /* Contact Info Cards */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            transition: transform 0.2s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: var(--space-md);
+        }
+
+        .info-card h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--space-sm);
+        }
+
+        .info-detail {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .info-detail:hover {
+            text-decoration: underline;
+        }
+
+        /* Social Links */
+        .social-links-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+        }
+
+        .social-links-card h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .social-link:hover {
+            transform: scale(1.02);
+        }
+
+        .social-link.twitter { background: var(--twitter); }
+        .social-link.github { background: var(--github); }
+        .social-link.linkedin { background: var(--linkedin); }
+        .social-link.youtube { background: var(--youtube); }
+        .social-link.discord { background: var(--discord); }
+        .social-link.rss { background: var(--rss); }
+
+        .social-icon {
+            font-size: 1.2rem;
+        }
+
+        .social-name {
+            font-weight: 500;
+        }
+
+        /* Contact Form */
+        .contact-form-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-xl);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* File Attachment */
+        .file-attachment {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-attachment:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .file-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .file-hint {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .checkbox-group a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: var(--space-md);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xs);
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .faq-item {
+            padding: var(--space-lg);
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .faq-question {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .faq-question::before {
+            content: 'Q:';
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            padding-left: var(--space-lg);
+        }
+
+        .faq-answer::before {
+            content: 'A:';
+            color: var(--success);
+            font-weight: 700;
+            margin-right: var(--space-xs);
+        }
+
+        /* Map Section */
+        .map-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .map-container {
+            height: 300px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            text-align: center;
+        }
+
+        .map-pin {
+            font-size: 3rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .office-address {
+            text-align: center;
+        }
+
+        .office-address h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .office-address p {
+            color: var(--text-secondary);
+        }
+
+        /* Response Time */
+        .response-time {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: 50px;
+        }
+
+        .response-icon {
+            font-size: 1.5rem;
+        }
+
+        .response-text {
+            color: var(--text-secondary);
+        }
+
+        .response-text strong {
+            color: var(--accent);
+        }
+
+        /* Success Message (hidden by default) */
+        .success-message {
+            display: none;
+            background: #d1fae5;
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            color: var(--success);
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Error Message (hidden by default) */
+        .error-message {
+            display: none;
+            background: #fee2e2;
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            color: var(--danger);
+            text-align: center;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .contact-hero h1 {
+                font-size: 2rem;
+            }
+
+            .contact-hero p {
+                font-size: 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .response-time {
+                flex-direction: column;
+                text-align: center;
+                border-radius: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .contact-hero { background: linear-gradient(135deg, #ff6384 0%, #9966ff 100%); }
+        .debug-layout .contact-info { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .contact-form-card { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .faq-section { background: rgba(153, 102, 255, 0.05); }
+        .debug-layout .map-section { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .info-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .social-link {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .faq-item {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .file-attachment {
+            border: 2px dashed #9966ff;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+                <a href="#" class="active">Contact</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Hero Section -->
+        <section class="contact-hero">
+            <h1>Get in Touch</h1>
+            <p>Have a question, suggestion, or just want to say hello? We'd love to hear from you.</p>
+        </section>
+
+        <!-- Contact Grid -->
+        <div class="contact-grid">
+            <!-- Contact Info Side -->
+            <div class="contact-info">
+                <!-- Email Card -->
+                <div class="info-card">
+                    <div class="info-icon">📧</div>
+                    <h3>Email Us</h3>
+                    <p>For general inquiries, partnerships, or support, drop us an email and we'll get back to you within 24 hours.</p>
+                    <a href="mailto:hello@devblog.com" class="info-detail">hello@devblog.com →</a>
+                </div>
+
+                <!-- Support Card -->
+                <div class="info-card">
+                    <div class="info-icon">🎧</div>
+                    <h3>Technical Support</h3>
+                    <p>Having issues with the site or your account? Our support team is ready to help.</p>
+                    <a href="mailto:support@devblog.com" class="info-detail">support@devblog.com →</a>
+                </div>
+
+                <!-- Office Card -->
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <h3>Visit Us</h3>
+                    <p>123 Tech Street<br>San Francisco, CA 94105<br>United States</p>
+                    <div class="info-detail">Mon-Fri, 9am-5pm PT</div>
+                </div>
+
+                <!-- Social Links Card -->
+                <div class="social-links-card">
+                    <h3>Connect With Us</h3>
+                    <div class="social-grid">
+                        <a href="#" class="social-link twitter">
+                            <span class="social-icon">𝕏</span>
+                            <span class="social-name">Twitter</span>
+                        </a>
+                        <a href="#" class="social-link github">
+                            <span class="social-icon">⌨️</span>
+                            <span class="social-name">GitHub</span>
+                        </a>
+                        <a href="#" class="social-link linkedin">
+                            <span class="social-icon">in</span>
+                            <span class="social-name">LinkedIn</span>
+                        </a>
+                        <a href="#" class="social-link youtube">
+                            <span class="social-icon">▶️</span>
+                            <span class="social-name">YouTube</span>
+                        </a>
+                        <a href="#" class="social-link discord">
+                            <span class="social-icon">💬</span>
+                            <span class="social-name">Discord</span>
+                        </a>
+                        <a href="#" class="social-link rss">
+                            <span class="social-icon">📡</span>
+                            <span class="social-name">RSS Feed</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form-card">
+                <div class="form-header">
+                    <h2>Send a Message</h2>
+                    <p>We'll get back to you as soon as possible</p>
+                </div>
+
+                <!-- Success Message (hidden by default) -->
+                <div class="success-message" id="successMessage">
+                    ✓ Thank you! Your message has been sent successfully.
+                </div>
+
+                <!-- Error Message (hidden by default) -->
+                <div class="error-message" id="errorMessage">
+                    ⚠ There was an error sending your message. Please try again.
+                </div>
+
+                <form id="contactForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">First Name <span>*</span></label>
+                            <input type="text" class="form-input" placeholder="John" value="John">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Last Name <span>*</span></label>
+                            <input type="text" class="form-input" placeholder="Doe" value="Doe">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email <span>*</span></label>
+                        <input type="email" class="form-input" placeholder="john@example.com" value="john.doe@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Subject <span>*</span></label>
+                        <select class="form-select">
+                            <option>General Inquiry</option>
+                            <option selected>Technical Support</option>
+                            <option>Partnership</option>
+                            <option>Advertising</option>
+                            <option>Feedback</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message <span>*</span></label>
+                        <textarea class="form-textarea" placeholder="Your message...">I have a question about your React tutorial series. Is there a way to download the code examples?</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="file-attachment">
+                            <div class="file-icon">📎</div>
+                            <div class="file-text">Attach a file (optional)</div>
+                            <div class="file-hint">Max size: 5MB. Supported: PDF, ZIP, Images</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="privacy" checked>
+                            <label for="privacy">I agree to the <a href="#">Privacy Policy</a> and consent to being contacted. <span>*</span></label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span>📤</span>
+                        <span>Send Message</span>
+                    </button>
+                </form>
+
+                <!-- Response Time Indicator -->
+                <div class="response-time">
+                    <span class="response-icon">⏱️</span>
+                    <span class="response-text">We typically respond within <strong>24 hours</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Quick answers to common questions</p>
+            </div>
+
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">How quickly do you respond?</div>
+                    <div class="faq-answer">We aim to respond to all inquiries within 24 hours during business days.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Can I contribute to the blog?</div>
+                    <div class="faq-answer">Yes! We welcome guest posts from developers. Please send us a pitch with your article idea.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Do you have a Discord community?</div>
+                    <div class="faq-answer">Yes, join our Discord server to connect with other developers and get help.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">How do I report a bug?</div>
+                    <div class="faq-answer">Use the contact form with "Technical Support" as the subject, or open an issue on GitHub.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Do you accept advertising?</div>
+                    <div class="faq-answer">Yes, we have advertising opportunities. Please select "Advertising" in the subject dropdown.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Can I request a topic?</div>
+                    <div class="faq-answer">Absolutely! We love hearing what our readers want to learn about.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="map-section">
+            <div class="section-header">
+                <h2>Find Us</h2>
+                <p>Visit our headquarters in San Francisco</p>
+            </div>
+
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <div class="map-pin">📍</div>
+                    <div>Map: 123 Tech Street, San Francisco, CA</div>
+                    <div style="font-size: 0.9rem; margin-top: var(--space-xs);">[Interactive map would be embedded here]</div>
+                </div>
+            </div>
+
+            <div class="office-address">
+                <h3>DevBlog Headquarters</h3>
+                <p>123 Tech Street, Suite 400<br>San Francisco, CA 94105<br>United States</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Latest</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📄</span>
+            <span>About</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📧</span>
+            <span>Contact</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        // Simple form validation for demo
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message (for demo)
+            document.getElementById('successMessage').classList.add('show');
+            document.getElementById('errorMessage').classList.remove('show');
+            
+            // Hide success message after 3 seconds
+            setTimeout(function() {
+                document.getElementById('successMessage').classList.remove('show');
+            }, 3000);
+        });
+    </script>
+</body>
+
+</html>

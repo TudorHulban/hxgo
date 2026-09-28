@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page Layout Debug - Fixed Related Grid</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --space-2xl: 4rem;
+
+            /* Layout */
+            --sidebar-width: 250px;
+            --content-max-width: 700px;
+            --nav-height: 70px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --bg-tertiary: #e5e7eb;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --rating: #fbbf24;
+        }
+
+        /* layouts/product.css */
+        .product-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            background: var(--bg-primary);
+        }
+
+        .product-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .product-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .product-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .product-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+        }
+
+        .product-layout__search input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+        }
+
+        .product-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .product-layout__cart {
+            position: relative;
+        }
+
+        .product-layout__cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .product-layout__main {
+            flex: 1;
+            width: 100%;
+        }
+
+        .product-layout__container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl) var(--space-lg);
+            width: 100%;
+        }
+
+        /* Product Gallery & Info Grid */
+        .product-layout__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Gallery Styles */
+        .product-layout__gallery {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            width: 100%;
+        }
+
+        .gallery-main {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .gallery-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+            width: 100%;
+        }
+
+        .gallery-thumb {
+            aspect-ratio: 1 / 1;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .gallery-thumb.active {
+            border-color: var(--accent);
+        }
+
+        /* Product Info Styles */
+        .product-layout__info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            width: 100%;
+        }
+
+        .product-breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .product-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .product-breadcrumb a:hover {
+            color: var(--accent);
+        }
+
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .stars {
+            color: var(--rating);
+            letter-spacing: 2px;
+        }
+
+        .rating-count {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .product-price small {
+            font-size: 1rem;
+            font-weight: normal;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-left: var(--space-sm);
+        }
+
+        .product-discount {
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            margin-left: var(--space-sm);
+        }
+
+        .product-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .option-label {
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+
+        .size-selector {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .size-option {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .size-option.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .color-selector {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-option.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--accent);
+        }
+
+        .color-option.red {
+            background: #ef4444;
+        }
+
+        .color-option.blue {
+            background: #3b82f6;
+        }
+
+        .color-option.black {
+            background: #1f2937;
+        }
+
+        .color-option.gray {
+            background: #9ca3af;
+        }
+
+        .product-quantity {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .quantity-selector button {
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .quantity-selector input {
+            width: 60px;
+            height: 40px;
+            text-align: center;
+            border: none;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .product-actions {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .button {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        .button.primary {
+            background: var(--accent);
+            color: white;
+            flex: 2;
+        }
+
+        .button.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .button.secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            flex: 1;
+        }
+
+        .button.secondary:hover {
+            background: var(--bg-secondary);
+        }
+
+        .product-meta {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-lg);
+        }
+
+        .product-meta span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Product Details Tabs */
+        .product-layout__details {
+            margin-bottom: var(--space-xl);
+            width: 100%;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .tab {
+            padding: var(--space-sm) 0;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            padding: var(--space-lg) 0;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .spec-item {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        /* Reviews Section */
+        .reviews-summary {
+            display: flex;
+            gap: var(--space-xl);
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .average-rating {
+            text-align: center;
+        }
+
+        .average-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .review-bars {
+            flex: 1;
+        }
+
+        .review-bar-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xs);
+        }
+
+        .bar-label {
+            min-width: 60px;
+        }
+
+        .bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--rating);
+            border-radius: 4px;
+        }
+
+        .review-card {
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: var(--space-md);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+        }
+
+        .review-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Related Products - FIXED for consistent columns */
+        .product-layout__related {
+            margin-top: var(--space-xl);
+            width: 100%;
+        }
+
+        .related-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-lg);
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            width: 100%;
+        }
+
+        .related-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .related-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .related-image {
+            aspect-ratio: 1 / 1;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .related-info {
+            padding: var(--space-md);
+        }
+
+        .related-name {
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+
+        .related-price {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .product-layout__footer {
+            background: #1f2937;
+            color: white;
+            padding: var(--space-xl) var(--space-lg);
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-xl);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .footer-section h4 {
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-section ul {
+            list-style: none;
+            color: #9ca3af;
+        }
+
+        .footer-section li {
+            margin-bottom: var(--space-xs);
+        }
+
+        /* Responsive - FIXED for consistent columns */
+        @media (max-width: 1023px) {
+            .related-grid {
+                grid-template-columns: repeat(2, 1fr);
+                /* 2 columns on tablet */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-layout__grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 639px) {
+            .product-layout__header {
+                height: auto;
+                padding: var(--space-sm) var(--space-md);
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .product-layout__header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .product-layout__search {
+                width: 100%;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .product-actions {
+                flex-direction: column;
+            }
+
+            .button.primary,
+            .button.secondary {
+                width: 100%;
+            }
+
+            .related-grid {
+                grid-template-columns: 1fr;
+                /* 1 column on mobile */
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reviews-summary {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .review-bars {
+                width: 100%;
+            }
+
+            .gallery-thumbnails {
+                grid-template-columns: repeat(4, 1fr);
+                /* Keep 4 thumbnails even on mobile */
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="product-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0, 0, 0, 0.1);
+        }
+
+        .debug-layout [class*="product-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .product-layout__header {
+            background: rgba(255, 99, 132, 0.2);
+        }
+
+        .debug-layout .product-layout__main {
+            background: rgba(54, 162, 235, 0.05);
+        }
+
+        .debug-layout .product-layout__gallery {
+            background: rgba(255, 206, 86, 0.1);
+        }
+
+        .debug-layout .product-layout__info {
+            background: rgba(75, 192, 192, 0.1);
+        }
+
+        .debug-layout .product-layout__details {
+            background: rgba(153, 102, 255, 0.1);
+        }
+
+        .debug-layout .product-layout__related {
+            background: rgba(255, 159, 64, 0.1);
+        }
+
+        .debug-layout .product-layout__footer {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Component debug */
+        .debug-layout .related-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .review-card {
+            background: rgba(54, 162, 235, 0.1);
+            border: 2px dashed #36a2eb;
+            position: relative;
+        }
+
+        .debug-layout .related-card::before,
+        .debug-layout .review-card::before,
+        .debug-layout .gallery-thumb::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            font-family: monospace;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body class="product-layout debug-layout">
+    <!-- Header -->
+    <header class="product-layout__header">
+        <div class="product-layout__header-left">
+            <div class="product-layout__logo">🛍️ Shop</div>
+            <nav style="display: flex; gap: 1rem;">
+                <a href="#" style="color: var(--text-primary); text-decoration: none;">Home</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">Shop</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">Deals</a>
+            </nav>
+        </div>
+        <div class="product-layout__search">
+            <span style="margin-right: 0.5rem;">🔍</span>
+            <input type="text" placeholder="Search products...">
+        </div>
+        <div class="product-layout__header-right">
+            <span>👤</span>
+            <span>❤️</span>
+            <div class="product-layout__cart">
+                <span>🛒</span>
+                <span class="product-layout__cart-count">3</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="product-layout__main">
+        <div class="product-layout__container">
+            <!-- Breadcrumb -->
+            <div class="product-breadcrumb" style="margin-bottom: var(--space-lg);">
+                <a href="#">Home</a> &gt; <a href="#">Electronics</a> &gt; <a href="#">Headphones</a> &gt; <span>Premium
+                    Wireless Headphones</span>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="product-layout__grid">
+                <!-- Gallery Section -->
+                <div class="product-layout__gallery">
+                    <div class="gallery-main">
+                        🎧 Main Product Image
+                    </div>
+                    <div class="gallery-thumbnails">
+                        <div class="gallery-thumb active">1</div>
+                        <div class="gallery-thumb">2</div>
+                        <div class="gallery-thumb">3</div>
+                        <div class="gallery-thumb">4</div>
+                    </div>
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="product-layout__info">
+                    <div>
+                        <div
+                            style="display: flex; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-sm);">
+                            <span
+                                style="background: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">NEW</span>
+                            <span
+                                style="background: var(--accent-light); color: var(--accent); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">FREE
+                                SHIPPING</span>
+                        </div>
+                        <h1 class="product-title">Premium Wireless Headphones</h1>
+
+                        <div class="product-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-count">(128 reviews)</span>
+                        </div>
+
+                        <div class="product-price">
+                            $299.99
+                            <small>$399.99</small>
+                            <span class="product-discount">25% OFF</span>
+                        </div>
+                    </div>
+
+                    <!-- Product Options -->
+                    <div class="product-options">
+                        <div>
+                            <div class="option-label">Color</div>
+                            <div class="color-selector">
+                                <div class="color-option black selected" title="Black"></div>
+                                <div class="color-option blue" title="Blue"></div>
+                                <div class="color-option red" title="Red"></div>
+                                <div class="color-option gray" title="Gray"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="option-label">Size</div>
+                            <div class="size-selector">
+                                <div class="size-option selected">S</div>
+                                <div class="size-option">M</div>
+                                <div class="size-option">L</div>
+                                <div class="size-option">XL</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="option-label">Quantity</div>
+                            <div class="product-quantity">
+                                <div class="quantity-selector">
+                                    <button>-</button>
+                                    <input type="text" value="1" readonly>
+                                    <button>+</button>
+                                </div>
+                                <span style="color: var(--text-secondary);">Only 5 left in stock</span>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button class="button primary">Add to Cart</button>
+                            <button class="button secondary">♥ Wishlist</button>
+                        </div>
+
+                        <div class="product-meta">
+                            <div>SKU: <span>WH-1000XM4</span></div>
+                            <div>Category: <span>Electronics</span></div>
+                            <div>Tags: <span>Wireless, Noise Cancelling, Premium</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Details Tabs -->
+            <div class="product-layout__details">
+                <div class="tabs">
+                    <div class="tab active">Description</div>
+                    <div class="tab">Specifications</div>
+                    <div class="tab">Shipping & Returns</div>
+                </div>
+
+                <div class="tab-content">
+                    <div style="margin-bottom: var(--space-lg);">
+                        <h3 style="margin-bottom: var(--space-sm);">Product Description</h3>
+                        <p>Experience premium sound quality with our latest wireless headphones. Featuring active noise
+                            cancellation, 30-hour battery life, and comfortable over-ear design for all-day listening.
+                        </p>
+                    </div>
+
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <span class="spec-label">Brand:</span>
+                            <span>SoundMaster</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Model:</span>
+                            <span>WH-1000XM4</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Connectivity:</span>
+                            <span>Bluetooth 5.0</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Battery Life:</span>
+                            <span>30 hours</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Weight:</span>
+                            <span>250g</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Warranty:</span>
+                            <span>2 years</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="product-layout__details" style="margin-top: var(--space-xl);">
+                <h2 style="margin-bottom: var(--space-lg);">Customer Reviews</h2>
+
+                <div class="reviews-summary">
+                    <div class="average-rating">
+                        <div class="average-number">4.8</div>
+                        <div class="stars" style="font-size: 1.25rem;">★★★★★</div>
+                        <div style="color: var(--text-secondary);">128 reviews</div>
+                    </div>
+
+                    <div class="review-bars">
+                        <div class="review-bar-item">
+                            <span class="bar-label">5 ★</span>
+                            <div class="bar">
+                                <div class="bar-fill" style="width: 80%;"></div>
+                            </div>
+                            <span>102</span>
+                        </div>
+                        <div class="review-bar-item">
+                            <span class="bar-label">4 ★</span>
+                            <div class="bar">
+                                <div class="bar-fill" style="width: 15%;"></div>
+                            </div>
+                            <span>19</span>
+                        </div>
+                        <div class="review-bar-item">
+                            <span class="bar-label">3 ★</span>
+                            <div class="bar">
+                                <div class="bar-fill" style="width: 3%;"></div>
+                            </div>
+                            <span>4</span>
+                        </div>
+                        <div class="review-bar-item">
+                            <span class="bar-label">2 ★</span>
+                            <div class="bar">
+                                <div class="bar-fill" style="width: 1%;"></div>
+                            </div>
+                            <span>2</span>
+                        </div>
+                        <div class="review-bar-item">
+                            <span class="bar-label">1 ★</span>
+                            <div class="bar">
+                                <div class="bar-fill" style="width: 1%;"></div>
+                            </div>
+                            <span>1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="reviewer-name">John D.</span>
+                        <span class="review-date">2 days ago</span>
+                    </div>
+                    <div class="stars" style="margin-bottom: var(--space-sm);">★★★★★</div>
+                    <p style="color: var(--text-secondary);">Best headphones I've ever owned. The noise cancellation is
+                        incredible and they're comfortable enough to wear all day.</p>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="reviewer-name">Sarah M.</span>
+                        <span class="review-date">1 week ago</span>
+                    </div>
+                    <div class="stars" style="margin-bottom: var(--space-sm);">★★★★☆</div>
+                    <p style="color: var(--text-secondary);">Great sound quality, but the battery life could be better.
+                        Still a solid purchase overall.</p>
+                </div>
+
+                <div style="text-align: center; margin-top: var(--space-lg);">
+                    <button class="button secondary">Load More Reviews</button>
+                </div>
+            </div>
+
+            <!-- Related Products - NOW WITH CONSISTENT COLUMNS -->
+            <div class="product-layout__related">
+                <h2 class="related-title">You Might Also Like</h2>
+                <div class="related-grid">
+                    <div class="related-card">
+                        <div class="related-image">🎧</div>
+                        <div class="related-info">
+                            <div class="related-name">Sports Headphones</div>
+                            <div class="related-price">$149.99</div>
+                        </div>
+                    </div>
+                    <div class="related-card">
+                        <div class="related-image">🎧</div>
+                        <div class="related-info">
+                            <div class="related-name">Wireless Earbuds</div>
+                            <div class="related-price">$89.99</div>
+                        </div>
+                    </div>
+                    <div class="related-card">
+                        <div class="related-image">🎧</div>
+                        <div class="related-info">
+                            <div class="related-name">Studio Monitor</div>
+                            <div class="related-price">$199.99</div>
+                        </div>
+                    </div>
+                    <div class="related-card">
+                        <div class="related-image">🎧</div>
+                        <div class="related-info">
+                            <div class="related-name">Portable Speaker</div>
+                            <div class="related-price">$79.99</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="product-layout__footer">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <h4>Shop</h4>
+                <ul>
+                    <li>All Products</li>
+                    <li>New Arrivals</li>
+                    <li>Best Sellers</li>
+                    <li>Deals</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li>Contact Us</li>
+                    <li>FAQs</li>
+                    <li>Shipping</li>
+                    <li>Returns</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li>About Us</li>
+                    <li>Careers</li>
+                    <li>Blog</li>
+                    <li>Press</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <ul>
+                    <li>Facebook</li>
+                    <li>Twitter</li>
+                    <li>Instagram</li>
+                    <li>YouTube</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

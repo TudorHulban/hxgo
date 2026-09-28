@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Add Task Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 320px;
+            --nav-height: 60px;
+            --form-width: 600px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+
+            /* Priority colors */
+            --priority-high: #ef4444;
+            --priority-medium: #f59e0b;
+            --priority-low: #10b981;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Add Task Content */
+        .add-task-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Add Task Form */
+        .add-task-form {
+            max-width: var(--form-width);
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-2xl);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-xs);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group .form-input {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        /* Priority Selector */
+        .priority-selector {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .priority-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .priority-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .priority-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .priority-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .priority-dot.high { background: var(--priority-high); }
+        .priority-dot.medium { background: var(--priority-medium); }
+        .priority-dot.low { background: var(--priority-low); }
+
+        /* Assignee Selector */
+        .assignee-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+            margin-top: var(--space-xs);
+        }
+
+        .assignee-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .assignee-option:hover {
+            background: var(--bg-secondary);
+        }
+
+        .assignee-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .assignee-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .assignee-info {
+            flex: 1;
+        }
+
+        .assignee-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .assignee-role {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: var(--space-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent);
+        }
+
+        .file-upload__icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .file-upload__text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .file-upload__text span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn.danger:hover {
+            background: #fee2e2;
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .template-item {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-item:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .template-item__title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .template-item__desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .shortcut-item:last-child {
+            border-bottom: none;
+        }
+
+        .shortcut-key {
+            min-width: 60px;
+            font-family: monospace;
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .shortcut-desc {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: var(--space-sm);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .add-task-form {
+                padding: var(--space-xl);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .add-task-content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+
+            .add-task-form {
+                padding: var(--space-lg);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .priority-selector {
+                flex-direction: column;
+            }
+
+            .assignee-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .add-task-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .add-task-form { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(153, 102, 255, 0.1); }
+        .debug-layout .app-layout__mobile-nav { background: rgba(255, 159, 64, 0.2); }
+
+        /* Component debug */
+        .debug-layout .form-section {
+            border: 1px dashed #36a2eb;
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            position: relative;
+        }
+
+        .debug-layout .form-section::before {
+            content: "form-section";
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+        }
+
+        .debug-layout .priority-option.selected {
+            background: rgba(54, 162, 235, 0.3);
+            border: 2px dashed #36a2eb;
+        }
+
+        .debug-layout .assignee-option.selected {
+            background: rgba(75, 192, 192, 0.3);
+            border: 2px dashed #4bc0c0;
+        }
+
+        .debug-layout .template-item {
+            background: rgba(255, 99, 132, 0.1);
+            border: 1px dashed #ff6384;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#" class="active">Tasks</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">8</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                    <span class="nav-item__badge">16</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">QUICK ACTIONS</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">➕</span>
+                    <span>Add New Task</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Bulk Import</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Use Template</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">RECENT TEMPLATES</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔄</span>
+                    <span>Bug Fix</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">✨</span>
+                    <span>Feature Request</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📝</span>
+                    <span>Documentation</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Add Task Content -->
+        <main class="add-task-content">
+            <div class="add-task-form">
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Create New Task</h1>
+                    <p>Fill in the details to create a new task. Fields marked with <span style="color: var(--danger);">*</span> are required.</p>
+                </div>
+
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <div class="form-section-title">Basic Information</div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Task Title <span>*</span></label>
+                        <input type="text" class="form-input" placeholder="e.g., Implement login functionality" value="Design user profile page">
+                        <div class="form-hint">Use a clear, descriptive title</div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" placeholder="Describe the task in detail...">Create wireframes and high-fidelity designs for the user profile page including:
+- Personal information section
+- Avatar upload
+- Account settings tabs
+- Notification preferences</textarea>
+                        <div class="form-hint">Markdown is supported</div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Project <span>*</span></label>
+                            <select class="form-select">
+                                <option value="">Select a project</option>
+                                <option value="mobile" selected>Mobile App</option>
+                                <option value="website">Website Redesign</option>
+                                <option value="api">API Integration</option>
+                                <option value="database">Database Migration</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Status</label>
+                            <select class="form-select">
+                                <option value="todo" selected>To Do</option>
+                                <option value="progress">In Progress</option>
+                                <option value="review">In Review</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Section -->
+                <div class="form-section">
+                    <div class="form-section-title">Task Details</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Due Date</label>
+                            <div class="input-group">
+                                <input type="date" class="form-input" value="2024-12-20">
+                                <span class="input-group-addon">📅</span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Story Points</label>
+                            <div class="input-group">
+                                <input type="number" class="form-input" placeholder="3" min="1" max="13" value="5">
+                                <span class="input-group-addon">pts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Priority</label>
+                        <div class="priority-selector">
+                            <div class="priority-option selected">
+                                <span class="priority-dot high"></span>
+                                <span>High</span>
+                            </div>
+                            <div class="priority-option">
+                                <span class="priority-dot medium"></span>
+                                <span>Medium</span>
+                            </div>
+                            <div class="priority-option">
+                                <span class="priority-dot low"></span>
+                                <span>Low</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Assignees</label>
+                        <div class="assignee-selector">
+                            <div class="assignee-option selected">
+                                <div class="assignee-avatar" style="background: #dbeafe;">SC</div>
+                                <div class="assignee-info">
+                                    <div class="assignee-name">Sarah Chen</div>
+                                    <div class="assignee-role">Design Lead</div>
+                                </div>
+                            </div>
+                            <div class="assignee-option">
+                                <div class="assignee-avatar" style="background: #d1fae5;">MJ</div>
+                                <div class="assignee-info">
+                                    <div class="assignee-name">Mike Johnson</div>
+                                    <div class="assignee-role">Backend Dev</div>
+                                </div>
+                            </div>
+                            <div class="assignee-option">
+                                <div class="assignee-avatar" style="background: #fce7f3;">AR</div>
+                                <div class="assignee-info">
+                                    <div class="assignee-name">Alex Rivera</div>
+                                    <div class="assignee-role">Frontend Dev</div>
+                                </div>
+                            </div>
+                            <div class="assignee-option">
+                                <div class="assignee-avatar" style="background: #fed7aa;">EW</div>
+                                <div class="assignee-info">
+                                    <div class="assignee-name">Emma Watson</div>
+                                    <div class="assignee-role">Product Manager</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Options -->
+                <div class="form-section">
+                    <div class="form-section-title">Additional Options</div>
+                    
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label class="form-label">Labels</label>
+                            <select class="form-select" multiple size="3">
+                                <option value="bug" selected>🐛 Bug</option>
+                                <option value="feature" selected>✨ Feature</option>
+                                <option value="enhancement">🚀 Enhancement</option>
+                                <option value="documentation">📝 Documentation</option>
+                                <option value="design">🎨 Design</option>
+                            </select>
+                            <div class="form-hint">Hold Ctrl/Cmd to select multiple</div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Watchers</label>
+                            <select class="form-select">
+                                <option value="">Select watchers</option>
+                                <option value="sc">Sarah Chen</option>
+                                <option value="mj" selected>Mike Johnson</option>
+                                <option value="ar">Alex Rivera</option>
+                                <option value="ew">Emma Watson</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>Send notifications to team</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>Blocked by another task</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox">
+                                <span>Add to sprint backlog</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" checked>
+                                <span>Track time for this task</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attachments -->
+                <div class="form-section">
+                    <div class="form-section-title">Attachments</div>
+                    
+                    <div class="file-upload">
+                        <div class="file-upload__icon">📎</div>
+                        <div class="file-upload__text">
+                            <span>Click to upload</span> or drag and drop
+                        </div>
+                        <div class="form-hint">PNG, JPG, PDF up to 10MB</div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button class="btn">Cancel</button>
+                    <button class="btn">Save as Draft</button>
+                    <button class="btn primary">Create Task</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Templates</h3>
+                    <a href="#">Manage</a>
+                </div>
+                
+                <div class="template-item">
+                    <div class="template-item__title">🐛 Bug Fix</div>
+                    <div class="template-item__desc">Pre-filled bug report template</div>
+                </div>
+
+                <div class="template-item">
+                    <div class="template-item__title">✨ Feature Request</div>
+                    <div class="template-item__desc">New feature implementation</div>
+                </div>
+
+                <div class="template-item">
+                    <div class="template-item__title">📝 Documentation</div>
+                    <div class="template-item__desc">Write or update docs</div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Keyboard Shortcuts</h3>
+                </div>
+                
+                <div class="shortcut-item">
+                    <span class="shortcut-key">⌘/Ctrl + S</span>
+                    <span class="shortcut-desc">Save draft</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-key">⌘/Ctrl + Enter</span>
+                    <span class="shortcut-desc">Submit task</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-key">Esc</span>
+                    <span class="shortcut-desc">Cancel</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-key">⌘/Ctrl + P</span>
+                    <span class="shortcut-desc">Add project</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Recent Tasks</h3>
+                </div>
+                
+                <div style="font-size: 0.85rem; padding: var(--space-xs) 0;">
+                    <div style="margin-bottom: var(--space-xs);">• Design login screen</div>
+                    <div style="margin-bottom: var(--space-xs);">• API documentation</div>
+                    <div style="margin-bottom: var(--space-xs);">• Database migration</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>➕</span>
+            <span>Add Task</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>📋</span>
+            <span>Templates</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Categories Management Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 280px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Category colors */
+            --cat-tech: #3b82f6;
+            --cat-design: #ec4899;
+            --cat-dev: #10b981;
+            --cat-tutorial: #f59e0b;
+            --cat-news: #8b5cf6;
+            --cat-career: #f97316;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.categories { background: #dbeafe; color: var(--accent); }
+        .stat-icon.posts { background: #d1fae5; color: var(--success); }
+        .stat-icon.views { background: #fce7f3; color: var(--pink); }
+        .stat-icon.unused { background: #fee2e2; color: var(--danger); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Categories Layout */
+        .categories-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Add/Edit Category Form */
+        .category-form-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+            position: sticky;
+            top: calc(var(--nav-height) + var(--space-xl));
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .form-header .cancel-edit {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .form-header.editing .cancel-edit {
+            display: block;
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Slug Preview */
+        .slug-preview {
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-xs);
+        }
+
+        .slug-preview span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor;
+        }
+
+        .color-option.blue { background: var(--cat-tech); }
+        .color-option.pink { background: var(--cat-design); }
+        .color-option.green { background: var(--cat-dev); }
+        .color-option.orange { background: var(--cat-tutorial); }
+        .color-option.purple { background: var(--cat-news); }
+        .color-option.yellow { background: var(--cat-career); }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+
+        /* Categories List */
+        .categories-list-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .list-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .list-controls {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .list-search {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .list-search input {
+            padding: var(--space-sm);
+            border: none;
+            width: 200px;
+        }
+
+        .list-search button {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-primary);
+            border: none;
+            border-left: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .categories-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .categories-table th {
+            text-align: left;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .categories-table td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .categories-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .category-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .category-name {
+            font-weight: 500;
+        }
+
+        .category-slug {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .posts-count {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .action-btn.edit:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .action-btn.view:hover {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .pagination-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .pagination-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .categories-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .category-form-card {
+                position: static;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .list-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .list-search {
+                width: 100%;
+            }
+
+            .list-search input {
+                width: 100%;
+            }
+
+            .categories-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .stats-grid { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .category-form-card { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .categories-list-card { background: rgba(153, 102, 255, 0.05); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .categories-table tr {
+            border-bottom: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .color-option.selected {
+            border: 3px solid #36a2eb;
+        }
+
+        .debug-layout .category-color {
+            border: 1px dashed currentColor;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog Admin</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Authors</a>
+                <a href="#" class="active">Categories</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Categories</h1>
+                <p>Manage blog categories, their colors, and SEO settings</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">📊 View Analytics</button>
+                <button class="btn primary">+ New Category</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon categories">📑</div>
+                <div class="stat-content">
+                    <h3>Total Categories</h3>
+                    <div class="value">12</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon posts">📝</div>
+                <div class="stat-content">
+                    <h3>Posts in Categories</h3>
+                    <div class="value">342</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon views">👁️</div>
+                <div class="stat-content">
+                    <h3>Total Views</h3>
+                    <div class="value">128.5K</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon unused">⚠️</div>
+                <div class="stat-content">
+                    <h3>Unused Categories</h3>
+                    <div class="value">2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Layout -->
+        <div class="categories-layout">
+            <!-- Add/Edit Category Form -->
+            <div class="category-form-card">
+                <div class="form-header">
+                    <h2>Add New Category</h2>
+                    <span class="cancel-edit">✕ Cancel</span>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Category Name <span>*</span></label>
+                    <input type="text" class="form-input" placeholder="e.g., Technology" value="Web Development">
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Slug</label>
+                    <input type="text" class="form-input" value="web-development">
+                    <div class="slug-preview">
+                        <span>🔗</span>
+                        https://devblog.com/category/<strong>web-development</strong>
+                    </div>
+                    <div class="form-hint">Leave empty to auto-generate from name</div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" placeholder="Describe this category...">Articles about web development, frontend and backend technologies, frameworks, and best practices.</textarea>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Parent Category</label>
+                    <select class="form-select">
+                        <option value="">None (Top Level)</option>
+                        <option value="tech">Technology</option>
+                        <option value="design">Design</option>
+                        <option value="dev">Development</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Category Color</label>
+                    <div class="color-picker">
+                        <div class="color-option blue selected" title="Blue"></div>
+                        <div class="color-option pink" title="Pink"></div>
+                        <div class="color-option green" title="Green"></div>
+                        <div class="color-option orange" title="Orange"></div>
+                        <div class="color-option purple" title="Purple"></div>
+                        <div class="color-option yellow" title="Yellow"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">SEO Title</label>
+                    <input type="text" class="form-input" value="Web Development Articles and Tutorials">
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Meta Description</label>
+                    <textarea class="form-textarea" rows="2">Explore our collection of web development articles covering React, Vue, Node.js, and more.</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn outline">Clear</button>
+                    <button class="btn primary">Save Category</button>
+                </div>
+            </div>
+
+            <!-- Categories List -->
+            <div class="categories-list-card">
+                <div class="list-header">
+                    <h2>All Categories</h2>
+                    <div class="list-controls">
+                        <div class="list-search">
+                            <input type="text" placeholder="Search categories...">
+                            <button>🔍</button>
+                        </div>
+                        <select class="btn small">
+                            <option>Sort by Name</option>
+                            <option>Sort by Posts</option>
+                            <option>Sort by Views</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="categories-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Slug</th>
+                            <th>Posts</th>
+                            <th>Views</th>
+                            <th>Trend</th>
+                            <th>Last Post</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: var(--cat-tech);"></div>
+                                    <div>
+                                        <div class="category-name">Technology</div>
+                                        <div class="category-slug">/technology</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>technology</td>
+                            <td><span class="posts-count">86</span></td>
+                            <td>32.4K</td>
+                            <td><span class="trend-up">↑ 12%</span></td>
+                            <td>2 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: var(--cat-design);"></div>
+                                    <div>
+                                        <div class="category-name">Design</div>
+                                        <div class="category-slug">/design</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>design</td>
+                            <td><span class="posts-count">54</span></td>
+                            <td>28.1K</td>
+                            <td><span class="trend-up">↑ 8%</span></td>
+                            <td>5 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: var(--cat-dev);"></div>
+                                    <div>
+                                        <div class="category-name">Development</div>
+                                        <div class="category-slug">/development</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>development</td>
+                            <td><span class="posts-count">72</span></td>
+                            <td>45.6K</td>
+                            <td><span class="trend-up">↑ 15%</span></td>
+                            <td>1 day ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: var(--cat-tutorial);"></div>
+                                    <div>
+                                        <div class="category-name">Tutorials</div>
+                                        <div class="category-slug">/tutorials</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>tutorials</td>
+                            <td><span class="posts-count">45</span></td>
+                            <td>18.9K</td>
+                            <td><span class="trend-down">↓ 3%</span></td>
+                            <td>1 week ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: var(--cat-news);"></div>
+                                    <div>
+                                        <div class="category-name">News</div>
+                                        <div class="category-slug">/news</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>news</td>
+                            <td><span class="posts-count">32</span></td>
+                            <td>12.3K</td>
+                            <td><span class="trend-up">↑ 5%</span></td>
+                            <td>3 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: var(--cat-career);"></div>
+                                    <div>
+                                        <div class="category-name">Career</div>
+                                        <div class="category-slug">/career</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>career</td>
+                            <td><span class="posts-count">28</span></td>
+                            <td>15.2K</td>
+                            <td><span class="trend-up">↑ 7%</span></td>
+                            <td>4 days ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="category-info">
+                                    <div class="category-color" style="background: #94a3b8;"></div>
+                                    <div>
+                                        <div class="category-name">Uncategorized</div>
+                                        <div class="category-slug">/uncategorized</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>uncategorized</td>
+                            <td><span class="posts-count">15</span></td>
+                            <td>4.2K</td>
+                            <td><span class="trend-neutral">→ 0%</span></td>
+                            <td>2 weeks ago</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">✏️</button>
+                                    <button class="action-btn view">👁️</button>
+                                    <button class="action-btn delete">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <div class="pagination-info">Showing 1-7 of 12 categories</div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" disabled>←</button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">→</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>📑</span>
+            <span>Categories</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👥</span>
+            <span>Authors</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </div>
+    </nav>
+</body>
+
+</html>

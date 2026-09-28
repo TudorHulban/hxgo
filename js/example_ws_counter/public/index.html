@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Counter</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #counter {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 12px 32px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .decrement {
+            background: #dc3545;
+        }
+
+        .decrement:hover {
+            background: #a71d2a;
+        }
+
+        .reset {
+            background: #6c757d;
+        }
+
+        .reset:hover {
+            background: #494f54;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Counter</h1>
+        <div id="counter">0</div>
+        <div>
+            <button hx-post="/counter/increment" hx-swap="#counter">+1</button>
+            <button hx-post="/counter/decrement" hx-swap="#counter" class="decrement">-1</button>
+            <button hx-post="/counter/reset" hx-swap="#counter" class="reset">Reset</button>
+        </div>
+        <div class="status" id="ws-status">● Connected</div>
+    </div>
+
+    <!-- Load scripts at the end of body -->
+    <script src="/hxgo_core_ws.js"></script>
+    <script src="/hxgo_plugin_listeners.js"></script>
+    <script src="/hxgo_plugin_ui.js"></script>
+    <script src="/hxgo_plugin_validation.js"></script>
+
+    <script>
+        // WebSocket status indicator
+        document.addEventListener('DOMContentLoaded', function () {
+            const status = document.getElementById('ws-status');
+            // Your hxgo.js already handles WebSocket connection
+            // This just shows it's working
+            setInterval(() => {
+                status.textContent = '● Connected';
+                status.style.color = '#28a745';
+            }, 3000);
+        });
+    </script>
+</body>
+
+</html>

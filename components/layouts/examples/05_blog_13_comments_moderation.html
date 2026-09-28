@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Comments Moderation Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --sidebar-width: 280px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Status colors */
+            --status-pending: #f59e0b;
+            --status-approved: #10b981;
+            --status-spam: #ef4444;
+            --status-trash: #6b7280;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn.warning {
+            background: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .btn.outline {
+            background: transparent;
+        }
+
+        .btn.small {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: 0.8rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.pending { background: #fed7aa; color: var(--status-pending); }
+        .stat-icon.approved { background: #d1fae5; color: var(--status-approved); }
+        .stat-icon.spam { background: #fee2e2; color: var(--status-spam); }
+        .stat-icon.trash { background: #e5e7eb; color: var(--status-trash); }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .stat-content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .filter-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .filter-tab.pending { border-left: 3px solid var(--status-pending); }
+        .filter-tab.approved { border-left: 3px solid var(--status-approved); }
+        .filter-tab.spam { border-left: 3px solid var(--status-spam); }
+        .filter-tab.trash { border-left: 3px solid var(--status-trash); }
+
+        .filter-row {
+            display: flex;
+            gap: var(--space-md);
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .filter-search {
+            display: flex;
+            gap: var(--space-xs);
+            flex: 2;
+        }
+
+        .filter-search input {
+            flex: 1;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        /* Bulk Actions */
+        .bulk-actions {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .bulk-select {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .bulk-select select {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .bulk-actions-info {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Comments Table */
+        .comments-table-container {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+
+        .comments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comments-table th {
+            text-align: left;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comments-table td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .comments-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .comments-table tr.pending {
+            background: #fffbeb;
+        }
+
+        .comments-table tr.spam {
+            background: #fef2f2;
+        }
+
+        .comments-table tr.approved {
+            background: #f0fdf4;
+        }
+
+        /* Checkbox */
+        .comment-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Comment Author */
+        .comment-author-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .comment-author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .comment-author-details {
+            line-height: 1.3;
+        }
+
+        .comment-author-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .comment-author-email {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .comment-author-ip {
+            font-size: 0.65rem;
+            font-family: monospace;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 2px 4px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        /* Comment Content */
+        .comment-content-cell {
+            max-width: 350px;
+        }
+
+        .comment-text {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .comment-meta {
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .comment-post {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .comment-post:hover {
+            text-decoration: underline;
+        }
+
+        .comment-date {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status-badge.pending { background: #fed7aa; color: var(--status-pending); }
+        .status-badge.approved { background: #d1fae5; color: var(--status-approved); }
+        .status-badge.spam { background: #fee2e2; color: var(--status-spam); }
+        .status-badge.trash { background: #e5e7eb; color: var(--status-trash); }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .action-btn.approve {
+            color: var(--status-approved);
+            border-color: var(--status-approved);
+        }
+
+        .action-btn.approve:hover {
+            background: var(--status-approved);
+            color: white;
+        }
+
+        .action-btn.reject {
+            color: var(--warning);
+            border-color: var(--warning);
+        }
+
+        .action-btn.reject:hover {
+            background: var(--warning);
+            color: white;
+        }
+
+        .action-btn.spam {
+            color: var(--status-spam);
+            border-color: var(--status-spam);
+        }
+
+        .action-btn.spam:hover {
+            background: var(--status-spam);
+            color: white;
+        }
+
+        .action-btn.trash {
+            color: var(--status-trash);
+            border-color: var(--status-trash);
+        }
+
+        .action-btn.trash:hover {
+            background: var(--status-trash);
+            color: white;
+        }
+
+        .action-btn.edit {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .action-btn.edit:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Quick Edit Form */
+        .quick-edit-form {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--space-md);
+            margin-top: var(--space-xs);
+        }
+
+        .quick-edit-form textarea {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: var(--space-sm);
+            min-height: 80px;
+        }
+
+        .quick-edit-actions {
+            display: flex;
+            gap: var(--space-xs);
+            justify-content: flex-end;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: var(--space-xs);
+        }
+
+        .pagination-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .pagination-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Right Panel - Moderation Tips */
+        .moderation-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .panel-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .panel-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-card__header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Spam Words */
+        .spam-word-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .spam-word-item:last-child {
+            border-bottom: none;
+        }
+
+        .spam-word {
+            flex: 1;
+            font-family: monospace;
+            font-weight: 500;
+        }
+
+        .spam-word-count {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .spam-word-remove {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .add-spam-word {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: var(--space-sm);
+        }
+
+        .add-spam-word input {
+            flex: 1;
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Recent Comments */
+        .recent-comment-item {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recent-comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-comment-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .recent-comment-content {
+            flex: 1;
+        }
+
+        .recent-comment-text {
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recent-comment-meta {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        /* Quick Filters */
+        .quick-filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .quick-filter-item:hover {
+            color: var(--accent);
+        }
+
+        .quick-filter-item:last-child {
+            border-bottom: none;
+        }
+
+        .quick-filter-name {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .quick-filter-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .quick-filter-dot.pending { background: var(--status-pending); }
+        .quick-filter-dot.approved { background: var(--status-approved); }
+        .quick-filter-dot.spam { background: var(--status-spam); }
+        .quick-filter-dot.trash { background: var(--status-trash); }
+
+        .quick-filter-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .moderation-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                order: -1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-search {
+                flex-direction: column;
+            }
+
+            .bulk-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .bulk-actions-info {
+                margin-left: 0;
+            }
+
+            .comments-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .comment-author-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__nav {
+                display: none;
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .stats-grid { background: rgba(54, 162, 235, 0.05); }
+        .debug-layout .filter-bar { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .comments-table-container { background: rgba(153, 102, 255, 0.02); }
+        .debug-layout .right-panel { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .comments-table tr {
+            border-bottom: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .filter-tab.active {
+            background: rgba(54, 162, 235, 0.3);
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .action-btn {
+            border: 1px dashed currentColor;
+        }
+
+        .debug-layout .comments-table tr.pending {
+            border-left: 3px solid #f59e0b;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog Admin</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Posts</a>
+                <a href="#">Authors</a>
+                <a href="#">Categories</a>
+                <a href="#">Tags</a>
+                <a href="#" class="active">Comments</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search comments...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">AD</div>
+                <span>Admin User ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Content Header -->
+        <div class="content-header">
+            <div class="content-header__title">
+                <h1>Comments Moderation</h1>
+                <p>Review, approve, and manage reader comments</p>
+            </div>
+            <div class="content-header__actions">
+                <button class="btn outline">⚙️ Settings</button>
+                <button class="btn outline">📊 Analytics</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon pending">⏳</div>
+                <div class="stat-content">
+                    <h3>Pending</h3>
+                    <div class="value">24</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon approved">✓</div>
+                <div class="stat-content">
+                    <h3>Approved</h3>
+                    <div class="value">1,284</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon spam">⚠️</div>
+                <div class="stat-content">
+                    <h3>Spam</h3>
+                    <div class="value">342</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon trash">🗑️</div>
+                <div class="stat-content">
+                    <h3>Trash</h3>
+                    <div class="value">18</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moderation Layout -->
+        <div class="moderation-layout">
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-tabs">
+                        <span class="filter-tab active pending">All Comments</span>
+                        <span class="filter-tab pending">Pending (24)</span>
+                        <span class="filter-tab approved">Approved (1.2K)</span>
+                        <span class="filter-tab spam">Spam (342)</span>
+                        <span class="filter-tab trash">Trash (18)</span>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <div class="filter-label">Post</div>
+                            <select class="filter-select">
+                                <option>All Posts</option>
+                                <option>Understanding React Hooks</option>
+                                <option>CSS Grid Layout Guide</option>
+                                <option>TypeScript Best Practices</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <div class="filter-label">Author Type</div>
+                            <select class="filter-select">
+                                <option>All</option>
+                                <option>Registered Users</option>
+                                <option>Guests</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <div class="filter-label">Date</div>
+                            <select class="filter-select">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                                <option>All time</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-search">
+                            <input type="text" placeholder="Search comments...">
+                            <button class="btn small">Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="bulk-actions">
+                    <div class="bulk-select">
+                        <input type="checkbox" id="select-all">
+                        <label for="select-all">Select All</label>
+                    </div>
+                    <select>
+                        <option>Bulk Actions</option>
+                        <option>Approve</option>
+                        <option>Mark as Spam</option>
+                        <option>Move to Trash</option>
+                    </select>
+                    <button class="btn small">Apply</button>
+                    <span class="bulk-actions-info">3 comments selected</span>
+                </div>
+
+                <!-- Comments Table -->
+                <div class="comments-table-container">
+                    <table class="comments-table">
+                        <thead>
+                            <tr>
+                                <th width="30px"></th>
+                                <th>Author</th>
+                                <th>Comment</th>
+                                <th>In Response To</th>
+                                <th>Submitted</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pending Comment -->
+                            <tr class="pending">
+                                <td><input type="checkbox" class="comment-checkbox" checked></td>
+                                <td>
+                                    <div class="comment-author-info">
+                                        <div class="comment-author-avatar">JD</div>
+                                        <div class="comment-author-details">
+                                            <div class="comment-author-name">John Doe</div>
+                                            <div class="comment-author-email">john.doe@email.com</div>
+                                            <span class="comment-author-ip">192.168.1.45</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">This is absolutely terrible advice. Anyone who follows this will break their production site. The author clearly doesn't know what they're talking about...</div>
+                                    <div class="comment-meta">
+                                        <span>⚠️ 3 reports</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="comment-post">Understanding React Hooks</a>
+                                </td>
+                                <td>
+                                    <div class="comment-date">2 hours ago</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge pending">Pending</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve" title="Approve">✓</button>
+                                        <button class="action-btn reject" title="Reject">✗</button>
+                                        <button class="action-btn spam" title="Mark as Spam">⚠️</button>
+                                        <button class="action-btn trash" title="Move to Trash">🗑️</button>
+                                        <button class="action-btn edit" title="Quick Edit">✏️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Spam Comment -->
+                            <tr class="spam">
+                                <td><input type="checkbox" class="comment-checkbox"></td>
+                                <td>
+                                    <div class="comment-author-info">
+                                        <div class="comment-author-avatar">??</div>
+                                        <div class="comment-author-details">
+                                            <div class="comment-author-name">CheapRoxham</div>
+                                            <div class="comment-author-email">spam@spam.com</div>
+                                            <span class="comment-author-ip">185.142.53.22</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">Great post! Check out my website for cheap products: totally-not-spam.com/buy-now</div>
+                                    <div class="comment-meta">
+                                        <span>🔗 Contains links</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="comment-post">CSS Grid Layout Guide</a>
+                                </td>
+                                <td>
+                                    <div class="comment-date">5 hours ago</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge spam">Spam</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve" title="Approve">✓</button>
+                                        <button class="action-btn reject" title="Reject">✗</button>
+                                        <button class="action-btn spam active" title="Mark as Spam">⚠️</button>
+                                        <button class="action-btn trash" title="Move to Trash">🗑️</button>
+                                        <button class="action-btn edit" title="Quick Edit">✏️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Approved Comment -->
+                            <tr class="approved">
+                                <td><input type="checkbox" class="comment-checkbox"></td>
+                                <td>
+                                    <div class="comment-author-info">
+                                        <div class="comment-author-avatar">SC</div>
+                                        <div class="comment-author-details">
+                                            <div class="comment-author-name">Sarah Chen</div>
+                                            <div class="comment-author-email">sarah.c@company.com</div>
+                                            <span class="comment-author-ip">10.0.2.15</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">Great explanation! This really helped me understand the concept. Looking forward to more content like this.</div>
+                                    <div class="comment-meta">
+                                        <span>❤️ Liked by author</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="comment-post">TypeScript Best Practices</a>
+                                </td>
+                                <td>
+                                    <div class="comment-date">1 day ago</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge approved">Approved</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve active" title="Approve">✓</button>
+                                        <button class="action-btn reject" title="Reject">✗</button>
+                                        <button class="action-btn spam" title="Mark as Spam">⚠️</button>
+                                        <button class="action-btn trash" title="Move to Trash">🗑️</button>
+                                        <button class="action-btn edit" title="Quick Edit">✏️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Pending with Quick Edit -->
+                            <tr class="pending">
+                                <td><input type="checkbox" class="comment-checkbox" checked></td>
+                                <td>
+                                    <div class="comment-author-info">
+                                        <div class="comment-author-avatar">AR</div>
+                                        <div class="comment-author-details">
+                                            <div class="comment-author-name">Alex Rivera</div>
+                                            <div class="comment-author-email">alex.r@company.com</div>
+                                            <span class="comment-author-ip">10.0.2.22</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">I think there's a typo in the second paragraph. "thier" should be "their". Otherwise great article!</div>
+                                    <div class="comment-meta">
+                                        <span>💬 Contains suggestion</span>
+                                    </div>
+                                    <!-- Quick Edit Form (visible on click) -->
+                                    <div class="quick-edit-form">
+                                        <textarea>I think there's a typo in the second paragraph. "thier" should be "their". Otherwise great article!</textarea>
+                                        <div class="quick-edit-actions">
+                                            <button class="btn small outline">Cancel</button>
+                                            <button class="btn small success">Update</button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#" class="comment-post">Getting Started with Next.js</a>
+                                </td>
+                                <td>
+                                    <div class="comment-date">3 days ago</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge pending">Pending</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn approve" title="Approve">✓</button>
+                                        <button class="action-btn reject" title="Reject">✗</button>
+                                        <button class="action-btn spam" title="Mark as Spam">⚠️</button>
+                                        <button class="action-btn trash" title="Move to Trash">🗑️</button>
+                                        <button class="action-btn edit active" title="Quick Edit">✏️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Trash Comment -->
+                            <tr>
+                                <td><input type="checkbox" class="comment-checkbox"></td>
+                                <td>
+                                    <div class="comment-author-info">
+                                        <div class="comment-author-avatar">XX</div>
+                                        <div class="comment-author-details">
+                                            <div class="comment-author-name">Deleted User</div>
+                                            <div class="comment-author-email">user@deleted.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="comment-content-cell">
+                                    <div class="comment-text">[Comment content not available - in trash]</div>
+                                </td>
+                                <td>
+                                    <a href="#" class="comment-post">Web Performance Tips</a>
+                                </td>
+                                <td>
+                                    <div class="comment-date">1 week ago</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge trash">Trash</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn" title="Restore">↩️</button>
+                                        <button class="action-btn trash" title="Delete Permanently">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <div class="pagination-info">Showing 1-5 of 1,668 comments</div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>←</button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn">4</button>
+                            <button class="pagination-btn">5</button>
+                            <button class="pagination-btn">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <!-- Quick Filters -->
+                <div class="panel-card">
+                    <div class="panel-card__header">
+                        <h3>🔍 Quick Filters</h3>
+                    </div>
+                    
+                    <div class="quick-filter-item">
+                        <div class="quick-filter-name">
+                            <span class="quick-filter-dot pending"></span>
+                            <span>Pending</span>
+                        </div>
+                        <span class="quick-filter-count">24</span>
+                    </div>
+
+                    <div class="quick-filter-item">
+                        <div class="quick-filter-name">
+                            <span class="quick-filter-dot approved"></span>
+                            <span>Approved</span>
+                        </div>
+                        <span class="quick-filter-count">1,284</span>
+                    </div>
+
+                    <div class="quick-filter-item">
+                        <div class="quick-filter-name">
+                            <span class="quick-filter-dot spam"></span>
+                            <span>Spam</span>
+                        </div>
+                        <span class="quick-filter-count">342</span>
+                    </div>
+
+                    <div class="quick-filter-item">
+                        <div class="quick-filter-name">
+                            <span class="quick-filter-dot trash"></span>
+                            <span>Trash</span>
+                        </div>
+                        <span class="quick-filter-count">18</span>
+                    </div>
+
+                    <div class="quick-filter-item">
+                        <div class="quick-filter-name">
+                            <span>Mentions</span>
+                        </div>
+                        <span class="quick-filter-count">8</span>
+                    </div>
+                </div>
+
+                <!-- Spam Words -->
+                <div class="panel-card">
+                    <div class="panel-card__header">
+                        <h3>🚫 Spam Keywords</h3>
+                        <a href="#">Edit</a>
+                    </div>
+                    
+                    <div class="spam-word-item">
+                        <span class="spam-word">viagra</span>
+                        <span class="spam-word-count">23 matches</span>
+                        <span class="spam-word-remove">✕</span>
+                    </div>
+
+                    <div class="spam-word-item">
+                        <span class="spam-word">casino</span>
+                        <span class="spam-word-count">18 matches</span>
+                        <span class="spam-word-remove">✕</span>
+                    </div>
+
+                    <div class="spam-word-item">
+                        <span class="spam-word">discount</span>
+                        <span class="spam-word-count">15 matches</span>
+                        <span class="spam-word-remove">✕</span>
+                    </div>
+
+                    <div class="spam-word-item">
+                        <span class="spam-word">cheap</span>
+                        <span class="spam-word-count">12 matches</span>
+                        <span class="spam-word-remove">✕</span>
+                    </div>
+
+                    <div class="add-spam-word">
+                        <input type="text" placeholder="Add keyword...">
+                        <button class="btn small">+</button>
+                    </div>
+                </div>
+
+                <!-- Recent Comments -->
+                <div class="panel-card">
+                    <div class="panel-card__header">
+                        <h3>💬 Recent Activity</h3>
+                        <a href="#">View All</a>
+                    </div>
+                    
+                    <div class="recent-comment-item">
+                        <div class="recent-comment-avatar">JD</div>
+                        <div class="recent-comment-content">
+                            <div class="recent-comment-text">This is absolutely terrible advice...</div>
+                            <div class="recent-comment-meta">2 hours ago · Pending</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-comment-item">
+                        <div class="recent-comment-avatar">??</div>
+                        <div class="recent-comment-content">
+                            <div class="recent-comment-text">Check out my website for cheap...</div>
+                            <div class="recent-comment-meta">5 hours ago · Spam</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-comment-item">
+                        <div class="recent-comment-avatar">SC</div>
+                        <div class="recent-comment-content">
+                            <div class="recent-comment-text">Great explanation! This really helped...</div>
+                            <div class="recent-comment-meta">1 day ago · Approved</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Moderation Tips -->
+                <div class="panel-card">
+                    <div class="panel-card__header">
+                        <h3>💡 Tips</h3>
+                    </div>
+                    
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p style="margin-bottom: var(--space-sm);">• Use bulk actions to moderate multiple comments at once</p>
+                        <p style="margin-bottom: var(--space-sm);">• Add common spam words to automatically filter comments</p>
+                        <p style="margin-bottom: var(--space-sm);">• Hold Shift to select multiple comments</p>
+                        <p>• Keyboard shortcuts: A (approve), S (spam), D (delete)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📝</span>
+            <span>Posts</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>💬</span>
+            <span>Comments</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🏷️</span>
+            <span>Tags</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </div>
+    </nav>
+
+    <script>
+        // Simple demo script (not functional)
+        console.log('Comments moderation page loaded');
+    </script>
+</body>
+
+</html>

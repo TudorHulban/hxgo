@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Author Public Profile Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+
+            /* Social colors */
+            --twitter: #1DA1F2;
+            --github: #333333;
+            --linkedin: #0077B5;
+            --website: #10b981;
+        }
+
+        /* Blog Layout */
+        .blog-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .blog-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .blog-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .blog-layout__logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .blog-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .blog-layout__nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .blog-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .blog-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .blog-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .blog-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .blog-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .blog-layout__main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            width: 100%;
+        }
+
+        .author-profile-header {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 0 0 var(--space-xl) 0;
+            /* Remove top padding */
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            /* Keep cover image contained */
+        }
+
+        .author-profile-cover {
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            border-radius: 12px;
+            margin-bottom: var(--space-xl);
+            position: relative;
+        }
+
+        .author-profile-info {
+            display: flex;
+            gap: var(--space-xl);
+            align-items: flex-end;
+            /* margin-top: -60px; */
+            padding: 0 var(--space-lg);
+        }
+
+        .author-profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--accent);
+        }
+
+        .author-profile-details {
+            flex: 1;
+            padding-bottom: var(--space-md);
+        }
+
+        .author-profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .author-profile-role {
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+        }
+
+        .author-profile-bio {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 600px;
+            margin-bottom: var(--space-md);
+        }
+
+        .author-profile-meta {
+            display: flex;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .author-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .author-profile-stats {
+            display: flex;
+            gap: var(--space-xl);
+            padding: 0 var(--space-lg);
+            margin-top: var(--space-lg);
+        }
+
+        .author-stat {
+            text-align: center;
+        }
+
+        .author-stat__value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .author-stat__label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .author-profile-social {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .social-link:hover {
+            transform: scale(1.1);
+        }
+
+        .social-link.twitter {
+            background: var(--twitter);
+        }
+
+        .social-link.github {
+            background: var(--github);
+        }
+
+        .social-link.linkedin {
+            background: var(--linkedin);
+        }
+
+        .social-link.website {
+            background: var(--website);
+        }
+
+        /* Author Tabs */
+        .author-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--space-xs);
+        }
+
+        .author-tab {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+        }
+
+        .author-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .author-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Content Layout */
+        .author-content-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        /* Posts Grid */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .post-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-image {
+            height: 180px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .post-content {
+            padding: var(--space-lg);
+        }
+
+        .post-meta {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .post-category {
+            padding: 2px 8px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .post-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+            line-height: 1.4;
+        }
+
+        .post-excerpt {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .post-stats {
+            display: flex;
+            gap: var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .post-read-more {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Sidebar */
+        .author-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .sidebar-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .sidebar-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .sidebar-card__header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* Popular Posts */
+        .popular-post-item {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .popular-post-item:last-child {
+            border-bottom: none;
+        }
+
+        .popular-post-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            flex-shrink: 0;
+        }
+
+        .popular-post-info {
+            flex: 1;
+        }
+
+        .popular-post-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .popular-post-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .popular-post-stats {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: 4px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Categories Cloud */
+        .categories-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+
+        .category-tag {
+            padding: 4px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .category-tag:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .category-tag.large {
+            font-size: 1rem;
+            padding: 6px 16px;
+        }
+
+        .category-tag.medium {
+            font-size: 0.9rem;
+        }
+
+        .category-tag.small {
+            font-size: 0.7rem;
+        }
+
+        /* Recent Comments */
+        .recent-comment-item {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recent-comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .recent-comment-content {
+            flex: 1;
+        }
+
+        .recent-comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .recent-comment-author {
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .recent-comment-time {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+
+        .recent-comment-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .recent-comment-post {
+            font-size: 0.7rem;
+            color: var(--accent);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xs);
+            margin-top: var(--space-xl);
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            background: white;
+        }
+
+        .pagination-item.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pagination-item:hover:not(.active) {
+            background: var(--bg-secondary);
+        }
+
+        /* Follow Button */
+        .follow-btn {
+            padding: var(--space-sm) var(--space-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: background 0.2s;
+        }
+
+        .follow-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .follow-btn.following {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Newsletter Signup */
+        .newsletter-card {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+            color: white;
+        }
+
+        .newsletter-card h3 {
+            color: white;
+        }
+
+        .newsletter-input {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: var(--space-md);
+        }
+
+        .newsletter-input input {
+            flex: 1;
+            padding: var(--space-sm);
+            border: none;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .newsletter-input button {
+            padding: var(--space-sm) var(--space-lg);
+            background: white;
+            color: var(--accent);
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .author-content-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .posts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-layout__main {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px);
+            }
+
+            .mobile-nav {
+                display: flex;
+            }
+
+            .author-profile-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                margin-top: -40px;
+            }
+
+            .author-profile-details {
+                padding-bottom: 0;
+            }
+
+            .author-profile-meta {
+                justify-content: center;
+            }
+
+            .author-profile-stats {
+                justify-content: center;
+            }
+
+            .author-profile-social {
+                justify-content: center;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .blog-layout__search {
+                display: none;
+            }
+
+            .blog-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .author-profile-meta {
+                flex-direction: column;
+                gap: var(--space-xs);
+            }
+
+            .author-profile-stats {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="blog-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0, 0, 0, 0.1);
+        }
+
+        .debug-layout [class*="blog-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .blog-layout__header {
+            background: rgba(255, 99, 132, 0.2);
+        }
+
+        .debug-layout .author-profile-header {
+            background: rgba(54, 162, 235, 0.05);
+        }
+
+        .debug-layout .posts-grid {
+            background: rgba(75, 192, 192, 0.02);
+        }
+
+        .debug-layout .author-sidebar {
+            background: rgba(153, 102, 255, 0.05);
+        }
+
+        .debug-layout .sidebar-card {
+            background: rgba(255, 159, 64, 0.05);
+        }
+
+        /* Component debug */
+        .debug-layout .post-card {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .sidebar-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .category-tag {
+            border: 1px dashed #4bc0c0;
+        }
+    </style>
+</head>
+
+<body class="blog-layout debug-layout">
+    <!-- Header -->
+    <header class="blog-layout__header">
+        <div class="blog-layout__header-left">
+            <div class="blog-layout__logo">📝 DevBlog</div>
+            <nav class="blog-layout__nav">
+                <a href="#">Home</a>
+                <a href="#">Latest</a>
+                <a href="#">Categories</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+        <div class="blog-layout__header-right">
+            <div class="blog-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="blog-layout__user">
+                <div class="blog-layout__user-avatar">GU</div>
+                <span>Guest ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="blog-layout__main">
+        <!-- Author Profile Header -->
+        <div class="author-profile-header">
+            <div class="author-profile-cover"></div>
+
+            <div class="author-profile-info">
+                <div class="author-profile-avatar-large">SC</div>
+                <div class="author-profile-details">
+                    <h1 class="author-profile-name">Sarah Chen</h1>
+                    <div class="author-profile-role">Senior Tech Writer & Frontend Specialist</div>
+                    <p class="author-profile-bio">
+                        Passionate about frontend development, CSS, and React. I've been writing tutorials and sharing
+                        knowledge with the developer community for over 5 years. Previously at Google, now full-time
+                        writer and educator.
+                    </p>
+                    <div class="author-profile-meta">
+                        <span class="author-meta-item">📍 San Francisco, CA</span>
+                        <span class="author-meta-item">📅 Joined March 2022</span>
+                        <span class="author-meta-item">✍️ 24 posts</span>
+                    </div>
+                    <div class="author-profile-social">
+                        <a href="#" class="social-link twitter">𝕏</a>
+                        <a href="#" class="social-link github">⌨️</a>
+                        <a href="#" class="social-link linkedin">in</a>
+                        <a href="#" class="social-link website">🌐</a>
+                    </div>
+                </div>
+                <button class="follow-btn">
+                    <span>➕</span>
+                    <span>Follow</span>
+                </button>
+            </div>
+
+            <div class="author-profile-stats">
+                <div class="author-stat">
+                    <div class="author-stat__value">24</div>
+                    <div class="author-stat__label">Posts</div>
+                </div>
+                <div class="author-stat">
+                    <div class="author-stat__value">45.2K</div>
+                    <div class="author-stat__label">Total Views</div>
+                </div>
+                <div class="author-stat">
+                    <div class="author-stat__value">3.2K</div>
+                    <div class="author-stat__label">Followers</div>
+                </div>
+                <div class="author-stat">
+                    <div class="author-stat__value">342</div>
+                    <div class="author-stat__label">Comments</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Author Tabs -->
+        <div class="author-tabs">
+            <span class="author-tab active">Latest Posts</span>
+            <span class="author-tab">Popular Posts</span>
+            <span class="author-tab">Series</span>
+            <span class="author-tab">About</span>
+        </div>
+
+        <!-- Author Content Layout -->
+        <div class="author-content-layout">
+            <!-- Main Content - Posts Grid -->
+            <div class="posts-grid">
+                <!-- Post 1 -->
+                <article class="post-card">
+                    <div class="post-image">📱</div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">React</span>
+                            <span>Dec 15, 2024</span>
+                            <span>8 min read</span>
+                        </div>
+                        <h2 class="post-title">Understanding React Hooks: A Deep Dive</h2>
+                        <p class="post-excerpt">
+                            Learn how to master React Hooks with practical examples. This comprehensive guide covers
+                            useState, useEffect, useContext, and custom hooks...
+                        </p>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span>👁️ 3.2K</span>
+                                <span>💬 24</span>
+                                <span>❤️ 156</span>
+                            </div>
+                            <a href="#" class="post-read-more">Read More →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="post-card">
+                    <div class="post-image">🎨</div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">CSS</span>
+                            <span>Dec 10, 2024</span>
+                            <span>6 min read</span>
+                        </div>
+                        <h2 class="post-title">CSS Grid Layout: Complete Guide</h2>
+                        <p class="post-excerpt">
+                            Master CSS Grid with practical examples. Learn how to create complex layouts with rows,
+                            columns, and advanced grid features...
+                        </p>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span>👁️ 4.5K</span>
+                                <span>💬 32</span>
+                                <span>❤️ 234</span>
+                            </div>
+                            <a href="#" class="post-read-more">Read More →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="post-card">
+                    <div class="post-image">🔷</div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">TypeScript</span>
+                            <span>Dec 5, 2024</span>
+                            <span>10 min read</span>
+                        </div>
+                        <h2 class="post-title">TypeScript Best Practices for 2024</h2>
+                        <p class="post-excerpt">
+                            Level up your TypeScript skills with these best practices. Learn about types, interfaces,
+                            generics, and advanced patterns...
+                        </p>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span>👁️ 2.8K</span>
+                                <span>💬 18</span>
+                                <span>❤️ 98</span>
+                            </div>
+                            <a href="#" class="post-read-more">Read More →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 4 -->
+                <article class="post-card">
+                    <div class="post-image">⚡</div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Next.js</span>
+                            <span>Nov 28, 2024</span>
+                            <span>7 min read</span>
+                        </div>
+                        <h2 class="post-title">Getting Started with Next.js 14</h2>
+                        <p class="post-excerpt">
+                            Explore the latest features in Next.js 14. Learn about App Router, Server Components, and
+                            performance optimization...
+                        </p>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span>👁️ 1.9K</span>
+                                <span>💬 12</span>
+                                <span>❤️ 67</span>
+                            </div>
+                            <a href="#" class="post-read-more">Read More →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 5 -->
+                <article class="post-card">
+                    <div class="post-image">📊</div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Performance</span>
+                            <span>Nov 20, 2024</span>
+                            <span>9 min read</span>
+                        </div>
+                        <h2 class="post-title">Web Performance Optimization Techniques</h2>
+                        <p class="post-excerpt">
+                            Improve your website's performance with these proven techniques. Learn about lazy loading,
+                            code splitting, and Core Web Vitals...
+                        </p>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span>👁️ 3.1K</span>
+                                <span>💬 21</span>
+                                <span>❤️ 143</span>
+                            </div>
+                            <a href="#" class="post-read-more">Read More →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 6 -->
+                <article class="post-card">
+                    <div class="post-image">🎭</div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Design</span>
+                            <span>Nov 15, 2024</span>
+                            <span>5 min read</span>
+                        </div>
+                        <h2 class="post-title">Design Systems with Tailwind CSS</h2>
+                        <p class="post-excerpt">
+                            Build consistent design systems using Tailwind CSS. Learn about configuration, theming, and
+                            component libraries...
+                        </p>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span>👁️ 1.5K</span>
+                                <span>💬 8</span>
+                                <span>❤️ 45</span>
+                            </div>
+                            <a href="#" class="post-read-more">Read More →</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="author-sidebar">
+                <!-- Popular Posts -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>🔥 Most Popular</h3>
+                        <a href="#">View All</a>
+                    </div>
+
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">CSS Grid Layout: Complete Guide</div>
+                            <div class="popular-post-meta">Dec 10, 2024</div>
+                            <div class="popular-post-stats">
+                                <span>👁️ 4.5K</span>
+                                <span>💬 32</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">Understanding React Hooks</div>
+                            <div class="popular-post-meta">Dec 15, 2024</div>
+                            <div class="popular-post-stats">
+                                <span>👁️ 3.2K</span>
+                                <span>💬 24</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popular-post-item">
+                        <div class="popular-post-image"></div>
+                        <div class="popular-post-info">
+                            <div class="popular-post-title">Web Performance Optimization</div>
+                            <div class="popular-post-meta">Nov 20, 2024</div>
+                            <div class="popular-post-stats">
+                                <span>👁️ 3.1K</span>
+                                <span>💬 21</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>📚 Categories</h3>
+                    </div>
+
+                    <div class="categories-cloud">
+                        <a href="#" class="category-tag large">React (8)</a>
+                        <a href="#" class="category-tag large">CSS (6)</a>
+                        <a href="#" class="category-tag medium">TypeScript (4)</a>
+                        <a href="#" class="category-tag medium">Next.js (3)</a>
+                        <a href="#" class="category-tag small">Performance (2)</a>
+                        <a href="#" class="category-tag small">Design (1)</a>
+                    </div>
+                </div>
+
+                <!-- Recent Comments -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card__header">
+                        <h3>💬 Recent Comments</h3>
+                    </div>
+
+                    <div class="recent-comment-item">
+                        <div class="recent-comment-avatar">MJ</div>
+                        <div class="recent-comment-content">
+                            <div class="recent-comment-header">
+                                <span class="recent-comment-author">Mike Johnson</span>
+                                <span class="recent-comment-time">2h ago</span>
+                            </div>
+                            <div class="recent-comment-text">Great explanation! This really helped me understand...
+                            </div>
+                            <div class="recent-comment-post">on CSS Grid Layout</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-comment-item">
+                        <div class="recent-comment-avatar">AR</div>
+                        <div class="recent-comment-content">
+                            <div class="recent-comment-header">
+                                <span class="recent-comment-author">Alex Rivera</span>
+                                <span class="recent-comment-time">1d ago</span>
+                            </div>
+                            <div class="recent-comment-text">Thanks for the tutorial. Looking forward to more content!
+                            </div>
+                            <div class="recent-comment-post">on React Hooks</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-comment-item">
+                        <div class="recent-comment-avatar">EW</div>
+                        <div class="recent-comment-content">
+                            <div class="recent-comment-header">
+                                <span class="recent-comment-author">Emma Watson</span>
+                                <span class="recent-comment-time">3d ago</span>
+                            </div>
+                            <div class="recent-comment-text">This is exactly what I needed for my project...</div>
+                            <div class="recent-comment-post">on TypeScript Best Practices</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="sidebar-card newsletter-card">
+                    <div class="sidebar-card__header">
+                        <h3>📧 Subscribe</h3>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                        Get notified when Sarah publishes new posts
+                    </p>
+                    <div class="newsletter-input">
+                        <input type="email" placeholder="Your email">
+                        <button>Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <span class="pagination-item">←</span>
+            <span class="pagination-item active">1</span>
+            <span class="pagination-item">2</span>
+            <span class="pagination-item">3</span>
+            <span class="pagination-item">4</span>
+            <span class="pagination-item">5</span>
+            <span class="pagination-item">→</span>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item">
+            <span>🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item active">
+            <span>👤</span>
+            <span>Author</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>📋</span>
+            <span>Categories</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🔍</span>
+            <span>Search</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+</body>
+
+</html>

@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - Application Settings Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints - keeping for reference but desktop only */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --settings-sidebar-width: 240px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Status colors */
+            --status-active: #10b981;
+            --status-inactive: #9ca3af;
+            --status-beta: #8b5cf6;
+            --status-experimental: #f59e0b;
+        }
+
+        /* Application Layout - Desktop Only */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            min-width: 1200px; /* Force desktop width */
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Settings Content */
+        .settings-content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+        }
+
+        /* Settings Layout - Desktop Optimized */
+        .settings-layout {
+            display: flex;
+            min-height: 100%;
+        }
+
+        /* Settings Sidebar - Wider for desktop */
+        .settings-sidebar {
+            width: var(--settings-sidebar-width);
+            background: white;
+            border-right: 1px solid var(--border-color);
+            padding: var(--space-xl) 0;
+            flex-shrink: 0;
+        }
+
+        .settings-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .settings-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            padding: 0 var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-left: 2px solid transparent;
+        }
+
+        .settings-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .settings-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        .settings-item__icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        .settings-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+        }
+
+        .settings-item__beta {
+            margin-left: auto;
+            background: var(--purple);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 500;
+        }
+
+        .settings-item__experimental {
+            margin-left: auto;
+            background: var(--warning);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 500;
+        }
+
+        /* Settings Main - Wider content area */
+        .settings-main {
+            flex: 1;
+            padding: var(--space-xl);
+            overflow-y: auto;
+        }
+
+        .settings-header {
+            margin-bottom: var(--space-xl);
+        }
+
+        .settings-header h1 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .settings-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Settings Card - Desktop styling */
+        .settings-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .settings-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .card-header__action {
+            color: var(--accent);
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Desktop Form Layout - Two columns */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg) var(--space-xl);
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .form-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .form-row {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-row.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-label span {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Input Groups */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-group .form-input {
+            border: none;
+            flex: 1;
+        }
+
+        .input-group-addon {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Toggle Switch */
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .toggle-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: .2s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Feature Flags */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .feature-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .feature-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .feature-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .feature-badge.beta {
+            background: var(--purple);
+            color: white;
+        }
+
+        .feature-badge.experimental {
+            background: var(--warning);
+            color: white;
+        }
+
+        .feature-badge.ga {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Storage Bar */
+        .storage-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: var(--space-sm) 0;
+        }
+
+        .storage-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        .storage-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .data-table td {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-badge.active { background: #d1fae5; color: var(--success); }
+        .status-badge.inactive { background: var(--bg-tertiary); color: var(--text-secondary); }
+        .status-badge.warning { background: #fee2e2; color: var(--danger); }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn.danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn.danger:hover {
+            background: #fee2e2;
+        }
+
+        /* Divider */
+        .divider {
+            margin: var(--space-xl) 0;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .divider span {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .settings-content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .settings-sidebar { background: rgba(75, 192, 192, 0.05); }
+        .debug-layout .settings-main { background: rgba(153, 102, 255, 0.02); }
+        .debug-layout .settings-card { background: rgba(255, 159, 64, 0.05); }
+
+        /* Component debug */
+        .debug-layout .settings-item.active {
+            background: rgba(54, 162, 235, 0.2);
+            border-left: 2px solid #36a2eb;
+        }
+
+        .debug-layout .feature-item {
+            border: 1px dashed #4bc0c0;
+        }
+
+        .debug-layout .data-table tr {
+            border-bottom: 1px dashed #ff6384;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Tasks</a>
+                <a href="#">Team</a>
+                <a href="#">Reports</a>
+                <a href="#" class="active">Admin</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe (Admin) ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Team</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📑</span>
+                    <span>Reports</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">⚙️</span>
+                    <span>Admin</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">ADMIN TOOLS</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📊</span>
+                    <span>System Health</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Audit Logs</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">🔐</span>
+                    <span>Security</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Settings Content -->
+        <main class="settings-content">
+            <div class="settings-layout">
+                <!-- Settings Sidebar - Application Settings -->
+                <div class="settings-sidebar">
+                    <div class="settings-section">
+                        <div class="settings-section-title">GENERAL</div>
+                        <div class="settings-item active">
+                            <span class="settings-item__icon">🏢</span>
+                            <span>Workspace</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🌐</span>
+                            <span>Domain & URLs</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🎨</span>
+                            <span>Branding</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">📧</span>
+                            <span>Email Settings</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-section-title">SECURITY</div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🔐</span>
+                            <span>Authentication</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🔑</span>
+                            <span>SSO & SAML</span>
+                            <span class="settings-item__beta">BETA</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🛡️</span>
+                            <span>Security Policies</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">📋</span>
+                            <span>Audit Logs</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-section-title">INFRASTRUCTURE</div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🗄️</span>
+                            <span>Database</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">☁️</span>
+                            <span>Cloud Services</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🔄</span>
+                            <span>Backups</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">📊</span>
+                            <span>Performance</span>
+                            <span class="settings-item__badge">3</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-section-title">FEATURES</div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🚩</span>
+                            <span>Feature Flags</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🧪</span>
+                            <span>Experimental</span>
+                            <span class="settings-item__experimental">NEW</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">📱</span>
+                            <span>Mobile</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <div class="settings-section-title">BILLING</div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">💳</span>
+                            <span>Plans & Pricing</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">📊</span>
+                            <span>Usage & Limits</span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item__icon">🧾</span>
+                            <span>Invoices</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Main - Workspace Settings -->
+                <div class="settings-main">
+                    <div class="settings-header">
+                        <h1>Workspace Settings</h1>
+                        <p>Configure your application workspace and global preferences</p>
+                    </div>
+
+                    <!-- Workspace Info Card -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h2>🏢 Workspace Information</h2>
+                            <span class="card-header__action">Edit</span>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label class="form-label">Workspace Name</label>
+                                <input type="text" class="form-input" value="Acme Corporation">
+                                <div class="form-hint">Your company or team name</div>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Workspace ID</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-input" value="acme-corp-2024" readonly>
+                                    <span class="input-group-addon">📋</span>
+                                </div>
+                                <div class="form-hint">Unique identifier, cannot be changed</div>
+                            </div>
+
+                            <div class="form-row full-width">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-textarea">Enterprise software development company specializing in cloud solutions.</textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Industry</label>
+                                <select class="form-select">
+                                    <option>Technology</option>
+                                    <option selected>Software Development</option>
+                                    <option>Finance</option>
+                                    <option>Healthcare</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Company Size</label>
+                                <select class="form-select">
+                                    <option>1-10</option>
+                                    <option>11-50</option>
+                                    <option selected>51-200</option>
+                                    <option>201-500</option>
+                                    <option>500+</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Domain & URLs Card -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h2>🌐 Domain & URLs</h2>
+                            <span class="card-header__action">Add Domain</span>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label class="form-label">Primary Domain</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">https://</span>
+                                    <input type="text" class="form-input" value="app.acmecorp.com">
+                                </div>
+                                <div class="form-hint">Your main application URL</div>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Status</label>
+                                <div>
+                                    <span class="status-badge active">Verified</span>
+                                    <span class="status-badge" style="margin-left: var(--space-sm);">SSL Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: var(--space-lg);">
+                            <h4 style="margin-bottom: var(--space-md); font-size: 0.95rem;">Additional Domains</h4>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Domain</th>
+                                        <th>Status</th>
+                                        <th>Primary</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>app.acmecorp.com</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>✓</td>
+                                        <td>...</td>
+                                    </tr>
+                                    <tr>
+                                        <td>staging.acmecorp.com</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td></td>
+                                        <td>...</td>
+                                    </tr>
+                                    <tr>
+                                        <td>dev.acmecorp.com</td>
+                                        <td><span class="status-badge warning">Pending SSL</span></td>
+                                        <td></td>
+                                        <td>...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Feature Flags Card -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h2>🚩 Feature Flags</h2>
+                            <span class="card-header__action">Manage All</span>
+                        </div>
+
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <div class="feature-info">
+                                    <h4>
+                                        Advanced Analytics
+                                        <span class="feature-badge ga">GA</span>
+                                    </h4>
+                                    <p>Enhanced analytics dashboard with custom reports</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="feature-item">
+                                <div class="feature-info">
+                                    <h4>
+                                        API Access
+                                        <span class="feature-badge ga">GA</span>
+                                    </h4>
+                                    <p>REST API for external integrations</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="feature-item">
+                                <div class="feature-info">
+                                    <h4>
+                                        SSO Integration
+                                        <span class="feature-badge beta">BETA</span>
+                                    </h4>
+                                    <p>Single Sign-On with SAML/OIDC</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="feature-item">
+                                <div class="feature-info">
+                                    <h4>
+                                        AI Assistant
+                                        <span class="feature-badge experimental">EXPERIMENTAL</span>
+                                    </h4>
+                                    <p>AI-powered task suggestions</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Storage & Limits Card -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h2>📊 Storage & Limits</h2>
+                            <span class="card-header__action">Upgrade Plan</span>
+                        </div>
+
+                        <div class="form-grid-3">
+                            <div>
+                                <div class="form-label">Total Storage</div>
+                                <div class="storage-bar">
+                                    <div class="storage-fill" style="width: 45%;"></div>
+                                </div>
+                                <div class="storage-stats">
+                                    <span>45.2 GB used</span>
+                                    <span>100 GB total</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="form-label">API Calls</div>
+                                <div class="storage-bar">
+                                    <div class="storage-fill" style="width: 78%; background: var(--warning);"></div>
+                                </div>
+                                <div class="storage-stats">
+                                    <span>78K calls</span>
+                                    <span>100K limit</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="form-label">Team Members</div>
+                                <div class="storage-bar">
+                                    <div class="storage-fill" style="width: 60%;"></div>
+                                </div>
+                                <div class="storage-stats">
+                                    <span>12 members</span>
+                                    <span>20 limit</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider">
+                            <span>Current Plan: Business</span>
+                        </div>
+
+                        <div class="form-grid-4" style="margin-top: var(--space-lg);">
+                            <div>
+                                <div class="form-label">Projects</div>
+                                <div style="font-size: 1.2rem; font-weight: 600;">24/50</div>
+                            </div>
+                            <div>
+                                <div class="form-label">Tasks</div>
+                                <div style="font-size: 1.2rem; font-weight: 600;">342/∞</div>
+                            </div>
+                            <div>
+                                <div class="form-label">Reports</div>
+                                <div style="font-size: 1.2rem; font-weight: 600;">18/100</div>
+                            </div>
+                            <div>
+                                <div class="form-label">Integrations</div>
+                                <div style="font-size: 1.2rem; font-weight: 600;">3/10</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Policies Card -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h2>🛡️ Security Policies</h2>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <h4>Two-Factor Authentication</h4>
+                                <p>Require 2FA for all team members</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <h4>Session Timeout</h4>
+                                <p>Automatically log out after inactivity</p>
+                            </div>
+                            <select style="width: 100px;">
+                                <option>30 min</option>
+                                <option selected>1 hour</option>
+                                <option>2 hours</option>
+                                <option>4 hours</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <h4>Password Policy</h4>
+                                <p>Minimum requirements for passwords</p>
+                            </div>
+                            <select style="width: 150px;">
+                                <option>Standard</option>
+                                <option selected>Strict</option>
+                                <option>Maximum</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <h4>IP Whitelisting</h4>
+                                <p>Restrict access to specific IPs</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Database Configuration Card -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h2>🗄️ Database Configuration</h2>
+                            <span class="card-header__action">Test Connection</span>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label class="form-label">Database Type</label>
+                                <select class="form-select">
+                                    <option selected>PostgreSQL 15</option>
+                                    <option>MySQL 8.0</option>
+                                    <option>MongoDB 6.0</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Host</label>
+                                <input type="text" class="form-input" value="postgres.internal.acmecorp.com">
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Port</label>
+                                <input type="text" class="form-input" value="5432">
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label">Database Name</label>
+                                <input type="text" class="form-input" value="app_production">
+                            </div>
+
+                            <div class="form-row full-width">
+                                <label class="form-label">Connection String</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-input" value="postgresql://user:****@postgres.internal:5432/app_production" readonly>
+                                    <span class="input-group-addon">📋</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: var(--space-md); background: var(--bg-secondary); padding: var(--space-md); border-radius: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Connection Status: <span class="status-badge active">Connected</span></span>
+                                <span>Latency: 12ms</span>
+                                <span>Pool Size: 20/50</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn">Cancel</button>
+                        <button class="btn">Reset to Defaults</button>
+                        <button class="btn danger">Restore Backup</button>
+                        <button class="btn primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

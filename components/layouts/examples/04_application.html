@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Layout Debug</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+            --breakpoint-wide: 1280px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Layout */
+            --sidebar-width: 260px;
+            --right-panel-width: 300px;
+            --nav-height: 60px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+        }
+
+        /* Application Layout */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        /* Header */
+        .app-layout__header {
+            height: var(--nav-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            z-index: 30;
+        }
+
+        .app-layout__header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+
+        .app-layout__logo {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .app-layout__menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .app-layout__nav {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: var(--space-xs) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-layout__nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .app-layout__header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .app-layout__search {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: var(--space-xs) var(--space-md);
+            gap: var(--space-xs);
+        }
+
+        .app-layout__search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 200px;
+            font-size: 0.9rem;
+        }
+
+        .app-layout__notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-layout__notifications-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-layout__user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+
+        .app-layout__user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .app-layout__main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Navigation */
+        .app-layout__left-nav {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .nav-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            margin-bottom: 2px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .nav-item__icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item__badge {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+
+        /* Projects List */
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .project-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .project-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .project-color.blue { background: var(--accent); }
+        .project-color.purple { background: var(--purple); }
+        .project-color.pink { background: var(--pink); }
+        .project-color.green { background: var(--success); }
+
+        /* Main Content */
+        .app-layout__content {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: var(--space-xl);
+            background: var(--bg-secondary);
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .content-header__title h1 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .content-header__title p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: var(--space-xs);
+        }
+
+        .content-header__actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .btn.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .stat-card__icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .stat-card__content h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-card__content .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-card__content .trend {
+            font-size: 0.8rem;
+            color: var(--success);
+            margin-left: var(--space-sm);
+        }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--space-lg);
+        }
+
+        .chart-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .chart-card__header h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .chart-card__header select {
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .chart-placeholder {
+            height: 250px;
+            background: linear-gradient(45deg, var(--bg-secondary) 25%, var(--bg-tertiary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 50%, var(--bg-secondary) 75%, var(--bg-tertiary) 75%);
+            background-size: 20px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        /* Activity List */
+        .activity-list {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .activity-header {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-header h3 {
+            font-size: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content p {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .activity-content .time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .activity-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        /* Right Panel */
+        .app-layout__right-panel {
+            width: var(--right-panel-width);
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .panel-section {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .panel-section__header h3 {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .panel-section__header a {
+            color: var(--accent);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        /* Task Item */
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-content p {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .task-content .task-meta {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .task-priority {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .priority-high { background: var(--danger); }
+        .priority-medium { background: var(--warning); }
+        .priority-low { background: var(--success); }
+
+        /* Team Member */
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+        }
+
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .member-info p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .member-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .member-status.offline {
+            background: var(--text-secondary);
+        }
+
+        /* Mobile Bottom Navigation */
+        .app-layout__mobile-nav {
+            display: none;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mobile-nav-item span:first-child {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-layout__menu-toggle {
+                display: block;
+            }
+
+            .app-layout__nav {
+                display: none;
+            }
+
+            .app-layout__left-nav {
+                position: fixed;
+                top: var(--nav-height);
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__left-nav.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__right-panel {
+                position: fixed;
+                top: var(--nav-height);
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            }
+
+            .app-layout__right-panel.open {
+                transform: translateX(0);
+            }
+
+            .app-layout__search input {
+                width: 150px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-layout__content {
+                padding: var(--space-lg);
+                padding-bottom: calc(var(--space-lg) + 60px); /* Space for mobile nav */
+            }
+
+            .app-layout__mobile-nav {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-layout__header {
+                padding: 0 var(--space-md);
+            }
+
+            .app-layout__search {
+                display: none;
+            }
+
+            .app-layout__user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .content-header__actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout [class*="app-layout__"] {
+            position: relative;
+            outline: 1px dotted rgba(0,0,0,0.1);
+        }
+
+        .debug-layout [class*="app-layout__"]::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Section colors */
+        .debug-layout .app-layout__header { background: rgba(255, 99, 132, 0.2); }
+        .debug-layout .app-layout__left-nav { background: rgba(54, 162, 235, 0.1); }
+        .debug-layout .app-layout__content { background: rgba(255, 206, 86, 0.05); }
+        .debug-layout .app-layout__right-panel { background: rgba(75, 192, 192, 0.1); }
+        .debug-layout .app-layout__mobile-nav { background: rgba(153, 102, 255, 0.2); }
+
+        /* Component debug */
+        .debug-layout .stat-card {
+            background: rgba(255, 99, 132, 0.1);
+            border: 2px dashed #ff6384;
+            position: relative;
+        }
+
+        .debug-layout .chart-card {
+            background: rgba(54, 162, 235, 0.1);
+            border: 2px dashed #36a2eb;
+            position: relative;
+        }
+
+        .debug-layout .activity-item {
+            background: rgba(153, 102, 255, 0.1);
+            border: 1px dashed #9966ff;
+        }
+
+        .debug-layout .task-item {
+            background: rgba(255, 159, 64, 0.1);
+            border: 1px dashed #ff9f40;
+        }
+
+        .debug-layout .stat-card::before,
+        .debug-layout .chart-card::before,
+        .debug-layout .activity-item::before,
+        .debug-layout .task-item::before {
+            content: attr(class);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body class="app-layout debug-layout">
+    <!-- Header -->
+    <header class="app-layout__header">
+        <div class="app-layout__header-left">
+            <button class="app-layout__menu-toggle" onclick="toggleLeftNav()">☰</button>
+            <div class="app-layout__logo">⚡ AppName</div>
+            <nav class="app-layout__nav">
+                <a href="#" class="active">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Analytics</a>
+                <a href="#">Reports</a>
+                <a href="#">Settings</a>
+            </nav>
+        </div>
+        <div class="app-layout__header-right">
+            <div class="app-layout__search">
+                <span>🔍</span>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="app-layout__notifications">
+                <span>🔔</span>
+                <span class="app-layout__notifications-badge">3</span>
+            </div>
+            <div class="app-layout__user">
+                <div class="app-layout__user-avatar">JD</div>
+                <span>John Doe ▼</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="app-layout__main">
+        <!-- Left Navigation -->
+        <nav class="app-layout__left-nav" id="leftNav">
+            <div class="nav-section">
+                <div class="nav-section-title">MAIN</div>
+                <div class="nav-item active">
+                    <span class="nav-item__icon">📊</span>
+                    <span>Dashboard</span>
+                    <span class="nav-item__badge">12</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📈</span>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📋</span>
+                    <span>Tasks</span>
+                    <span class="nav-item__badge">5</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">TEAM</div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">👥</span>
+                    <span>Members</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">💬</span>
+                    <span>Messages</span>
+                    <span class="nav-item__badge">3</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-item__icon">📅</span>
+                    <span>Calendar</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">PROJECTS</div>
+                <div class="project-item">
+                    <span class="project-color blue"></span>
+                    <span>Website Redesign</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color purple"></span>
+                    <span>Mobile App</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color pink"></span>
+                    <span>API Integration</span>
+                </div>
+                <div class="project-item">
+                    <span class="project-color green"></span>
+                    <span>Marketing Site</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-layout__content">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="content-header__title">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, John! Here's what's happening with your projects.</p>
+                </div>
+                <div class="content-header__actions">
+                    <button class="btn">📤 Export</button>
+                    <button class="btn primary">+ New Project</button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-card__icon">📁</div>
+                    <div class="stat-card__content">
+                        <h3>Total Projects</h3>
+                        <div>
+                            <span class="value">24</span>
+                            <span class="trend">↑ 12%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card__icon">✓</div>
+                    <div class="stat-card__content">
+                        <h3>Completed Tasks</h3>
+                        <div>
+                            <span class="value">156</span>
+                            <span class="trend">↑ 8%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card__icon">⏳</div>
+                    <div class="stat-card__content">
+                        <h3>In Progress</h3>
+                        <div>
+                            <span class="value">43</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card__icon">👥</div>
+                    <div class="stat-card__content">
+                        <h3>Team Members</h3>
+                        <div>
+                            <span class="value">12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-card__header">
+                        <h3>Project Progress</h3>
+                        <select>
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                        </select>
+                    </div>
+                    <div class="chart-placeholder">
+                        📊 Line Chart - Project Progress Over Time
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card__header">
+                        <h3>Task Distribution</h3>
+                        <select>
+                            <option>By Status</option>
+                            <option>By Priority</option>
+                            <option>By Member</option>
+                        </select>
+                    </div>
+                    <div class="chart-placeholder">
+                        🥧 Pie Chart - Task Distribution
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-list">
+                <div class="activity-header">
+                    <h3>Recent Activity</h3>
+                    <a href="#" style="color: var(--accent); font-size: 0.9rem;">View All</a>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-avatar">SC</div>
+                    <div class="activity-content">
+                        <p><strong>Sarah Chen</strong> completed task "Design Review"</p>
+                        <span class="time">2 minutes ago</span>
+                    </div>
+                    <span class="activity-badge">Completed</span>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">AR</div>
+                    <div class="activity-content">
+                        <p><strong>Alex Rivera</strong> created new project "Mobile App"</p>
+                        <span class="time">1 hour ago</span>
+                    </div>
+                    <span class="activity-badge">New</span>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">MJ</div>
+                    <div class="activity-content">
+                        <p><strong>Mike Johnson</strong> commented on "API Design"</p>
+                        <span class="time">3 hours ago</span>
+                    </div>
+                    <span class="activity-badge">Comment</span>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-avatar">EW</div>
+                    <div class="activity-content">
+                        <p><strong>Emma Watson</strong> uploaded "Q4 Report.pdf"</p>
+                        <span class="time">5 hours ago</span>
+                    </div>
+                    <span class="activity-badge">File</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="app-layout__right-panel" id="rightPanel">
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Quick Tasks</h3>
+                    <a href="#">Add Task</a>
+                </div>
+                
+                <div class="task-item">
+                    <input type="checkbox">
+                    <div class="task-content">
+                        <p>Review pull requests</p>
+                        <span class="task-meta">Due today</span>
+                    </div>
+                    <span class="task-priority priority-high"></span>
+                </div>
+
+                <div class="task-item">
+                    <input type="checkbox">
+                    <div class="task-content">
+                        <p>Update documentation</p>
+                        <span class="task-meta">Due tomorrow</span>
+                    </div>
+                    <span class="task-priority priority-medium"></span>
+                </div>
+
+                <div class="task-item">
+                    <input type="checkbox">
+                    <div class="task-content">
+                        <p>Team meeting</p>
+                        <span class="task-meta">3:00 PM</span>
+                    </div>
+                    <span class="task-priority priority-low"></span>
+                </div>
+
+                <div class="task-item">
+                    <input type="checkbox">
+                    <div class="task-content">
+                        <p>Deploy to staging</p>
+                        <span class="task-meta">This week</span>
+                    </div>
+                    <span class="task-priority priority-high"></span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Team Online</h3>
+                    <a href="#">View All</a>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-avatar">SC</div>
+                    <div class="member-info">
+                        <h4>Sarah Chen</h4>
+                        <p>Design Lead</p>
+                    </div>
+                    <span class="member-status"></span>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">AR</div>
+                    <div class="member-info">
+                        <h4>Alex Rivera</h4>
+                        <p>Frontend Dev</p>
+                    </div>
+                    <span class="member-status"></span>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">MJ</div>
+                    <div class="member-info">
+                        <h4>Mike Johnson</h4>
+                        <p>Backend Dev</p>
+                    </div>
+                    <span class="member-status offline"></span>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-avatar">EW</div>
+                    <div class="member-info">
+                        <h4>Emma Watson</h4>
+                        <p>Product Manager</p>
+                    </div>
+                    <span class="member-status"></span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section__header">
+                    <h3>Upcoming Deadlines</h3>
+                </div>
+                
+                <div style="font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs);">
+                        <span>Website Redesign</span>
+                        <span style="color: var(--danger);">2 days</span>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-tertiary); border-radius: 2px;">
+                        <div style="width: 75%; height: 100%; background: var(--danger); border-radius: 2px;"></div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs);">
+                        <span>API Documentation</span>
+                        <span style="color: var(--warning);">5 days</span>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-tertiary); border-radius: 2px;">
+                        <div style="width: 45%; height: 100%; background: var(--warning); border-radius: 2px;"></div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs);">
+                        <span>Mobile App</span>
+                        <span style="color: var(--success);">12 days</span>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-tertiary); border-radius: 2px;">
+                        <div style="width: 25%; height: 100%; background: var(--success); border-radius: 2px;"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="app-layout__mobile-nav">
+        <div class="mobile-nav-item active">
+            <span>📊</span>
+            <span>Home</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleLeftNav()">
+            <span>📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item" onclick="toggleRightPanel()">
+            <span>👥</span>
+            <span>Team</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>🔔</span>
+            <span>Alerts</span>
+        </div>
+        <div class="mobile-nav-item">
+            <span>👤</span>
+            <span>Profile</span>
+        </div>
+    </nav>
+
+    <script>
+        function toggleLeftNav() {
+            document.getElementById('leftNav').classList.toggle('open');
+        }
+
+        function toggleRightPanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        // Close panels when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const leftNav = document.getElementById('leftNav');
+            const rightPanel = document.getElementById('rightPanel');
+            const menuToggle = document.querySelector('.app-layout__menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!leftNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                    leftNav.classList.remove('open');
+                }
+                
+                if (!rightPanel.contains(event.target) && !event.target.closest('.mobile-nav-item')) {
+                    rightPanel.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

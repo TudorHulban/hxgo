@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Internal Server Error | DevBlog</title>
+    <style>
+        /* _reset.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* _variables.css */
+        :root {
+            /* Breakpoints */
+            --breakpoint-mobile: 640px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-desktop: 1024px;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Layout */
+            --nav-height: 60px;
+            --container-width: 800px;
+
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+            --teal: #14b8a6;
+
+            /* Error specific */
+            --error-bg: #7f1d1d;
+            --error-text: #fecaca;
+            --error-accent: #ef4444;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+        }
+
+        /* Error Container */
+        .error-container {
+            max-width: var(--container-width);
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: var(--space-3xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        /* Error Code */
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, #fff 0%, #fecaca 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Error Title */
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-md);
+            color: white;
+        }
+
+        /* Error Message */
+        .error-message {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: var(--space-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Error Icon */
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            display: inline-block;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error Details Card */
+        .error-details-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .error-details-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .error-details-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .error-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .error-detail-item {
+            margin-bottom: var(--space-sm);
+        }
+
+        .error-detail-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 2px;
+        }
+
+        .error-detail-value {
+            font-family: monospace;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .error-stack {
+            grid-column: span 2;
+            background: rgba(0, 0, 0, 0.3);
+            padding: var(--space-md);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-top: var(--space-sm);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--danger);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .quick-action-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            text-decoration: none;
+            color: white;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-action-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .quick-action-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quick-action-desc {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Support Section */
+        .support-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+
+        .support-title {
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+
+        .support-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .support-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .support-link:hover {
+            opacity: 1;
+        }
+
+        /* Report Form */
+        .report-section {
+            margin-top: var(--space-xl);
+            text-align: left;
+        }
+
+        .report-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+
+        .report-form {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: var(--space-lg);
+            display: none;
+        }
+
+        .report-form.visible {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: var(--space-xs);
+            opacity: 0.8;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: white;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            background: white;
+            color: var(--danger);
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        .error-footer {
+            margin-top: var(--space-xl);
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-md);
+            }
+
+            .error-container {
+                padding: var(--space-xl);
+            }
+
+            .error-code {
+                font-size: 6rem;
+            }
+
+            .error-title {
+                font-size: 2rem;
+            }
+
+            .error-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .error-stack {
+                grid-column: span 1;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .error-code {
+                font-size: 4rem;
+            }
+
+            .error-title {
+                font-size: 1.5rem;
+            }
+
+            .error-message {
+                font-size: 1rem;
+            }
+
+            .support-links {
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-sm);
+            }
+        }
+
+        /* Debug styles */
+        .debug-layout {
+            position: relative;
+        }
+
+        .debug-layout::before {
+            content: "500-error-page";
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 99, 132, 0.9);
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 9999;
+            font-family: monospace;
+        }
+
+        .debug-layout .error-container {
+            outline: 2px dotted rgba(255, 99, 132, 0.5);
+        }
+
+        .debug-layout [class*="error-"] {
+            position: relative;
+            outline: 1px dotted rgba(255, 99, 132, 0.3);
+        }
+
+        /* Section colors for debug */
+        .debug-layout .error-icon {
+            background: rgba(255, 99, 132, 0.1);
+            border-radius: 50%;
+            padding: var(--space-sm);
+        }
+
+        .debug-layout .error-details-card {
+            background: rgba(54, 162, 235, 0.1);
+        }
+
+        .debug-layout .quick-actions {
+            background: rgba(75, 192, 192, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        .debug-layout .support-section {
+            background: rgba(153, 102, 255, 0.1);
+        }
+
+        .debug-layout .report-section {
+            background: rgba(255, 159, 64, 0.1);
+            padding: var(--space-sm);
+            border-radius: 8px;
+        }
+
+        /* Component debug */
+        .debug-layout .btn {
+            border: 1px dashed #ff6384;
+        }
+
+        .debug-layout .quick-action-card {
+            border: 1px dashed #36a2eb;
+        }
+
+        .debug-layout .error-detail-value {
+            border: 1px dashed #4bc0c0;
+        }
+    </style>
+</head>
+
+<body class="debug-layout">
+    <div class="error-container">
+        <!-- Error Icon with Animation -->
+        <div class="error-icon">⚙️</div>
+
+        <!-- Error Code -->
+        <div class="error-code">500</div>
+
+        <!-- Error Title -->
+        <h1 class="error-title">Internal Server Error</h1>
+
+        <!-- Error Message -->
+        <p class="error-message">
+            Something went wrong on our end. Our team has been notified and is working to fix the issue.
+            Please try again in a few minutes.
+        </p>
+
+        <!-- Error Details (for developers/admins) -->
+        <div class="error-details-card">
+            <div class="error-details-header">
+                <span>🔍</span>
+                <h3>Error Details (Admin View)</h3>
+            </div>
+
+            <div class="error-details-grid">
+                <div class="error-detail-item">
+                    <div class="error-detail-label">Error ID</div>
+                    <div class="error-detail-value">ERR-500-20241221-8f3a2b</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">Timestamp</div>
+                    <div class="error-detail-value">2024-12-21 15:32:45 UTC</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">Error Type</div>
+                    <div class="error-detail-value">PDOException</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">File</div>
+                    <div class="error-detail-value">/var/www/html/includes/db.php:234</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">Request URI</div>
+                    <div class="error-detail-value">/posts/understanding-react-hooks</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">Method</div>
+                    <div class="error-detail-value">GET</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">User ID</div>
+                    <div class="error-detail-value">12345 (sarah.chen)</div>
+                </div>
+
+                <div class="error-detail-item">
+                    <div class="error-detail-label">IP Address</div>
+                    <div class="error-detail-value">192.168.1.45</div>
+                </div>
+
+                <div class="error-stack">
+                    <div style="opacity: 0.7; margin-bottom: var(--space-xs);">Stack Trace:</div>
+                    #0 /var/www/html/includes/db.php(234): PDO->prepare()<br>
+                    #1 /var/www/html/includes/queries.php(89): get_post_by_id()<br>
+                    #2 /var/www/html/posts/index.php(45): fetch_post()<br>
+                    #3 /var/www/html/index.php(12): require()
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="window.location.reload()">
+                <span>↻</span>
+                <span>Try Again</span>
+            </button>
+            <a href="/" class="btn btn-secondary">
+                <span>🏠</span>
+                <span>Go to Homepage</span>
+            </a>
+            <a href="/contact" class="btn btn-outline">
+                <span>📧</span>
+                <span>Contact Support</span>
+            </a>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="/posts" class="quick-action-card">
+                <div class="quick-action-icon">📋</div>
+                <div class="quick-action-title">Browse Posts</div>
+                <div class="quick-action-desc">Read latest articles</div>
+            </a>
+
+            <a href="/search" class="quick-action-card">
+                <div class="quick-action-icon">🔍</div>
+                <div class="quick-action-title">Search</div>
+                <div class="quick-action-desc">Find what you need</div>
+            </a>
+
+            <a href="/status" class="quick-action-card">
+                <div class="quick-action-icon">📊</div>
+                <div class="quick-action-title">Status Page</div>
+                <div class="quick-action-desc">System status</div>
+            </a>
+        </div>
+
+        <!-- Report Form (toggleable) -->
+        <div class="report-section">
+            <div class="report-toggle" onclick="toggleReportForm()">
+                <span>📝</span>
+                <span>Report this issue</span>
+            </div>
+
+            <div class="report-form" id="reportForm">
+                <div class="form-group">
+                    <label class="form-label">Your Email (optional)</label>
+                    <input type="email" class="form-input" placeholder="sarah@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">What were you trying to do?</label>
+                    <textarea class="form-textarea" placeholder="I was trying to read an article when..."></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="form-submit">Submit Report</button>
+                </div>
+                <div style="font-size: 0.8rem; opacity: 0.6;">
+                    Error ID will be automatically included: ERR-500-20241221-8f3a2b
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Information -->
+        <div class="support-section">
+            <div class="support-title">Need immediate help?</div>
+            <div class="support-links">
+                <a href="/docs" class="support-link">
+                    <span>📚</span>
+                    <span>Documentation</span>
+                </a>
+                <a href="/community" class="support-link">
+                    <span>💬</span>
+                    <span>Community Forums</span>
+                </a>
+                <a href="/status" class="support-link">
+                    <span>📊</span>
+                    <span>System Status</span>
+                </a>
+                <a href="/twitter" class="support-link">
+                    <span>𝕏</span>
+                    <span>@DevBlog</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="error-footer">
+            <a href="/privacy" class="footer-link">Privacy Policy</a>
+            <a href="/terms" class="footer-link">Terms of Service</a>
+            <a href="/contact" class="footer-link">Contact</a>
+        </footer>
+    </div>
+
+    <script>
+        function toggleReportForm() {
+            const form = document.getElementById('reportForm');
+            form.classList.toggle('visible');
+        }
+
+        // For demo - auto-show the report form
+        setTimeout(() => {
+            document.getElementById('reportForm').classList.add('visible');
+        }, 1000);
+    </script>
+</body>
+
+</html>
