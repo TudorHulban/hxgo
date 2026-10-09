@@ -15,7 +15,9 @@ type WSMessage struct {
 	Endpoint  string
 	CSRFToken string
 
-	RequestID string // response should include <!-- _hx_req_id: {id} -->
+	// RequestID is validated to [A-Za-z0-9_-]{1,64}, so it is safe to embed in
+	// the HTML comment: <!-- _hx_req_id: {id} -->
+	RequestID string
 	Value     string
 
 	IsPOST bool
@@ -24,36 +26,19 @@ type WSMessage struct {
 func (m WSMessage) String() string {
 	var sb strings.Builder
 
-	// Pre-allocate memory to minimize allocations
 	sb.Grow(256)
 
-	fmt.Fprint(&sb, "WSMessage{\n")
-	fmt.Fprintf(&sb,
-		"  Endpoint:  %q\n",
-		m.Endpoint,
-	)
-	fmt.Fprintf(&sb,
-		"  IsPOST:    %t\n",
-		m.IsPOST,
-	)
-	fmt.Fprintf(&sb,
-		"  CSRFToken: %q\n",
-		m.CSRFToken,
-	)
-	fmt.Fprintf(&sb,
-		"  RequestID: %q (<!-- _hx_req_id: %s -->)\n",
-		m.RequestID,
-		m.RequestID,
-	)
-	fmt.Fprintf(&sb,
-		"  Value:     %q\n",
-		m.Value,
-	)
+	sb.WriteString("WSMessage{\n")
+	fmt.Fprintf(&sb, "  Endpoint:  %q\n", m.Endpoint)
+	fmt.Fprintf(&sb, "  IsPOST:    %t\n", m.IsPOST)
+	fmt.Fprintf(&sb, "  CSRFToken: %q\n", m.CSRFToken)
+	fmt.Fprintf(&sb, "  RequestID: %q\n", m.RequestID)
+	fmt.Fprintf(&sb, "  Value:     %q\n", m.Value)
 
 	if len(m.Values) > 0 {
 		fmt.Fprintf(&sb, "  Values:    %s\n", m.Values.Encode())
 	} else {
-		fmt.Fprint(&sb, "  Values:    empty\n")
+		sb.WriteString("  Values:    empty\n")
 	}
 
 	sb.WriteString("}")
@@ -61,43 +46,64 @@ func (m WSMessage) String() string {
 	return sb.String()
 }
 
-func parseFormMessage(raw string) (*WSMessage, error) {
-	verbAndEndpoint, body, couldCut := strings.Cut(raw, "\n")
-	if !couldCut {
-		return nil,
-			hxerrors.ErrInvalidInput{
-				Issue:      errors.New("malformed frame"),
-				InputValue: raw,
-				InputName:  "raw",
-				Caller:     "handleFormMessage",
-			}
+func invalidInput(caller, raw string, issue error) error {
+	return hxerrors.ErrInvalidInput{
+		Issue:      issue,
+		InputValue: raw,
+		InputName:  "raw",
+		Caller:     caller,
+	}
+}
+
+// validRequestID allows only characters that cannot break out of an HTML comment.
+func validRequestID(id string) bool {
+	if len(id) > maxRequestIDLen {
+		return false
 	}
 
-	verb, endpoint, _ := strings.Cut(verbAndEndpoint, " ")
-	endpoint = strings.TrimSpace(endpoint)
+	for i := 0; i < len(id); i++ {
+		c := id[i]
 
-	if len(endpoint) == 0 {
+		switch {
+		case c >= 'a' && c <= 'z',
+			c >= 'A' && c <= 'Z',
+			c >= '0' && c <= '9',
+			c == '_', c == '-':
+
+		default:
+			return false
+		}
+	}
+
+	return true
+}
+
+// parseFormMessage expects raw to start with "GET " or "POST "
+// (guaranteed by ParseWSMessage). The body after the first newline is optional.
+func parseFormMessage(raw string) (*WSMessage, error) {
+	const caller = "parseFormMessage"
+
+	head, body, _ := strings.Cut(raw, "\n")
+	verb, endpoint, _ := strings.Cut(head, " ")
+
+	endpoint = strings.TrimSpace(endpoint)
+	if endpoint == "" {
 		return nil,
-			hxerrors.ErrInvalidInput{
-				Issue:      errors.New("malformed frame"),
-				InputValue: raw,
-				InputName:  "raw",
-				Caller:     "handleFormMessage",
-			}
+			invalidInput(
+				caller,
+				raw,
+				errors.New("malformed frame"),
+			)
 	}
 
 	values, errParse := url.ParseQuery(body)
 	if errParse != nil {
 		return nil,
-			hxerrors.ErrInvalidInput{
-				Issue: fmt.Errorf(
-					"malformed body: %w",
-					errParse,
-				),
-				InputValue: raw,
-				InputName:  "raw",
-				Caller:     "handleFormMessage",
-			}
+			invalidInput(
+				caller,
+				raw,
+				fmt.Errorf("malformed body: %w", errParse),
+			)
 	}
 
 	csrf := values.Get("_csrf")
@@ -106,48 +112,34 @@ func parseFormMessage(raw string) (*WSMessage, error) {
 	requestID := values.Get("_hx_req_id")
 	values.Del("_hx_req_id")
 
-	if verb == "POST" {
-		return &WSMessage{
-				Endpoint:  endpoint,
-				CSRFToken: csrf,
-				RequestID: requestID,
-
-				Values: values,
-				IsPOST: true,
-			},
-			nil
+	if !validRequestID(requestID) {
+		return nil,
+			invalidInput(
+				caller,
+				raw,
+				errors.New("invalid request id"),
+			)
 	}
 
-	if verb == "GET" {
-		return &WSMessage{
-				Endpoint:  endpoint,
-				CSRFToken: csrf,
-				RequestID: requestID,
-
-				Values: values,
-			},
-			nil
-	}
-
-	return nil,
-		hxerrors.ErrInvalidInput{
-			Issue:      fmt.Errorf("unsupported verb %q", verb),
-			InputValue: raw,
-			InputName:  "raw",
-			Caller:     "handleFormMessage",
-		}
+	return &WSMessage{
+			Endpoint:  endpoint,
+			CSRFToken: csrf,
+			RequestID: requestID,
+			Values:    values,
+			IsPOST:    verb == "POST",
+		},
+		nil
 }
 
 func parsePipeMessage(raw string) (*WSMessage, error) {
 	endpoint, value, couldCut := strings.Cut(raw, "|")
-	if !couldCut || len(endpoint) == 0 {
+	if !couldCut || endpoint == "" {
 		return nil,
-			hxerrors.ErrInvalidInput{
-				Issue:      errors.New("malformed frame"),
-				InputValue: raw,
-				InputName:  "raw",
-				Caller:     "handlePipeMessage",
-			}
+			invalidInput(
+				"parsePipeMessage",
+				raw,
+				errors.New("malformed frame"),
+			)
 	}
 
 	return &WSMessage{
