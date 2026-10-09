@@ -22,7 +22,7 @@ func NewServer() *Server {
 		serverWS: ws.NewServer(),
 	}
 
-	result.serverWS.Handlers["/login"] = result.wslogin
+	result.serverWS.Register("/login", result.wslogin)
 
 	result.app.Use(
 		"/ws",
@@ -75,14 +75,13 @@ func extractCredentials(v url.Values) (string, string) {
 	return username, password
 }
 
-func (s *Server) wslogin(c *websocket.Conn, message *ws.WSMessage) {
+func (*Server) wslogin(c *ws.Client, message *ws.WSMessage) {
 	user, password := extractCredentials(message.Values)
 
 	if user == "admin" && password == "password" {
-		_ = c.WriteMessage(
-			websocket.TextMessage,
+		_ = c.Send(
 			[]byte(
-				s.serverWS.WrapResponse(
+				ws.WrapResponse(
 					message.RequestID,
 					fmt.Sprintf(
 						`<div id="redirect" hx-redirect="%s"></div>`,
@@ -93,10 +92,9 @@ func (s *Server) wslogin(c *websocket.Conn, message *ws.WSMessage) {
 		)
 	}
 
-	_ = c.WriteMessage(
-		websocket.TextMessage,
+	_ = c.Send(
 		[]byte(
-			s.serverWS.WrapResponse(
+			ws.WrapResponse(
 				message.RequestID,
 				fmt.Sprintf(
 					`<div id="redirect" hx-redirect="%s"></div>`,

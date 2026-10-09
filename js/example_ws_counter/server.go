@@ -24,9 +24,9 @@ func NewServer() *Server {
 		serverWS: ws.NewServer(),
 	}
 
-	result.serverWS.Handlers["/counter/increment"] = result.handleIncrement
-	result.serverWS.Handlers["/counter/decrement"] = result.handleDecrement
-	result.serverWS.Handlers["/counter/reset"] = result.handleReset
+	result.serverWS.Register("/counter/increment", result.handleIncrement)
+	result.serverWS.Register("/counter/decrement", result.handleDecrement)
+	result.serverWS.Register("/counter/reset", result.handleReset)
 
 	result.app.Use(
 		"/ws",
@@ -47,66 +47,60 @@ func NewServer() *Server {
 	return &result
 }
 
-func (s *Server) handleIncrement(c *websocket.Conn, message *ws.WSMessage) {
+func (s *Server) handleIncrement(c *ws.Client, message *ws.WSMessage) {
 	html := fmt.Sprintf(
 		`<div id="counter">%d</div>`,
 		s.counter.Add(1),
 	)
 
-	if errWrite := c.WriteMessage(
-		websocket.TextMessage,
+	if !c.Send(
 		[]byte(
-			s.serverWS.WrapResponse(message.RequestID, html),
+			ws.WrapResponse(message.RequestID, html),
 		),
-	); errWrite != nil {
-		log.Printf(
-			"write to client failed: %v",
-			errWrite,
+	) {
+		log.Print(
+			"write to client failed",
 		)
 	}
 
-	s.serverWS.Broadcast(html, c)
+	s.serverWS.Broadcast([]byte(html), c)
 }
 
-func (s *Server) handleDecrement(c *websocket.Conn, message *ws.WSMessage) {
+func (s *Server) handleDecrement(c *ws.Client, message *ws.WSMessage) {
 	html := fmt.Sprintf(
 		`<div id="counter">%d</div>`,
 		s.counter.Add(-1),
 	)
 
-	if errWrite := c.WriteMessage(
-		websocket.TextMessage,
+	if !c.Send(
 		[]byte(
-			s.serverWS.WrapResponse(message.RequestID, html),
+			ws.WrapResponse(message.RequestID, html),
 		),
-	); errWrite != nil {
-		log.Printf(
-			"write to client failed: %v",
-			errWrite,
+	) {
+		log.Print(
+			"write to client failed",
 		)
 	}
 
-	s.serverWS.Broadcast(html, c)
+	s.serverWS.Broadcast([]byte(html), c)
 }
 
-func (s *Server) handleReset(c *websocket.Conn, message *ws.WSMessage) {
+func (s *Server) handleReset(c *ws.Client, message *ws.WSMessage) {
 	s.counter.Store(0)
 
 	html := `<div id="counter">0</div>`
 
-	if errWrite := c.WriteMessage(
-		websocket.TextMessage,
+	if !c.Send(
 		[]byte(
-			s.serverWS.WrapResponse(message.RequestID, html),
+			ws.WrapResponse(message.RequestID, html),
 		),
-	); errWrite != nil {
-		log.Printf(
-			"write to client failed: %v",
-			errWrite,
+	) {
+		log.Print(
+			"write to client failed",
 		)
 	}
 
-	s.serverWS.Broadcast(html, c)
+	s.serverWS.Broadcast([]byte(html), c)
 }
 
 func (s *Server) Run(addr string) error {
