@@ -34,30 +34,6 @@ func (s *ServerWS) Register(endpoint string, fn HandlerFunc) {
 	s.handlers[endpoint] = fn
 }
 
-// WrapResponse prefixes payload with the request-id marker.
-// requestID is assumed to be validated by ParseWSMessage.
-func WrapResponse(requestID, payload string) string {
-	if requestID == "" {
-		return payload
-	}
-
-	return reqIDPrefix + requestID + reqIDSuffix + payload
-}
-
-// WrapByteResponse is the []byte variant, with a single exact-size allocation.
-func WrapByteResponse(requestID string, payload []byte) []byte {
-	if requestID == "" {
-		return payload
-	}
-
-	out := make([]byte, 0, len(reqIDPrefix)+len(requestID)+len(reqIDSuffix)+len(payload))
-	out = append(out, reqIDPrefix...)
-	out = append(out, requestID...)
-	out = append(out, reqIDSuffix...)
-
-	return append(out, payload...)
-}
-
 // Broadcast queues payload for every client except exclude (may be nil).
 // It never blocks on the network. payload is shared between clients and must
 // not be modified after the call.
