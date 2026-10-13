@@ -2,6 +2,7 @@ package dsl
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -134,4 +135,73 @@ func (n *Node) Canonical() string {
 			strings.Join(kids, ", "),
 		)
 	}
+}
+
+// CanonicalInto appends the canonical form of n to dst and returns the
+// extended slice. Output is byte-for-byte identical to Canonical().
+func (n *Node) CanonicalInto(destination []byte) []byte {
+	switch {
+	case n.isText:
+		s := *(*string)(n.data)
+
+		destination = append(destination, "text("...)
+		destination = strconv.AppendQuote(destination, s) // same escaping as fmt's %q
+		destination = append(destination, ')')
+
+	case n.isAttribute:
+		v := *(*string)(n.data)
+
+		destination = append(destination, `class="`...)
+		destination = append(destination, v...)
+		destination = append(destination, '"')
+
+	case n.isCSS:
+		d := (*struct {
+			name  string
+			value string
+		})(n.data)
+
+		destination = append(destination, d.name...)
+		destination = append(destination, ':')
+		destination = append(destination, d.value...)
+
+	default:
+		d := (*struct {
+			tag      string
+			attrs    []Node
+			children []Node
+		})(n.data)
+
+		destination = append(destination, d.tag...)
+
+		if len(d.attrs) > 0 {
+			destination = append(destination, '[')
+
+			for i := range d.attrs {
+				if i > 0 {
+					destination = append(destination, ", "...)
+				}
+
+				destination = d.attrs[i].CanonicalInto(destination)
+			}
+
+			destination = append(destination, ']')
+		}
+
+		if len(d.children) > 0 {
+			destination = append(destination, '(')
+
+			for i := range d.children {
+				if i > 0 {
+					destination = append(destination, ", "...)
+				}
+
+				destination = d.children[i].CanonicalInto(destination)
+			}
+
+			destination = append(destination, ')')
+		}
+	}
+
+	return destination
 }
