@@ -45,7 +45,7 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 	_, _ = p.w.Write([]byte("(\n"))
 
 	// collect Tailwind CSS-like attributes
-	methods := collectTailwindMethods(n.children)
+	methods := collectTailwindMethods(n.Children)
 
 	if len(methods) > 0 {
 		p.writeIndentN(indent + 1)
@@ -61,7 +61,7 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 	}
 
 	// print remaining children (non-CSS)
-	for _, child := range n.children {
+	for _, child := range n.Children {
 		if child.isCSS {
 			continue // Skip CSS nodes - already handled above
 		}

@@ -15,12 +15,12 @@ func DeleteTextNodes() Transformer {
 		}
 
 		out := n
-		out.children = nil
+		out.Children = nil
 
-		for _, child := range n.children {
+		for _, child := range n.Children {
 			transformed := DeleteTextNodes()(child)
 			if !transformed.IsZero() {
-				out.children = append(out.children, transformed)
+				out.Children = append(out.Children, transformed)
 			}
 		}
 
@@ -45,12 +45,12 @@ func DeleteNodesWhere(pred func(Node) bool) Transformer {
 		}
 
 		out := n
-		out.children = nil
+		out.Children = nil
 
-		for _, child := range n.children {
+		for _, child := range n.Children {
 			transformed := DeleteNodesWhere(pred)(child)
 			if !transformed.IsZero() {
-				out.children = append(out.children, transformed)
+				out.Children = append(out.Children, transformed)
 			}
 		}
 
@@ -69,12 +69,12 @@ func DeleteAttributesNamed(name string) Transformer {
 
 		// Recurse into children
 		out := n
-		out.children = nil
+		out.Children = nil
 
-		for _, child := range n.children {
+		for _, child := range n.Children {
 			transformed := DeleteAttributesNamed(name)(child)
 			if !transformed.IsZero() {
-				out.children = append(out.children, transformed)
+				out.Children = append(out.Children, transformed)
 			}
 		}
 
@@ -89,7 +89,7 @@ func TailwindTransformer(n Node) Node {
 
 	var classValue string
 
-	for _, child := range n.children {
+	for _, child := range n.Children {
 		if child.isAttribute {
 			name, value := child.GetAttributeNameValue()
 			if name == "class" {
@@ -120,18 +120,18 @@ func TailwindTransformer(n Node) Node {
 	}
 
 	out := n
-	out.children = nil
+	out.Children = nil
 
 	// Emit each Tailwind method as a CSS node
 	for _, m := range methods {
 		cssNode := AttrWithValue(m, "")
 		cssNode.isCSS = true // Mark as CSS so it's collected properly
 
-		out.children = append(out.children, cssNode)
+		out.Children = append(out.Children, cssNode)
 	}
 
 	// Keep all non-class children
-	for _, child := range n.children {
+	for _, child := range n.Children {
 		if child.isAttribute {
 			name, _ := child.GetAttributeNameValue()
 			if name == _Class {
@@ -139,7 +139,7 @@ func TailwindTransformer(n Node) Node {
 			}
 		}
 
-		out.children = append(out.children, child)
+		out.Children = append(out.Children, child)
 	}
 
 	return out

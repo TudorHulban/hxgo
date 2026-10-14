@@ -20,7 +20,7 @@ func Doctype(child Node) Node {
 	return Node{
 		fn:       renderDoctype,
 		data:     nil,
-		children: []Node{child},
+		Children: []Node{child},
 	}
 }
 

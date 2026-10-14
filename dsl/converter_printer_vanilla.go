@@ -88,8 +88,8 @@ func (p *DSLPrinter) printElement(n Node) {
 
 	p.indent++
 
-	for i := range n.children {
-		p.printNode(n.children[i])
+	for i := range n.Children {
+		p.printNode(n.Children[i])
 		_, _ = p.w.Write([]byte(","))
 
 		if p.isMultiLine {

@@ -101,7 +101,7 @@ func TestPrintDSL(t *testing.T) {
 			node: Node{
 				fn:   renderElement,
 				data: dataForTag("a"),
-				children: []Node{
+				Children: []Node{
 					{
 						fn: renderAttribute,
 						data: unsafe.Pointer(&struct {
@@ -132,7 +132,7 @@ func TestPrintDSL(t *testing.T) {
 			node: Node{
 				fn:   renderElement,
 				data: dataForTag("li"),
-				children: []Node{
+				Children: []Node{
 					{
 						fn: renderAttribute,
 						data: unsafe.Pointer(&struct {
@@ -147,7 +147,7 @@ func TestPrintDSL(t *testing.T) {
 					{
 						fn:   renderElement,
 						data: dataForTag("span"),
-						children: []Node{
+						Children: []Node{
 							{
 								fn:     renderText,
 								data:   unsafe.Pointer(&[]string{"Text"}[0]),

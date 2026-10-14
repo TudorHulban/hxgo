@@ -19,7 +19,7 @@ type Node struct {
 	fn   renderer
 	data unsafe.Pointer
 
-	children []Node
+	Children []Node
 
 	isAttribute bool
 	isCSS       bool
@@ -29,14 +29,14 @@ type Node struct {
 func (n Node) IsZero() bool {
 	return n.fn == nil &&
 		n.data == nil &&
-		len(n.children) == 0 &&
+		len(n.Children) == 0 &&
 		!n.isAttribute &&
 		!n.isCSS &&
 		!n.isText
 }
 
 func (n *Node) Add(children ...Node) {
-	n.children = append(n.children, children...)
+	n.Children = append(n.Children, children...)
 }
 
 func (n Node) GetTagName() string {

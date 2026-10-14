@@ -22,9 +22,9 @@ func converterWalk(a *accumulator, n Node) {
 	n.fn(a, n.data) // writes "<tag"
 
 	// Attributes
-	for i := range n.children {
-		if n.children[i].isAttribute {
-			converterWalk(a, n.children[i])
+	for i := range n.Children {
+		if n.Children[i].isAttribute {
+			converterWalk(a, n.Children[i])
 		}
 	}
 
@@ -45,12 +45,12 @@ func converterWalk(a *accumulator, n Node) {
 	a.html = append(a.html, '>')
 
 	// Content children
-	for i := range n.children {
-		if n.children[i].isAttribute || n.children[i].isCSS {
+	for i := range n.Children {
+		if n.Children[i].isAttribute || n.Children[i].isCSS {
 			continue
 		}
 
-		converterWalk(a, n.children[i])
+		converterWalk(a, n.Children[i])
 	}
 
 	// Close tag

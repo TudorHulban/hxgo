@@ -106,7 +106,7 @@ func Test04DivStyle(t *testing.T) {
 		1,
 	)
 	require.Len(t,
-		el.children,
+		el.Children,
 		2,
 	)
 
