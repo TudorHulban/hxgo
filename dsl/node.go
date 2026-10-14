@@ -62,7 +62,7 @@ func (n Node) GetAttributeNameValue() (string, string) {
 	return d.name, d.value
 }
 
-func (n *Node) Canonical() string {
+func (n Node) Canonical() string {
 	switch {
 	case n.isText:
 		s := *(*string)(n.data)
@@ -139,7 +139,7 @@ func (n *Node) Canonical() string {
 
 // CanonicalInto appends the canonical form of n to dst and returns the
 // extended slice. Output is byte-for-byte identical to Canonical().
-func (n *Node) CanonicalInto(destination []byte) []byte {
+func (n Node) CanonicalInto(destination []byte) []byte {
 	switch {
 	case n.isText:
 		s := *(*string)(n.data)
