@@ -13,6 +13,6 @@ func DSLText(s string) Node {
 
 	return Node{
 		fn:   renderDSLText,
-		data: unsafe.Pointer(data),
+		Data: unsafe.Pointer(data),
 	}
 }

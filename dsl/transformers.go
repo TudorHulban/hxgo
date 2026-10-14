@@ -10,7 +10,7 @@ type Transformer func(Node) Node
 
 func DeleteTextNodes() Transformer {
 	return func(n Node) Node {
-		if n.isText {
+		if n.IsText {
 			return Node{} // delete
 		}
 
@@ -29,7 +29,7 @@ func DeleteTextNodes() Transformer {
 }
 
 func IsClassAttribute(n Node) bool {
-	if !n.isAttribute {
+	if !n.IsAttribute {
 		return false
 	}
 
@@ -60,7 +60,7 @@ func DeleteNodesWhere(pred func(Node) bool) Transformer {
 
 func DeleteAttributesNamed(name string) Transformer {
 	return func(n Node) Node {
-		if n.isAttribute {
+		if n.IsAttribute {
 			attrName, _ := n.GetAttributeNameValue()
 			if attrName == name {
 				return Node{} // or a sentinel meaning “delete me”
@@ -83,14 +83,14 @@ func DeleteAttributesNamed(name string) Transformer {
 }
 
 func TailwindTransformer(n Node) Node {
-	if n.isAttribute || n.isText || n.isCSS {
+	if n.IsAttribute || n.IsText || n.IsCSS {
 		return n
 	}
 
 	var classValue string
 
 	for _, child := range n.Children {
-		if child.isAttribute {
+		if child.IsAttribute {
 			name, value := child.GetAttributeNameValue()
 			if name == "class" {
 				classValue = value
@@ -125,14 +125,14 @@ func TailwindTransformer(n Node) Node {
 	// Emit each Tailwind method as a CSS node
 	for _, m := range methods {
 		cssNode := AttrWithValue(m, "")
-		cssNode.isCSS = true // Mark as CSS so it's collected properly
+		cssNode.IsCSS = true // Mark as CSS so it's collected properly
 
 		out.Children = append(out.Children, cssNode)
 	}
 
 	// Keep all non-class children
 	for _, child := range n.Children {
-		if child.isAttribute {
+		if child.IsAttribute {
 			name, _ := child.GetAttributeNameValue()
 			if name == _Class {
 				continue
@@ -147,7 +147,7 @@ func TailwindTransformer(n Node) Node {
 
 func ExtractAttributeValue(n Node, fn func(string) string) Node {
 	// Only operate on attribute nodes
-	if !n.isAttribute {
+	if !n.IsAttribute {
 		return n
 	}
 
@@ -168,7 +168,7 @@ func ExtractAttributeValue(n Node, fn func(string) string) Node {
 
 	return Node{
 		fn:          renderAttribute,
-		data:        unsafe.Pointer(data),
-		isAttribute: true,
+		Data:        unsafe.Pointer(data),
+		IsAttribute: true,
 	}
 }

@@ -9,11 +9,11 @@ func collectTailwindMethods(children []Node) []string {
 	var out []string
 
 	for _, c := range children {
-		if !c.isAttribute {
+		if !c.IsAttribute {
 			continue
 		}
 
-		if !c.isCSS {
+		if !c.IsCSS {
 			continue
 		}
 
@@ -62,7 +62,7 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 
 	// print remaining children (non-CSS)
 	for _, child := range n.Children {
-		if child.isCSS {
+		if child.IsCSS {
 			continue // Skip CSS nodes - already handled above
 		}
 
@@ -75,16 +75,16 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 
 func printNodeTW(p *DSLPrinter, n Node, indent int) {
 	switch {
-	case n.isText:
+	case n.IsText:
 		p.writeIndentN(indent)
 		p.printText(n)
 		_, _ = p.w.Write([]byte(",\n"))
 
-	case n.isCSS:
+	case n.IsCSS:
 		// Tailwind CSS attributes handled in printElementTW - skip here
 		return
 
-	case n.isAttribute:
+	case n.IsAttribute:
 		p.writeIndentN(indent)
 		p.printAttribute(n)
 		_, _ = p.w.Write([]byte(",\n"))

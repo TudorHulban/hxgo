@@ -64,9 +64,9 @@ func (p *DSLPrinter) writeIndentN(extra int) {
 
 func (p *DSLPrinter) printNode(n Node) {
 	switch {
-	case n.isText:
+	case n.IsText:
 		p.printText(n)
-	case n.isAttribute:
+	case n.IsAttribute:
 		p.printAttribute(n)
 	default:
 		p.printElement(n)
@@ -74,7 +74,7 @@ func (p *DSLPrinter) printNode(n Node) {
 }
 
 func (p *DSLPrinter) printElement(n Node) {
-	tag := extractTagName(n.data)
+	tag := extractTagName(n.Data)
 
 	p.writeIndent()
 	_, _ = p.w.Write([]byte(_DSL))
@@ -107,7 +107,7 @@ func (p *DSLPrinter) printAttribute(n Node) {
 	d := (*struct {
 		key string
 		val string
-	})(n.data)
+	})(n.Data)
 
 	// SPECIAL CASE: empty value → raw DSL call
 	if d.val == "" {
@@ -128,7 +128,7 @@ func (p *DSLPrinter) printAttribute(n Node) {
 }
 
 func (p *DSLPrinter) printText(n Node) {
-	s := *(*string)(n.data)
+	s := *(*string)(n.Data)
 
 	p.writeIndent()
 	_, _ = p.w.Write([]byte(_DSL))

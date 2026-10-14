@@ -19,7 +19,7 @@ func Body(children ...Node) Node {
 func Doctype(child Node) Node {
 	return Node{
 		fn:       renderDoctype,
-		data:     nil,
+		Data:     nil,
 		Children: []Node{child},
 	}
 }

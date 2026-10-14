@@ -9,8 +9,8 @@ func Text(text string) Node {
 			a.Write1(s)
 		},
 
-		data:   unsafe.Pointer(&text),
-		isText: true,
+		Data:   unsafe.Pointer(&text),
+		IsText: true,
 	}
 }
 
@@ -21,7 +21,7 @@ func Raw(text string) Node {
 			a.Write1(s)
 		},
 
-		data: unsafe.Pointer(&text),
+		Data: unsafe.Pointer(&text),
 	}
 }
 

@@ -44,8 +44,8 @@ func convertText(n *html.Node) Node {
 
 	return Node{
 		fn:     renderText,
-		data:   unsafe.Pointer(text),
-		isText: true, // NEW
+		Data:   unsafe.Pointer(text),
+		IsText: true, // NEW
 	}
 }
 
@@ -74,8 +74,8 @@ func convertAttribute(a html.Attribute) Node {
 
 	return Node{
 		fn:          renderAttribute,
-		data:        unsafe.Pointer(d),
-		isAttribute: true,
+		Data:        unsafe.Pointer(d),
+		IsAttribute: true,
 	}
 }
 
@@ -94,7 +94,7 @@ func buildDataForTag(tag string) unsafe.Pointer {
 func convertElement(n *html.Node) Node {
 	node := Node{
 		fn:   renderElement,
-		data: dataForTag(n.Data),
+		Data: dataForTag(n.Data),
 	}
 
 	// attributes first

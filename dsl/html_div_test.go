@@ -81,11 +81,11 @@ func Test04DivStyle(t *testing.T) {
 	}
 
 	require.Len(t,
-		(*TData)(el.data).attrs,
+		(*TData)(el.Data).attrs,
 		1,
 	)
 	require.Len(t,
-		(*TData)(el.data).children,
+		(*TData)(el.Data).children,
 		1,
 	)
 
@@ -102,7 +102,7 @@ func Test04DivStyle(t *testing.T) {
 	)
 
 	require.Len(t,
-		(*TData)(el.data).children,
+		(*TData)(el.Data).children,
 		1,
 	)
 	require.Len(t,

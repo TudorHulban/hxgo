@@ -5,25 +5,25 @@ func converterWalk(a *accumulator, n Node) {
 		return
 	}
 
-	if n.isAttribute {
-		n.fn(a, n.data)
+	if n.IsAttribute {
+		n.fn(a, n.Data)
 
 		return
 	}
 
 	// Text nodes - render and done
-	if n.isText {
-		n.fn(a, n.data)
+	if n.IsText {
+		n.fn(a, n.Data)
 
 		return
 	}
 
 	// Open tag
-	n.fn(a, n.data) // writes "<tag"
+	n.fn(a, n.Data) // writes "<tag"
 
 	// Attributes
 	for i := range n.Children {
-		if n.Children[i].isAttribute {
+		if n.Children[i].IsAttribute {
 			converterWalk(a, n.Children[i])
 		}
 	}
@@ -34,7 +34,7 @@ func converterWalk(a *accumulator, n Node) {
 		closeTag []byte
 	}
 
-	d := (*tagData)(n.data)
+	d := (*tagData)(n.Data)
 
 	if d.closeTag == nil {
 		a.html = append(a.html, '/', '>')
@@ -46,7 +46,7 @@ func converterWalk(a *accumulator, n Node) {
 
 	// Content children
 	for i := range n.Children {
-		if n.Children[i].isAttribute || n.Children[i].isCSS {
+		if n.Children[i].IsAttribute || n.Children[i].IsCSS {
 			continue
 		}
 
@@ -54,7 +54,7 @@ func converterWalk(a *accumulator, n Node) {
 	}
 
 	// Close tag
-	renderElementClose(a, n.data)
+	renderElementClose(a, n.Data)
 }
 
 // RenderConvertedHTML should be used when testing the HTML converter.
