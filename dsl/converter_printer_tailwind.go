@@ -9,11 +9,11 @@ func collectTailwindMethods(children []Node) []string {
 	var out []string
 
 	for _, c := range children {
-		if !c.IsAttribute {
+		if !c.isAttribute {
 			continue
 		}
 
-		if !c.IsCSS {
+		if !c.isCSS {
 			continue
 		}
 
@@ -45,7 +45,7 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 	_, _ = p.w.Write([]byte("(\n"))
 
 	// collect Tailwind CSS-like attributes
-	methods := collectTailwindMethods(n.Children)
+	methods := collectTailwindMethods(n.children)
 
 	if len(methods) > 0 {
 		p.writeIndentN(indent + 1)
@@ -61,8 +61,8 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 	}
 
 	// print remaining children (non-CSS)
-	for _, child := range n.Children {
-		if child.IsCSS {
+	for _, child := range n.children {
+		if child.isCSS {
 			continue // Skip CSS nodes - already handled above
 		}
 
@@ -75,16 +75,16 @@ func printElementTW(p *DSLPrinter, n Node, indent int) {
 
 func printNodeTW(p *DSLPrinter, n Node, indent int) {
 	switch {
-	case n.IsText:
+	case n.isText:
 		p.writeIndentN(indent)
 		p.printText(n)
 		_, _ = p.w.Write([]byte(",\n"))
 
-	case n.IsCSS:
+	case n.isCSS:
 		// Tailwind CSS attributes handled in printElementTW - skip here
 		return
 
-	case n.IsAttribute:
+	case n.isAttribute:
 		p.writeIndentN(indent)
 		p.printAttribute(n)
 		_, _ = p.w.Write([]byte(",\n"))

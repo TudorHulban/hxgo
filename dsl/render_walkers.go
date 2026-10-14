@@ -5,10 +5,10 @@ func walkFull(a *accumulator, n Node) {
 		return
 	}
 
-	n.fn(a, n.Data)
+	n.fn(a, n.data)
 
-	for i := range n.Children {
-		walkFull(a, n.Children[i])
+	for i := range n.children {
+		walkFull(a, n.children[i])
 	}
 }
 
@@ -17,13 +17,13 @@ func walkHTML(a *accumulator, n Node) {
 		return
 	}
 
-	n.fn(a, n.Data)
+	n.fn(a, n.data)
 
-	for i := range n.Children {
-		if n.Children[i].IsCSS {
+	for i := range n.children {
+		if n.children[i].isCSS {
 			continue
 		}
 
-		walkHTML(a, n.Children[i])
+		walkHTML(a, n.children[i])
 	}
 }

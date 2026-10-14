@@ -12,7 +12,7 @@ func el(tag string, children ...Node) Node {
 	var nodes []Node
 
 	for i := range children {
-		if children[i].IsAttribute {
+		if children[i].isAttribute {
 			attrs = append(attrs, children[i])
 		} else {
 			nodes = append(nodes, children[i])
@@ -27,7 +27,7 @@ func el(tag string, children ...Node) Node {
 
 	return Node{
 		fn:   renderEl,
-		Data: unsafe.Pointer(data),
+		data: unsafe.Pointer(data),
 	}
 }
 
@@ -43,7 +43,7 @@ func renderEl(a *accumulator, p unsafe.Pointer) {
 
 	// Render attributes - single iteration
 	for i := range d.attrs {
-		d.attrs[i].fn(a, d.attrs[i].Data)
+		d.attrs[i].fn(a, d.attrs[i].data)
 	}
 
 	if isTagless(d.tag) {
@@ -70,7 +70,7 @@ func elWId(tag, cssID string, children ...Node) Node {
 	var nodes []Node
 
 	for i := range children {
-		if children[i].IsAttribute {
+		if children[i].isAttribute {
 			attrs = append(attrs, children[i])
 		} else {
 			nodes = append(nodes, children[i])
@@ -86,7 +86,7 @@ func elWId(tag, cssID string, children ...Node) Node {
 
 	return Node{
 		fn:   renderElWId,
-		Data: unsafe.Pointer(data),
+		data: unsafe.Pointer(data),
 	}
 }
 
@@ -109,7 +109,7 @@ func renderElWId(a *accumulator, p unsafe.Pointer) {
 
 	// Render attributes - single iteration
 	for i := range d.attrs {
-		d.attrs[i].fn(a, d.attrs[i].Data)
+		d.attrs[i].fn(a, d.attrs[i].data)
 	}
 
 	a.Write1(">")

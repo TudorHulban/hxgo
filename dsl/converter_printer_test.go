@@ -70,8 +70,8 @@ func TestPrintDSL(t *testing.T) {
 			description: "2. text node",
 			node: Node{
 				fn:     renderText,
-				Data:   unsafe.Pointer(&[]string{"Home"}[0]),
-				IsText: true,
+				data:   unsafe.Pointer(&[]string{"Home"}[0]),
+				isText: true,
 			},
 			expectedDSL: helpers.Sprintf(
 				`%s.Text("Home")`,
@@ -82,14 +82,14 @@ func TestPrintDSL(t *testing.T) {
 			description: "3. attribute node",
 			node: Node{
 				fn: renderAttribute,
-				Data: unsafe.Pointer(&struct {
+				data: unsafe.Pointer(&struct {
 					key string
 					val string
 				}{
 					key: "class",
 					val: "breadcrumb-item",
 				}),
-				IsAttribute: true,
+				isAttribute: true,
 			},
 			expectedDSL: helpers.Sprintf(
 				`%s.Class("breadcrumb-item")`,
@@ -100,23 +100,23 @@ func TestPrintDSL(t *testing.T) {
 			description: "4. element with attribute and text child",
 			node: Node{
 				fn:   renderElement,
-				Data: dataForTag("a"),
-				Children: []Node{
+				data: dataForTag("a"),
+				children: []Node{
 					{
 						fn: renderAttribute,
-						Data: unsafe.Pointer(&struct {
+						data: unsafe.Pointer(&struct {
 							key string
 							val string
 						}{
 							key: "href",
 							val: "#",
 						}),
-						IsAttribute: true,
+						isAttribute: true,
 					},
 					{
 						fn:     renderText,
-						Data:   unsafe.Pointer(&[]string{"Home"}[0]),
-						IsText: true,
+						data:   unsafe.Pointer(&[]string{"Home"}[0]),
+						isText: true,
 					},
 				},
 			},
@@ -131,27 +131,27 @@ func TestPrintDSL(t *testing.T) {
 			description: "5. nested element",
 			node: Node{
 				fn:   renderElement,
-				Data: dataForTag("li"),
-				Children: []Node{
+				data: dataForTag("li"),
+				children: []Node{
 					{
 						fn: renderAttribute,
-						Data: unsafe.Pointer(&struct {
+						data: unsafe.Pointer(&struct {
 							key string
 							val string
 						}{
 							key: "class",
 							val: "breadcrumb-item",
 						}),
-						IsAttribute: true,
+						isAttribute: true,
 					},
 					{
 						fn:   renderElement,
-						Data: dataForTag("span"),
-						Children: []Node{
+						data: dataForTag("span"),
+						children: []Node{
 							{
 								fn:     renderText,
-								Data:   unsafe.Pointer(&[]string{"Text"}[0]),
-								IsText: true,
+								data:   unsafe.Pointer(&[]string{"Text"}[0]),
+								isText: true,
 							},
 						},
 					},

@@ -5,9 +5,9 @@ import "unsafe"
 func Class(name string) Node {
 	return Node{
 		fn:   renderClass,
-		Data: unsafe.Pointer(&name),
+		data: unsafe.Pointer(&name),
 
-		IsAttribute: true,
+		isAttribute: true,
 	}
 }
 

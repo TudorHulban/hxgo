@@ -10,17 +10,17 @@ type Transformer func(Node) Node
 
 func DeleteTextNodes() Transformer {
 	return func(n Node) Node {
-		if n.IsText {
+		if n.isText {
 			return Node{} // delete
 		}
 
 		out := n
-		out.Children = nil
+		out.children = nil
 
-		for _, child := range n.Children {
+		for _, child := range n.children {
 			transformed := DeleteTextNodes()(child)
 			if !transformed.IsZero() {
-				out.Children = append(out.Children, transformed)
+				out.children = append(out.children, transformed)
 			}
 		}
 
@@ -29,7 +29,7 @@ func DeleteTextNodes() Transformer {
 }
 
 func IsClassAttribute(n Node) bool {
-	if !n.IsAttribute {
+	if !n.isAttribute {
 		return false
 	}
 
@@ -45,12 +45,12 @@ func DeleteNodesWhere(pred func(Node) bool) Transformer {
 		}
 
 		out := n
-		out.Children = nil
+		out.children = nil
 
-		for _, child := range n.Children {
+		for _, child := range n.children {
 			transformed := DeleteNodesWhere(pred)(child)
 			if !transformed.IsZero() {
-				out.Children = append(out.Children, transformed)
+				out.children = append(out.children, transformed)
 			}
 		}
 
@@ -60,7 +60,7 @@ func DeleteNodesWhere(pred func(Node) bool) Transformer {
 
 func DeleteAttributesNamed(name string) Transformer {
 	return func(n Node) Node {
-		if n.IsAttribute {
+		if n.isAttribute {
 			attrName, _ := n.GetAttributeNameValue()
 			if attrName == name {
 				return Node{} // or a sentinel meaning “delete me”
@@ -69,12 +69,12 @@ func DeleteAttributesNamed(name string) Transformer {
 
 		// Recurse into children
 		out := n
-		out.Children = nil
+		out.children = nil
 
-		for _, child := range n.Children {
+		for _, child := range n.children {
 			transformed := DeleteAttributesNamed(name)(child)
 			if !transformed.IsZero() {
-				out.Children = append(out.Children, transformed)
+				out.children = append(out.children, transformed)
 			}
 		}
 
@@ -83,14 +83,14 @@ func DeleteAttributesNamed(name string) Transformer {
 }
 
 func TailwindTransformer(n Node) Node {
-	if n.IsAttribute || n.IsText || n.IsCSS {
+	if n.isAttribute || n.isText || n.isCSS {
 		return n
 	}
 
 	var classValue string
 
-	for _, child := range n.Children {
-		if child.IsAttribute {
+	for _, child := range n.children {
+		if child.isAttribute {
 			name, value := child.GetAttributeNameValue()
 			if name == "class" {
 				classValue = value
@@ -120,26 +120,26 @@ func TailwindTransformer(n Node) Node {
 	}
 
 	out := n
-	out.Children = nil
+	out.children = nil
 
 	// Emit each Tailwind method as a CSS node
 	for _, m := range methods {
 		cssNode := AttrWithValue(m, "")
-		cssNode.IsCSS = true // Mark as CSS so it's collected properly
+		cssNode.isCSS = true // Mark as CSS so it's collected properly
 
-		out.Children = append(out.Children, cssNode)
+		out.children = append(out.children, cssNode)
 	}
 
 	// Keep all non-class children
-	for _, child := range n.Children {
-		if child.IsAttribute {
+	for _, child := range n.children {
+		if child.isAttribute {
 			name, _ := child.GetAttributeNameValue()
 			if name == _Class {
 				continue
 			}
 		}
 
-		out.Children = append(out.Children, child)
+		out.children = append(out.children, child)
 	}
 
 	return out
@@ -147,7 +147,7 @@ func TailwindTransformer(n Node) Node {
 
 func ExtractAttributeValue(n Node, fn func(string) string) Node {
 	// Only operate on attribute nodes
-	if !n.IsAttribute {
+	if !n.isAttribute {
 		return n
 	}
 
@@ -168,7 +168,7 @@ func ExtractAttributeValue(n Node, fn func(string) string) Node {
 
 	return Node{
 		fn:          renderAttribute,
-		Data:        unsafe.Pointer(data),
-		IsAttribute: true,
+		data:        unsafe.Pointer(data),
+		isAttribute: true,
 	}
 }

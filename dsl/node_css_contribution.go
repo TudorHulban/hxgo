@@ -30,9 +30,9 @@ func renderCSSContribution(a *accumulator, data unsafe.Pointer) {
 func (co *CSSContribution) AsNode() Node {
 	return Node{
 		fn:   renderCSSContribution,
-		Data: unsafe.Pointer(co),
+		data: unsafe.Pointer(co),
 
-		IsCSS: true,
+		isCSS: true,
 	}
 }
 

@@ -17,68 +17,75 @@ type renderer func(*accumulator, unsafe.Pointer)
 // No virtual method tables.
 type Node struct {
 	fn   renderer
-	Data unsafe.Pointer
+	data unsafe.Pointer
 
-	Children []Node
+	children []Node
 
-	IsAttribute bool
-	IsCSS       bool
-	IsText      bool
+	isAttribute bool
+	isCSS       bool
+	isText      bool
+	isRaw       bool
 }
 
 func (n Node) IsZero() bool {
 	return n.fn == nil &&
-		n.Data == nil &&
-		len(n.Children) == 0 &&
-		!n.IsAttribute &&
-		!n.IsCSS &&
-		!n.IsText
+		n.data == nil &&
+		len(n.children) == 0 &&
+		!n.isAttribute &&
+		!n.isCSS &&
+		!n.isText &&
+		!n.isRaw
 }
 
 func (n *Node) Add(children ...Node) {
-	n.Children = append(n.Children, children...)
+	n.children = append(n.children, children...)
 }
 
 func (n Node) GetTagName() string {
-	if n.IsAttribute || n.IsText || n.IsCSS {
+	if n.isAttribute || n.isText || n.isCSS || n.isRaw {
 		return ""
 	}
 
-	name := (*struct{ name string })(n.Data).name
+	name := (*struct{ name string })(n.data).name
 
 	return strings.TrimPrefix(name, "<")
 }
 
 func (n Node) GetAttributeNameValue() (string, string) {
-	if !n.IsAttribute {
+	if !n.isAttribute {
 		return "", ""
 	}
 
 	d := (*struct {
 		name  string
 		value string
-	})(n.Data)
+	})(n.data)
 
 	return d.name, d.value
 }
 
 func (n Node) Canonical() string {
 	switch {
-	case n.IsText:
-		s := *(*string)(n.Data)
+	case n.isText:
+		s := *(*string)(n.data)
 
 		return fmt.Sprintf(`text(%q)`, s)
 
-	case n.IsAttribute:
-		v := *(*string)(n.Data)
+	case n.isRaw:
+		s := *(*string)(n.data)
+
+		return fmt.Sprintf(`raw(%q)`, s)
+
+	case n.isAttribute:
+		v := *(*string)(n.data)
 
 		return fmt.Sprintf(`class="%s"`, v)
 
-	case n.IsCSS:
+	case n.isCSS:
 		d := (*struct {
 			name  string
 			value string
-		})(n.Data)
+		})(n.data)
 
 		return fmt.Sprintf("%s:%s", d.name, d.value)
 
@@ -87,7 +94,7 @@ func (n Node) Canonical() string {
 			tag      string
 			attrs    []Node
 			children []Node
-		})(n.Data)
+		})(n.data)
 
 		var attrs []string
 		for i := range d.attrs {
@@ -141,25 +148,32 @@ func (n Node) Canonical() string {
 // extended slice. Output is byte-for-byte identical to Canonical().
 func (n Node) CanonicalInto(destination []byte) []byte {
 	switch {
-	case n.IsText:
-		s := *(*string)(n.Data)
+	case n.isText:
+		s := *(*string)(n.data)
 
 		destination = append(destination, "text("...)
 		destination = strconv.AppendQuote(destination, s) // same escaping as fmt's %q
 		destination = append(destination, ')')
 
-	case n.IsAttribute:
-		v := *(*string)(n.Data)
+	case n.isRaw:
+		s := *(*string)(n.data)
+
+		destination = append(destination, "raw("...)
+		destination = strconv.AppendQuote(destination, s) // same escaping as fmt's %q
+		destination = append(destination, ')')
+
+	case n.isAttribute:
+		v := *(*string)(n.data)
 
 		destination = append(destination, `class="`...)
 		destination = append(destination, v...)
 		destination = append(destination, '"')
 
-	case n.IsCSS:
+	case n.isCSS:
 		d := (*struct {
 			name  string
 			value string
-		})(n.Data)
+		})(n.data)
 
 		destination = append(destination, d.name...)
 		destination = append(destination, ':')
@@ -170,7 +184,7 @@ func (n Node) CanonicalInto(destination []byte) []byte {
 			tag      string
 			attrs    []Node
 			children []Node
-		})(n.Data)
+		})(n.data)
 
 		destination = append(destination, d.tag...)
 
@@ -204,4 +218,14 @@ func (n Node) CanonicalInto(destination []byte) []byte {
 	}
 
 	return destination
+}
+
+func (n *Node) DebugParts() ([]Node, []Node) {
+	d := (*struct {
+		tag      string
+		attrs    []Node
+		children []Node
+	})(n.data)
+
+	return d.attrs, d.children
 }

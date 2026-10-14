@@ -33,9 +33,9 @@ func AttrWithValue(name, value string) Node {
 
 	return Node{
 		fn:   renderAttrWithValue,
-		Data: unsafe.Pointer(data),
+		data: unsafe.Pointer(data),
 
-		IsAttribute: true,
+		isAttribute: true,
 	}
 }
 
