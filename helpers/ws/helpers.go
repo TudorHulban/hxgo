@@ -16,7 +16,7 @@ func WrapResponse(requestID, payload string) string {
 // marker. With an empty requestID it just concatenates.
 // requestID is assumed to be validated by ParseWSMessage.
 func WrapResponses(requestID string, payloads ...string) string {
-	if requestID == "" { // Zero-alloc fast path: nothing to wrap, nothing to join.
+	if requestID == "" {
 		switch len(payloads) {
 		case 0:
 			return ""
@@ -29,6 +29,11 @@ func WrapResponses(requestID string, payloads ...string) string {
 
 	for ix := range payloads {
 		total = total + len(payloads[ix])
+	}
+
+	// Add space for separators if there are multiple payloads
+	if len(payloads) > 1 {
+		total = total + len(reqPayloadSeparator)*(len(payloads)-1)
 	}
 
 	if requestID != "" {
@@ -49,11 +54,13 @@ func WrapResponses(requestID string, payloads ...string) string {
 	}
 
 	for ix := range payloads {
+		if ix > 0 {
+			n = n + copy(buf[n:], []byte(reqPayloadSeparator))
+		}
+
 		n = n + copy(buf[n:], payloads[ix])
 	}
 
-	// buf never escapes or gets mutated after this point, so aliasing it as a
-	// string is safe and avoids the copy that string(buf) would make.
 	return unsafe.String(unsafe.SliceData(buf), total)
 }
 
@@ -77,18 +84,32 @@ func WrapByteResponse(requestID string, payload []byte) []byte {
 }
 
 func WrapByteResponses(requestID string, payloads ...[]byte) []byte {
+	if requestID == "" {
+		switch len(payloads) {
+		case 0:
+			return nil
+		case 1:
+			return payloads[0]
+		}
+	}
+
 	outputByteLength := 0
 
 	for ix := range payloads {
 		outputByteLength = outputByteLength + len(payloads[ix])
 	}
 
-	if requestID == "" {
-		if len(payloads) == 1 {
-			return payloads[0]
-		}
-	} else {
+	// Add space for separators if there are multiple payloads
+	if len(payloads) > 1 {
+		outputByteLength = outputByteLength + len([]byte(reqPayloadSeparator))*(len(payloads)-1)
+	}
+
+	if requestID != "" {
 		outputByteLength = outputByteLength + len(reqIDPrefix) + len(requestID) + len(reqIDSuffix)
+	}
+
+	if outputByteLength == 0 {
+		return nil
 	}
 
 	buf := make([]byte, outputByteLength)
@@ -101,6 +122,10 @@ func WrapByteResponses(requestID string, payloads ...[]byte) []byte {
 	}
 
 	for ix := range payloads {
+		if ix > 0 {
+			bufOffset = bufOffset + copy(buf[bufOffset:], []byte(reqPayloadSeparator))
+		}
+
 		bufOffset = bufOffset + copy(buf[bufOffset:], payloads[ix])
 	}
 
