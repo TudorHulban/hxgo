@@ -203,14 +203,6 @@ func (elem ComboSelectMonth) Build() *dsl.Node {
 	return &node
 }
 
-// fnName := func(n dsl.Node) string {
-// 	if n.Fn == nil {
-// 		return "<nil>"
-// 	}
-
-// 	return runtime.FuncForPC(reflect.ValueOf(n.Fn).Pointer()).Name()
-// }
-
 func Test_Combo_With_SelectInput(t *testing.T) {
 	combo := NewComboSelectMonth(
 		time.Now(),

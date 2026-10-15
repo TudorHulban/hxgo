@@ -168,7 +168,7 @@ func (el InputSelect) tagLabel() string {
 	)
 }
 
-func (el InputSelect) ResonseUpdate() dsl.Node {
+func (el InputSelect) ResponseUpdate() dsl.Node {
 	return dsl.Raw(
 		helpers.Sprintf(
 			`<select %s>%s</select>`,

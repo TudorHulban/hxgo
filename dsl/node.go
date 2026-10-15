@@ -22,7 +22,7 @@ type Node struct {
 	isAttribute bool
 	isCSS       bool
 	isText      bool
-	isRaw       bool
+	isRaw       bool // needed only for canonicals. drop candidate.
 }
 
 func (n Node) IsZero() bool {
