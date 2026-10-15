@@ -11,8 +11,9 @@ var (
 )
 
 const (
-	reqIDPrefix = "<!-- _hx_req_id: "
-	reqIDSuffix = " -->\n"
+	reqIDPrefix         = "<!-- _hx_req_id: "
+	reqIDSuffix         = " -->\n"
+	reqPayloadSeparator = "|"
 )
 
 const (

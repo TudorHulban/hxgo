@@ -60,7 +60,7 @@ func WidgetAppointment(params *ParamsWidgetAppointment) *ResponseWidgetAppointme
 						`display: flex; flex-direction: column; gap: 0.1em;`,
 					),
 
-					inputSimple.Raw(),
+					inputSimple.Build(),
 
 					inputslots.WidgetSlots(
 						&params.ParamsWidgetSlots,

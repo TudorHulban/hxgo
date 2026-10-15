@@ -21,7 +21,8 @@ func Raw(text string) Node {
 			a.Write1(s)
 		},
 
-		data: unsafe.Pointer(&text),
+		data:  unsafe.Pointer(&text),
+		isRaw: true,
 	}
 }
 
