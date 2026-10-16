@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ONCHANGE_ENABLE: 'hx-onchange-enable'
     });
 
-    const VERSION = "0.1.3-core-ws-perf";
+    const VERSION = "0.1.4-core-ws-perf";
     console.log("version %s", VERSION);
 
     // --- WebSocket State ---
@@ -48,12 +48,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
      * performance.now(). Turn everything off with hx.setDebug(false) or by
      * setting `debug = false` below. Per-element swap detail uses console.debug,
      * so it is only visible when the console level "Verbose" is enabled.
+     * Every line starts with a wall-clock stamp [HH:MM:SS.mmm] (browser local time)
+     * so it can be lined up with server logs. On one machine the clocks agree.
      *
      * One user action produces these lines, matched by request id (hx1, hx2...):
      *
      *   hx1 -> POST /today | beforeRequest listeners | collect+prep | ws.send() | client total | size
-     *   hx1 <- swap        | rtt | parse | swap (N el) | handler total | size
-     *   hx1 next paint     | ≈ +X after handler
+     *   hx1 <- swap        | rtt [= server + net | ≈ ping-baseline + server-side] | parse | swap (N el) | handler total | size
+     *   hx1 paint ≈        | frame-wait + render = X after handler | felt Y since action start
      *
      * Timeline of one request (left to right is time):
      *
@@ -64,25 +66,69 @@ document.addEventListener('DOMContentLoaded', (event) => {
      *           │                            It does not include the network or the server.
      *           │   └─ "client total" = the three items above
      *           │
-     *           ├──────────── rtt ────────── server handler + server Send + network +
-     *           │                            browser event-loop wait (if the main thread
-     *           │                            was busy, that wait is inside rtt too)
+     *           ├──────────── rtt ────────── Just before ws.send() -> first line of onmessage.
+     *           │                            = server handler + server Send + transport.
+     *           │                            With a server-reported time it is split into
+     *           │                            "= server X + net Y" (see SPLITTING rtt below).
+     *           │                            Parse, swap and paint are NOT in it: the value is
+     *           │                            fixed before any of that runs. It is not called
+     *           │                            "net-rtt" because it includes the server's work.
+     *           │                            If the main thread was busy when the frame
+     *           │                            arrived (e.g. still rendering a previous swap),
+     *           │                            that wait is inside rtt too.
      *           │
-     *   onmessage starts ─┬─ parse           strip the _hx_req_id comment, innerHTML
+     *   onmessage starts ─┬─ parse           innerHTML of the response only. The header strip
+     *                     │                  (regex + slice) is microseconds and is only part
+     *                     │                  of "handler total".
      *                     ├─ swap (N el)     outerHTML replace per [id] element, including
      *                     │                  hx:beforeSwap / afterSwap / reattachListeners
      *                     │                  listeners. N counts every [id] in the response,
      *                     │                  nested ones too (they get swapped twice).
      *                     ├─ handler total   all of onmessage, including hx:afterResponse
      *                     │                  listeners. Slightly more than parse + swap.
-     *                     └─ next paint ≈    from the end of the handler to just after the
-     *                                        next frame. Style, layout and paint cost lands
-     *                                        here, NOT in "swap", because the browser defers
-     *                                        them. At 60Hz a frame is 16.7ms, so expect
-     *                                        0 to 17ms of pure vsync wait on top.
+     *                     └─ paint ≈         the browser's cost after the handler, in two parts:
+     *                          frame-wait      handler end -> next rendering opportunity
+     *                                          (requestAnimationFrame fires). Mostly vsync
+     *                                          wait: 0 to 17ms at 60Hz, nothing to optimise.
+     *                          render          rAF -> a task queued from it. Style, layout,
+     *                                          paint and commit of the swapped DOM. This is
+     *                                          the part that shrinks if the swap gets smaller.
      *
-     * Rough end-to-end time the user feels for one action:
-     *   client total + rtt + handler total + next paint
+     * "felt" = from the start of sendWsAction until just after the paint above. It does
+     * not include the time the browser spent before calling our input handler. The
+     * bracket "(X without frame-wait)" removes frame-wait, which is display cadence and
+     * not under your control. Compare that bracketed number before/after an optimisation:
+     * it only moves when the app itself got faster or slower.
+     *
+     * SPLITTING rtt INTO SERVER AND NET
+     *   The browser cannot see what the server did, so the server has to say. It adds its
+     *   own duration, in integer µs, to the response header comment:
+     *
+     *     <!-- _hx_req_id: hx4 srv=187 -->
+     *
+     *   Then the line shows   rtt 2,700µs = server 187µs + net 2,513µs
+     *   with net = rtt - srv (clamped at 0, clock coarsening can make it slightly negative).
+     *   Without srv= the browser can still ESTIMATE the split from a ping baseline. After
+     *   every connect (and whenever you run hx.pingTest()) it sends 10 pings and keeps the
+     *   median pong rtt as the "ping-baseline". Each response then prints:
+     *
+     *     rtt 2,400µs ≈ ping-baseline 600µs + server-side 1,800µs
+     *
+     *   server-side = rtt - baseline = everything the request did that a ping did not:
+     *   dispatch, parsing, auth, the handler and the write path. It is an estimate, because
+     *   a ping may take a shorter path through the server than a request does. If your
+     *   own handler timing is far below "server-side", the gap is in that surrounding
+     *   code, not in the handler. An exact srv= always wins over the estimate. Recalibrate
+     *   with hx.pingTest() if the baseline looks stale.
+     *
+     *   Where the server starts and stops its clock decides what "net" contains:
+     *     - Start when the frame is READ, not when the handler starts. Otherwise dispatch
+     *       and queueing time inside the server hides in "net".
+     *     - Stop as late as possible, right before the socket write.
+     *   net then holds: transport both ways, the write itself, and any browser
+     *   main-thread wait before onmessage ran. On loopback that is about the heartbeat
+     *   rtt (hx.pingTest() gives a better baseline). A big "net" on one request with a
+     *   normal "server" means the delay was NOT your backend.
      *
      * Other lines:
      *   - "connected ... in X"      WebSocket handshake time, once per connection.
@@ -90,6 +136,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
      *                               work for it, so it approximates the pure transport
      *                               cost. (request rtt - heartbeat rtt) is roughly the
      *                               time your server handler took.
+     *   - hx.pingTest(n, gapMs)     console helper: n pings, one at a time. Prints
+     *                               min / median / max transport rtt and stores the
+     *                               median as the rtt baseline (it also runs once after
+     *                               every connect). Flat pings but a
+     *                               jumpy request rtt means the jitter is in the server's
+     *                               request path. Jumpy pings mean transport or the
+     *                               server's read loop.
      *   - "buffered NB"             ws.bufferedAmount right after send(). A value that
      *                               keeps growing means the connection cannot keep up.
      *   - rtt "n/a"                 response had no request id (server push) or the
@@ -103,7 +156,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
      *     Judge steady state: repeat the action 10 to 20 times and ignore hx1.
      *   - Numbers on 127.0.0.1 exclude real network latency. Add the real RTT of the
      *     link when estimating what remote users see.
-     *   - Open DevTools slows rendering, so "next paint" is pessimistic while it is open.
+     *   - "render" ends at a setTimeout queued from the rAF callback. That is right after
+     *     the frame was produced, not a guarantee that pixels reached the screen.
+     *   - Open DevTools slows rendering, so paint numbers are pessimistic while it is open.
      */
     let debug = true;
     let wsConnectStart = 0;
@@ -111,22 +166,46 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     const us = (from, to) => Math.round((to - from) * 1000);
     const fmtUs = (n) => n.toLocaleString('en-US') + 'µs';
-    const dbg = (...parts) => { if (debug) console.log('[hx]', ...parts); };
-    const perfLog = (...parts) => { if (debug) console.log('[hx-perf]', ...parts); };
+    let onPong = null; // set by pingTest() to receive pong arrival times
+    let warnedNoServerTime = false; // one-time hint when the rtt cannot be split
+    let pingBaselineUs = null;      // median pong rtt, set by pingTest(); see doc comment
 
-    // One summary line per received message, plus a late "next paint" line.
+    // [HH:MM:SS.mmm] in browser local time, for lining logs up with the server.
+    const getTimestamp = () => {
+        const now = new Date();
+        return now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
+    };
+
+    const dbg = (...parts) => { if (debug) console.log(`[hx ${getTimestamp()}]`, ...parts); };
+    const perfLog = (...parts) => { if (debug) console.log(`[hx-perf ${getTimestamp()}]`, ...parts); };
+
+    // One summary line per received message, plus a late "paint" line.
     const logResponse = (id, entry, perf, bytes) => {
         if (!debug) return;
 
         const label = id || 'push';
-        const rtt = entry
-            ? fmtUs(us(entry.tSend, perf.tRecv))
-            : 'n/a (untracked or already timed out)';
+        let rtt = 'n/a (untracked or already timed out)';
+        if (perf.rttUs !== null) {
+            rtt = fmtUs(perf.rttUs);
+
+            if (perf.serverUs !== null) {
+                // net = everything that is not the server's own work (see doc comment)
+                const netUs = Math.max(0, perf.rttUs - perf.serverUs);
+                rtt += ` = server ${fmtUs(perf.serverUs)} + net ${fmtUs(netUs)}`;
+            } else if (pingBaselineUs !== null) {
+                // Estimate: a ping's rtt is the transport cost, the rest is the server's work.
+                const serverEstUs = Math.max(0, perf.rttUs - pingBaselineUs);
+                rtt += ` ≈ ping-baseline ${fmtUs(pingBaselineUs)} + server-side ${fmtUs(serverEstUs)}`;
+            } else if (!warnedNoServerTime) {
+                warnedNoServerTime = true;
+                dbg('rtt cannot be split yet: no srv=<µs> in the _hx_req_id comment and no ping baseline (run hx.pingTest())');
+            }
+        }
 
         perfLog(
             `${label} ← ${perf.outcome}`,
             `| rtt ${rtt}`,
-            `| parse ${fmtUs(us(perf.tRecv, perf.tParsed))}`,
+            `| parse ${fmtUs(us(perf.tParseStart, perf.tParseEnd))}`,
             `| swap ${fmtUs(perf.swapUs)} (${perf.swapped} el)`,
             `| handler total ${fmtUs(us(perf.tRecv, perf.tEnd))}`,
             `| ${bytes} chars`
@@ -134,13 +213,81 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         if (perf.swapped > 0) {
             const tDone = perf.tEnd;
-            // rAF runs before paint; the timeout queued from it runs after the frame
-            // was produced, which approximates "visible on screen".
-            requestAnimationFrame(() => setTimeout(() => {
-                perfLog(`${label} next paint ≈ +${fmtUs(us(tDone, performance.now()))} after handler`);
-            }, 0));
+
+            // rAF fires at the next rendering opportunity (frame-wait ends here).
+            // The timeout queued from it runs once that frame was produced, so the
+            // span in between is style + layout + paint + commit (render).
+            requestAnimationFrame(() => {
+                const tFrame = performance.now();
+
+                setTimeout(() => {
+                    const tPainted = performance.now();
+
+                    perfLog(
+                        `${label} paint ≈ frame-wait ${fmtUs(us(tDone, tFrame))}`,
+                        `+ render ${fmtUs(us(tFrame, tPainted))}`,
+                        `= ${fmtUs(us(tDone, tPainted))} after handler`,
+                        ...(entry ? [
+                            `| felt ${fmtUs(us(entry.tStart, tPainted))} since action start`,
+                            `(${fmtUs(us(entry.tStart, tPainted) - us(tDone, tFrame))} without frame-wait)`
+                        ] : [])
+                    );
+                }, 0);
+            });
         }
     };
+
+    // Measures pure transport rtt: `count` pings, `gapMs` apart, one at a time.
+    // Run hx.pingTest() in the console. Resolves with the samples in µs.
+    // Compare with request rtt: flat pings + jumpy request rtt = jitter is in the
+    // server's request path, not in the network or the browser.
+    const pingTest = (count = 20, gapMs = 100) => new Promise((resolve) => {
+        const samples = [];
+        let guard = null;
+
+        const finish = () => {
+            clearTimeout(guard);
+            onPong = null;
+
+            if (samples.length > 0) {
+                const sorted = [...samples].sort((x, y) => x - y);
+                const medianUs = sorted[Math.floor(sorted.length / 2)];
+                pingBaselineUs = medianUs; // used to estimate server-side time in logResponse
+
+                perfLog(
+                    `pingTest ${samples.length}/${count}`,
+                    `| min ${fmtUs(sorted[0])}`,
+                    `| median ${fmtUs(medianUs)} (now the rtt baseline)`,
+                    `| max ${fmtUs(sorted[sorted.length - 1])}`
+                );
+            }
+            resolve(samples);
+        };
+
+        const sendOne = () => {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                dbg('pingTest: socket not open');
+                finish();
+                return;
+            }
+            guard = setTimeout(finish, 2000); // pong never came back
+            pingSentAt = performance.now();
+            ws.send('ping');
+        };
+
+        onPong = (tRecv) => {
+            clearTimeout(guard);
+            samples.push(us(pingSentAt, tRecv));
+
+            if (samples.length < count) {
+                setTimeout(sendOne, gapMs);
+            } else {
+                finish();
+            }
+        };
+
+        sendOne();
+    });
 
     // --- Event System ---
     const fireEvent = (name, detail = {}, options = {}) => {
@@ -210,7 +357,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (debug) {
             const t3 = performance.now();
             console.debug(
-                '[hx-perf]',
+                `[hx-perf ${getTimestamp()}]`,
                 `  swap #${id}`,
                 `| beforeSwap ${fmtUs(us(t0, t1))}`,
                 `| outerHTML ${fmtUs(us(t1, t2))}`,
@@ -246,6 +393,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             dbg(`connected to ${WS_URL} in ${fmtUs(us(wsConnectStart, performance.now()))}`);
             fireEvent('connected');
 
+            if (debug) pingTest(10, 20); // calibrates pingBaselineUs for the rtt estimate
+
             if (heartbeatInterval) clearInterval(heartbeatInterval);
             heartbeatInterval = setInterval(() => {
                 if (ws && ws.readyState === WebSocket.OPEN) {
@@ -260,21 +409,46 @@ document.addEventListener('DOMContentLoaded', (event) => {
             let html = event.data;
 
             if (html === 'pong') {
-                if (pingSentAt) dbg(`pong, heartbeat rtt ${fmtUs(us(pingSentAt, tRecv))}`);
+                if (onPong) {
+                    onPong(tRecv); // pingTest() is collecting samples and prints its own summary
+                } else if (pingSentAt) {
+                    dbg(`pong, heartbeat rtt ${fmtUs(us(pingSentAt, tRecv))}`);
+                }
                 return;
             }
 
-            const perf = { tRecv, tParsed: tRecv, tEnd: tRecv, swapUs: 0, swapped: 0, outcome: 'swap' };
             const bytes = html.length;
             let responseId = null;
-            let entry = null; // grabbed before retireRequest deletes it, needed for rtt
+            let entry = null; // grabbed before retireRequest deletes it, needed for rtt and felt time
+
+            const commentMatch = html.match(/^<!--\s*_hx_req_id:\s*(\S+?)(?:\s+srv=(\d+))?\s*-->\s*/);
+            if (commentMatch) {
+                responseId = commentMatch[1];
+                entry = pendingRequests.get(responseId) || null;
+            }
+
+            // Server-reported duration (µs), optional: <!-- _hx_req_id: hx4 srv=187 -->
+            const serverUs = commentMatch && commentMatch[2] !== undefined
+                ? Number(commentMatch[2])
+                : null;
+
+            // rtt is fixed here, before any parse / swap / listener runs, so browser
+            // work after the frame arrived can never leak into it.
+            const perf = {
+                tRecv,
+                rttUs: entry ? us(entry.tSend, tRecv) : null,
+                serverUs,
+                tParseStart: tRecv,
+                tParseEnd: tRecv,
+                tEnd: tRecv,
+                swapUs: 0,
+                swapped: 0,
+                outcome: 'swap'
+            };
 
             try {
-                const commentMatch = html.match(/^<!--\s*_hx_req_id:\s*(\S+)\s*-->\s*/);
                 if (commentMatch) {
-                    responseId = commentMatch[1];
                     html = html.slice(commentMatch[0].length);
-                    entry = pendingRequests.get(responseId) || null;
                 }
 
                 if (html.startsWith('unknown endpoint:')) {
@@ -284,9 +458,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     return;
                 }
 
+                perf.tParseStart = performance.now();
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
-                perf.tParsed = performance.now();
+                perf.tParseEnd = performance.now();
 
                 // Check for redirect
                 const redirectElement = temp.querySelector('[hx-redirect]');
@@ -520,6 +695,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         pendingRequests.set(id, {
             timerId,
+            tStart,
             tSend: 0, // set right before ws.send()
             element,
             endpoint,
@@ -793,6 +969,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         getCSRFToken,
         reconnect,          // force reconnect with fresh token
         setDebug: (on) => { debug = Boolean(on); },
+        pingTest,
         config: CONFIG,
         constants: HX
     };

@@ -14,7 +14,6 @@ require (
 	github.com/gofiber/fiber/v3 v3.4.0
 	github.com/tudorhulban/func-usage v0.0.8-0.20260215145502-4e5c84759bfa
 	github.com/tudorhulban/hxerrors v0.0.2-0.20260730145821-55e4d22a89bf
-	github.com/tudorhulban/hxhelpers v0.0.2-0.20260918114531-5650ce7d056f
 )
 
 require (
@@ -32,6 +31,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/savsgio/gotils v0.0.0-20250924091648-bce9a52d7761 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
+	github.com/tudorhulban/hxhelpers v0.0.3-0.20261016104008-ef202173279b // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.72.0 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
