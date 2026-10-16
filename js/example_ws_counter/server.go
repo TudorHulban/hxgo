@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"sync/atomic"
+	"time"
 
 	"github.com/TudorHulban/hxgo/helpers/ws"
 	"github.com/gofiber/contrib/v3/websocket"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/static"
+	"github.com/tudorhulban/hxhelpers"
 )
 
 type Server struct {
@@ -48,6 +50,8 @@ func NewServer() *Server {
 }
 
 func (s *Server) handleIncrement(c *ws.Client, message *ws.WSMessage) {
+	defer hxhelpers.TraceExitTime(time.Now())
+
 	html := fmt.Sprintf(
 		`<div id="counter">%d</div>`,
 		s.counter.Add(1),
